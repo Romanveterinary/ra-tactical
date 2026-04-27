@@ -1,0 +1,8 @@
+{
+  "name": "RA_MOBILE Tactical",
+  "short_name": "RA_Tactical",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RA_MOBILE v8.9 TACTICAL</title>
+    
+    <link rel="stylesheet" href="leaflet.css" />
+    <script src="leaflet.js"></script>
+    <script src="tf.min.js"></script>
+    <script src="coco-ssd.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css?v=8.9">
+    <style>
+        /* Стилі для ЕКО-БЛЕКАУТ режиму */
+        #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
+        .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
+        #eco-top { top: 0; left: 0; width: 100%; height: 15px; }
+        #eco-bottom { bottom: 0; left: 0; width: 100%; height: 15px; }
+        #eco-left { top: 0; left: 0; width: 15px; height: 100%; }
+        #eco-right { top: 0; right: 0; width: 15px; height: 100%; }
+        #eco-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        #eco-dist { font-size: 3rem; color: #4ade80; font-family: monospace; font-weight: bold; text-shadow: 0 0 5px #000; }
+        #eco-touch-area { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 80px; display: flex; align-items: center; justify-content: center; color: #222; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div id="side-menu" class="side-nav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v8.9</h3>
+        <hr style="border: 0.5px solid #222;">
+        <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
+        <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
+        <a href="#" onclick="showModule('mod-eye'); closeNav()">👁 ОПТИКА / ШІ</a>
+        <a href="#" onclick="showModule('mod-metal'); closeNav()">🧲 МЕТАЛОШУКАЧ</a>
+        <a href="#" onclick="showModule('mod-shield'); closeNav()">🛡 ЩИТ / СЕЙСМІКА</a>
+        <hr style="border: 0.5px solid #222; margin-top: 30px;">
+        <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; font-size: 1.3rem;">💥 ПРОТОКОЛ: ЗНИЩИТИ</a>
+    </div>
+
+    <div id="menu-trigger" onclick="openNav()">&#9776;</div>
+
+    <div id="tactical-hud">
+        <div class="hud-row">
+            <span id="gps-status">GPS: ПОШУК...</span>
+            <span id="stealth-status" class="stealth-danger">⚠️ РАДІОСЛІД</span>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <section id="mod-map" class="module active">
+            <div id="map-container"></div>
+            <div class="map-overlay-controls">
+                <button id="btn-del-last" class="map-btn" style="color:#f33;">✖ ОСТАННЯ ТОЧКА</button>
+                <button id="btn-clear-map" class="map-btn" style="color:#f33;">🗑 ОЧИСТИТИ ВСЕ</button>
+                <button id="btn-layer-toggle" class="map-btn">🗺 ШАР</button>
+                <button id="btn-cache-map" class="map-btn">💾 КЕШ 2х2 км</button>
+            </div>
+        </section>
+
+        <section id="mod-compass" class="module">
+            <div id="compass-container">
+                <div id="tc-ring"></div>
+                <div id="tc-arrow"></div>
+                
+                <div class="compass-data">
+                    <div id="tc-deg">0°</div>
+                    <div id="tc-dist">--- м</div>
+                    <div id="tc-coords-small">LAT: -- <br> LON: --</div>
+                    <div id="tc-acc" style="font-size: 0.7rem; color: #555; margin-top: 5px;">ТОЧН: --</div>
+                </div>
+            </div>
+            
+            <div id="route-info" style="text-align:center; color:#666; margin: 15px 0; font-weight: bold;">ЦІЛЬ: НЕМАЄ</div>
+
+            <div class="guide-panel">
+                <div class="flex-row">
+                    <button id="btn-guide-type" class="tactical-btn" style="flex:1; border-color:#555; color:#f1c40f;">РЕЖИМ: ПОШУК</button>
+                    <button id="btn-guide-audio" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;">ЗВУК: ВИМК</button>
+                </div>
+                <button id="btn-guide" class="tactical-btn" style="color:#558; border-color:#224;">ПОВОДИР: ВИМК</button>
+            </div>
+
+            <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
+
+            <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
+            <div id="cal-offset-info" style="text-align:center; margin-top:10px; font-size:0.8rem; color:#0cf;"></div>
+        </section>
+
+        <section id="mod-eye" class="module">
+            <div class="cam-box">
+                <video id="v-stream" autoplay playsinline muted></video>
+                <canvas id="proc-canvas" style="display:none;"></canvas>
+                <canvas id="ui-canvas"></canvas>
+                <div id="ai-stats">ШІ НЕ АКТИВНИЙ</div>
+            </div>
+            <div class="flex-row">
+                <button id="btn-cam" class="tactical-btn">🔴 КАМЕРА</button>
+                <button id="btn-ai-cam" class="tactical-btn">🤖 ШІ SCAN</button>
+            </div>
+            <div class="flex-row">
+                <button id="btn-ir" class="tactical-btn">🔭 ІЧ-ФІЛЬТР</button>
+                <button id="btn-scan" class="tactical-btn">📉 СЕЙСМІКА</button>
+            </div>
+            
+            <div class="control-group">
+                <label style="color:#0cf;">АСТРО-НАВІГАЦІЯ (ЯКЩО РЕБ ЗГЛУШИВ GPS)</label>
+                <p style="font-size:0.7rem; color:#aaa; margin-top:0;">Увімкніть камеру, наведіть перехрестя на об'єкт і натисніть кнопку.</p>
+                <div class="flex-row" style="margin-top: 10px;">
+                    <button id="btn-cal-sun" class="tactical-btn" style="color:#f1c40f; border-color:#880;">☀ СОНЦЕ</button>
+                    <button id="btn-cal-star" class="tactical-btn" style="color:#0cf; border-color:#048;">⭐ ПОЛЯРНА</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>ЧУТЛИВІСТЬ ШІ</label>
+                <input type="range" id="ai-sens" min="10" max="90" value="50">
+                <label>КАЛІБРУВАННЯ ДАЛЕКОМІРА</label>
+                <input type="range" id="ai-focal" min="0.5" max="2.5" step="0.1" value="1.0">
+                <label>ПОРІГ ІЧ-ФІЛЬТРА</label>
+                <input type="range" id="ir-sens" min="50" max="255" value="200">
+            </div>
+        </section>
+
+        <section id="mod-metal" class="module">
+            <h2>ДІД-КОП (МАГНІТОМЕТР)</h2>
+            <div id="mag-num">0 µT</div>
+            <div class="bar-bg"><div id="mag-bar" class="bar-fill"></div></div>
+            <button id="btn-metal-toggle" class="tactical-btn" style="color:#f33;">МЕТАЛОШУКАЧ: ВИМК</button>
+            <button id="btn-calibrate" class="tactical-btn">ОБНУЛИТИ ФОН</button>
+            <div class="control-group" style="margin-top: 20px;">
+                <label>ЧУТЛИВІСТЬ ДАТЧИКА</label>
+                <input type="range" id="sens-range" min="2" max="60" value="15">
+            </div>
+        </section>
+
+        <section id="mod-shield" class="module">
+            <h2>ЩИТ (СЕЙСМІКА ТЕЛЕФОНА)</h2>
+            <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
+            <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
+        </section>
+    </div>
+
+    <div id="eco-overlay">
+        <div id="eco-top" class="eco-edge"></div>
+        <div id="eco-bottom" class="eco-edge"></div>
+        <div id="eco-left" class="eco-edge"></div>
+        <div id="eco-right" class="eco-edge"></div>
+        
+        <div id="eco-touch-area" onclick="peekEco()">ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)</div>
+        
+        <div id="eco-content">
+            <div id="eco-dist">--- м</div>
+        </div>
+        
+        <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
+    </div>
+    
+    <script src="app.js?v=8.9"></script>
+</body>
+</html>
