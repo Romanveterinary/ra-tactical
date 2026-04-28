@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v8.9 TACTICAL</title>
+    <title>RA_MOBILE v9.0 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
     <script src="tf.min.js"></script>
     <script src="coco-ssd.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=8.9">
+    <link rel="stylesheet" href="style.css?v=9.0">
     <style>
         /* Стилі для ЕКО-БЛЕКАУТ режиму */
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
@@ -27,12 +27,11 @@
 <body>
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v8.9</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v9.0</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-eye'); closeNav()">👁 ОПТИКА / ШІ</a>
-        <a href="#" onclick="showModule('mod-metal'); closeNav()">🧲 МЕТАЛОШУКАЧ</a>
         <a href="#" onclick="showModule('mod-shield'); closeNav()">🛡 ЩИТ / СЕЙСМІКА</a>
         <hr style="border: 0.5px solid #222; margin-top: 30px;">
         <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; font-size: 1.3rem;">💥 ПРОТОКОЛ: ЗНИЩИТИ</a>
@@ -45,12 +44,16 @@
             <span id="gps-status">GPS: ПОШУК...</span>
             <span id="stealth-status" class="stealth-danger">⚠️ РАДІОСЛІД</span>
         </div>
+        <div class="hud-row" style="margin-top: 5px; font-size: 0.75rem;">
+            <span id="speed-val" style="color: var(--glow);">ШВИД: 0.0 км/г</span>
+        </div>
     </div>
 
     <div id="main-content">
         <section id="mod-map" class="module active">
             <div id="map-container"></div>
             <div class="map-overlay-controls">
+                <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;">✖ ОСТАННЯ ТОЧКА</button>
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;">🗑 ОЧИСТИТИ ВСЕ</button>
                 <button id="btn-layer-toggle" class="map-btn">🗺 ШАР</button>
@@ -60,8 +63,19 @@
 
         <section id="mod-compass" class="module">
             <div id="compass-container">
-                <div id="tc-ring"></div>
+                <div id="tc-ring">
+                    <div class="compass-mark" style="transform: translate(-50%, -50%) translateY(-135px); color: var(--danger);">N</div>
+                    <div class="compass-mark" style="transform: translate(-50%, -50%) translateY(135px);">S</div>
+                    <div class="compass-mark" style="transform: translate(-50%, -50%) translateX(135px);">E</div>
+                    <div class="compass-mark" style="transform: translate(-50%, -50%) translateX(-135px);">W</div>
+                    <div id="sun-mark" class="compass-mark" style="display:none; text-shadow: 0 0 10px #f1c40f;">☀</div>
+                </div>
+                
                 <div id="tc-arrow"></div>
+
+                <div id="clinometer-wrap">
+                    <div id="clino-bar"></div>
+                </div>
                 
                 <div class="compass-data">
                     <div id="tc-deg">0°</div>
@@ -122,18 +136,6 @@
             </div>
         </section>
 
-        <section id="mod-metal" class="module">
-            <h2>ДІД-КОП (МАГНІТОМЕТР)</h2>
-            <div id="mag-num">0 µT</div>
-            <div class="bar-bg"><div id="mag-bar" class="bar-fill"></div></div>
-            <button id="btn-metal-toggle" class="tactical-btn" style="color:#f33;">МЕТАЛОШУКАЧ: ВИМК</button>
-            <button id="btn-calibrate" class="tactical-btn">ОБНУЛИТИ ФОН</button>
-            <div class="control-group" style="margin-top: 20px;">
-                <label>ЧУТЛИВІСТЬ ДАТЧИКА</label>
-                <input type="range" id="sens-range" min="2" max="60" value="15">
-            </div>
-        </section>
-
         <section id="mod-shield" class="module">
             <h2>ЩИТ (СЕЙСМІКА ТЕЛЕФОНА)</h2>
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
@@ -156,6 +158,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=8.9"></script>
+    <script src="app.js?v=9.0"></script>
 </body>
 </html>
