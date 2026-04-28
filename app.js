@@ -4,7 +4,7 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => { 
         navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('[SW] Service Worker OK v8.9', reg.scope))
+            .then(reg => console.log('[SW] Service Worker OK v9.0', reg.scope))
             .catch(e => console.error('[SW] ПОМИЛКА:', e)); 
     });
 }
@@ -17,13 +17,17 @@ let currentPoint = null, lastGoodGPS = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
-let isMetalActive = false, magSensor = null, baseField = null;
 let aiModel = null, isAiLive = false;
 
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
 let isWalkCalibrating = false, walkStartPoint = null;
 let topoLayer = null, darkLayer = null, currentLayer = 'topo';
+
+// Змінні для мапи та сліду
+let isMapFollowing = true;
+let tracePoints = [];
+let traceLineLayer = null;
 
 let guideMode = false, guideType = 'search', navAudioEnabled = false;
 let lastVibroTime = 0, lastWarnTime = 0, lastGpsPing = 0;
@@ -58,24 +62,19 @@ function vibrateError() {
     if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
 }
 
-// НОВЕ: ПРОТОКОЛ ЗНИЩЕННЯ ДАНИХ
 function triggerDestroyProtocol() {
     if (confirm("УВАГА! ЗНИЩИТИ ВЕСЬ МАРШРУТ ТА ДАНІ ПРОГРАМИ?")) {
-        // 1. Зачистка масивів
-        routePoints = []; 
-        // 2. Оновлення мапи
+        routePoints = []; tracePoints = [];
         updateRoute();
-        // 3. Зачистка кешу браузера
+        if(traceLineLayer && map) map.removeLayer(traceLineLayer);
         localStorage.removeItem('savedRoute');
-        // 4. Очищення змінних
         currentBearing = null;
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         document.getElementById('tc-arrow').style.display = 'none';
         
-        // 5. Візуальне і тактильне підтвердження
         closeNav();
-        if(navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]); // Довга вібрація знищення
+        if(navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]); 
         alert("ДАНІ УСПІШНО ЗНИЩЕНО.");
     }
 }
@@ -144,6 +143,12 @@ function initMap() {
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(confirm("Додати точку маршруту?")) { routePoints.push(e.latlng); updateRoute(); }
         });
+        
+        map.on('dragstart', () => {
+            isMapFollowing = false;
+            document.getElementById('btn-follow').style.color = '#fff';
+        });
+
         const saved = localStorage.getItem('savedRoute');
         if(saved) { routePoints = JSON.parse(saved); updateRoute(); }
     } catch(e) {}
@@ -173,6 +178,12 @@ function updateRoute() {
     document.getElementById('route-info').innerText = `ЦІЛЬ: ТОЧКА 1 З ${routePoints.length}`;
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
+
+document.getElementById('btn-follow').onclick = () => {
+    isMapFollowing = true;
+    document.getElementById('btn-follow').style.color = '#4ade80';
+    if (lastGoodGPS && map) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]);
+};
 
 document.getElementById('btn-layer-toggle').onclick = () => {
     if(!map || !topoLayer || !darkLayer) return;
@@ -210,16 +221,41 @@ document.getElementById('btn-cache-map').onclick = async () => {
 // ==========================================
 // 5. GPS ТА ПОВОДИР
 // ==========================================
+function updateSunPosition(lat, lon) {
+    let sunAz = getSunAzimuth(lat, lon, new Date());
+    let sunMark = document.getElementById('sun-mark');
+    if(sunMark) {
+        sunMark.style.display = 'block';
+        sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; 
+    }
+}
+
 function initGPS() {
     if ('geolocation' in navigator) {
         navigator.geolocation.watchPosition(pos => {
             const { latitude: lat, longitude: lon, altitude: alt, accuracy: acc } = pos.coords;
             lastGoodGPS = { lat, lon };
             
+            // Швидкість
+            let speedKmH = pos.coords.speed ? (pos.coords.speed * 3.6).toFixed(1) : "0.0";
+            let speedEl = document.getElementById('speed-val');
+            if(speedEl) speedEl.innerText = `ШВИД: ${speedKmH} км/г`;
+            
             let coordsEl = document.getElementById('tc-coords-small');
             if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
             let accEl = document.getElementById('tc-acc');
             if(accEl) accEl.innerText = `ТОЧН: ${Math.round(acc)}м`;
+
+            // Малювання сліду
+            tracePoints.push([lat, lon]);
+            if(tracePoints.length > 25) tracePoints.shift();
+            if(map) {
+                if(traceLineLayer) map.removeLayer(traceLineLayer);
+                traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map);
+            }
+            
+            // Оновлення Сонця на компасі
+            updateSunPosition(lat, lon);
 
             let stat = document.getElementById('gps-status');
             if(acc > 150) {
@@ -231,13 +267,14 @@ function initGPS() {
             } else {
                 if(stat) { stat.innerText = "GPS: OK"; stat.style.color = "#4ade80"; }
                 isSignalLost = false;
-                if (guideMode && Date.now() - lastGpsPing > 3000 && !isEcoMode) { // Вимкнув пінг в ЕКО, щоб не заважав
+                if (guideMode && Date.now() - lastGpsPing > 3000 && !isEcoMode) {
                     if(navigator.vibrate) navigator.vibrate(30);
                     lastGpsPing = Date.now();
                 }
             }
 
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
+            if (isMapFollowing && !firstFix && map) map.panTo([lat, lon]);
 
             if(!userMarker && map && typeof L !== 'undefined') {
                 userMarker = L.marker([lat, lon], {
@@ -253,7 +290,6 @@ function initGPS() {
                 let distEl = document.getElementById('tc-dist');
                 if(distEl) distEl.innerText = Math.round(d) + " м";
                 
-                // Оновлюємо дистанцію для ЕКО режиму
                 let ecoDistEl = document.getElementById('eco-dist');
                 if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " м";
                 
@@ -327,12 +363,10 @@ function peekEco() {
     if (!isEcoMode || isEcoPeeking) return;
     isEcoPeeking = true;
     
-    // Показуємо контент
     document.getElementById('eco-content').style.opacity = '1';
-    document.getElementById('eco-touch-area').style.color = '#000'; // Ховаємо текст
+    document.getElementById('eco-touch-area').style.color = '#000';
     if(navigator.vibrate) navigator.vibrate(50);
     
-    // Ховаємо через 3 секунди
     clearTimeout(ecoPeekTimer);
     ecoPeekTimer = setTimeout(() => {
         document.getElementById('eco-content').style.opacity = '0';
@@ -353,16 +387,22 @@ window.addEventListener('deviceorientationabsolute', e => {
     let tri = document.getElementById('user-tri');
     if(tri) tri.style.transform = `rotate(${trueH}deg)`;
 
+    // Клінометр (Рівень нахилу)
+    let pitch = e.beta || 0;
+    let clinoBar = document.getElementById('clino-bar');
+    if(clinoBar) {
+        let boundedPitch = Math.max(-90, Math.min(90, pitch));
+        let percent = ((boundedPitch + 90) / 180) * 100;
+        clinoBar.style.bottom = (100 - percent) + '%';
+    }
+
     if (currentBearing !== null) {
         let relAngle = (currentBearing - trueH + 360) % 360;
         let arr = document.getElementById('tc-arrow');
         if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; }
 
-        // --- ЛОГІКА ЕКО-БЛЕКАУТУ (Рамка-компас) ---
         if (isEcoMode && isEcoPeeking) {
-            document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); // Скидаємо всі
-            
-            // Визначаємо куди світити (Толерантність 45 градусів на кожну сторону)
+            document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
             if (relAngle >= 315 || relAngle < 45) {
                 document.getElementById('eco-top').style.opacity = '1';
             } else if (relAngle >= 45 && relAngle < 135) {
@@ -374,7 +414,6 @@ window.addEventListener('deviceorientationabsolute', e => {
             }
         }
 
-        // --- ЛОГІКА ВІБРО-ПОВОДИРЯ (Працює завжди, навіть в ЕКО) ---
         if (guideMode && !isSignalLost) {
             const timeNow = Date.now();
             let absDiff = Math.abs((relAngle + 540) % 360 - 180); 
@@ -406,12 +445,6 @@ window.addEventListener('deviceorientationabsolute', e => {
         if (isEcoMode) document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
     }
 });
-
-document.getElementById('btn-cal-walk').onclick = () => {
-    if(!lastGoodGPS) return alert("Немає GPS!");
-    isWalkCalibrating = true; walkStartPoint = {...lastGoodGPS};
-    document.getElementById('btn-cal-walk').style.color = "#f33"; document.getElementById('btn-cal-walk').innerText = "ЙДІТЬ ПРЯМО...";
-};
 
 // ==========================================
 // 7. ОПТИКА, АСТРО-НАВІГАЦІЯ ТА ШІ
@@ -587,46 +620,7 @@ async function detectAI() {
 }
 
 // ==========================================
-// 8. МЕТАЛОШУКАЧ
-// ==========================================
-document.getElementById('btn-metal-toggle').onclick = async () => {
-    await initSensors(); isMetalActive = !isMetalActive;
-    let btn = document.getElementById('btn-metal-toggle');
-    btn.innerText = isMetalActive ? "МЕТАЛОШУКАЧ: УВІМК" : "МЕТАЛОШУКАЧ: ВИМК";
-    btn.style.color = isMetalActive ? "#4ade80" : "#f33"; btn.style.borderColor = isMetalActive ? "#050" : "#511";
-
-    if (isMetalActive) { baseField = null; startMag(); } 
-    else if (magSensor) { magSensor.stop(); magSensor = null; document.getElementById('mag-bar').style.width = "0%"; document.getElementById('mag-num').innerText = "0 µT"; if(gain) gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1); }
-};
-
-function startMag() {
-    if (!('Magnetometer' in window)) { vibrateError(); return document.getElementById('mag-num').innerText = "❌ БЛОКОВАНО HTTP/НЕМАЄ ДАТЧИКА"; }
-    try {
-        magSensor = new Magnetometer({frequency: 20});
-        magSensor.addEventListener('reading', () => {
-            let field = Math.sqrt(magSensor.x**2 + magSensor.y**2 + magSensor.z**2);
-            if (baseField === null) baseField = field;
-            let diff = Math.abs(field - baseField);
-            let threshold = parseInt(document.getElementById('sens-range').value);
-            
-            document.getElementById('mag-num').innerText = Math.round(diff) + " µT";
-            document.getElementById('mag-bar').style.width = Math.min((diff/threshold)*100, 100) + "%";
-            
-            if (diff > threshold && gain) {
-                gain.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.05);
-                osc.frequency.setTargetAtTime(400 + (diff * 5), audioCtx.currentTime, 0.05);
-                if(navigator.vibrate) navigator.vibrate(20);
-            } else if(gain) { gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1); }
-        });
-        magSensor.addEventListener('error', e => { document.getElementById('mag-num').innerText = "❌ ПОМИЛКА ДАТЧИКА"; vibrateError(); });
-        magSensor.start();
-    } catch(e) { document.getElementById('mag-num').innerText = "❌ ДОСТУП ЗАБОРОНЕНО"; vibrateError(); }
-}
-
-document.getElementById('btn-calibrate').onclick = () => { baseField = null; };
-
-// ==========================================
-// 9. ЩИТ ТА МАТЕМАТИКА
+// 8. ЩИТ ТА МАТЕМАТИКА
 // ==========================================
 document.getElementById('btn-shield').onclick = async () => { 
     await initSensors(); isShielded = !isShielded; 
