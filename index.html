@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v9.0 TACTICAL</title>
+    <title>RA_MOBILE v10.0 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
     <script src="tf.min.js"></script>
     <script src="coco-ssd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=9.1">
+    <link rel="stylesheet" href="style.css?v=10.0">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -24,17 +26,31 @@
     </style>
 </head>
 <body>
+    <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
+        <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
+        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:20px;">ВХІД</button>
+        <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;">❌ ДОСТУП ЗАБОРОНЕНО</div>
+    </div>
+
+    <div id="qr-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:11000; flex-direction:column; align-items:center; justify-content:center;">
+        <h3 style="color:#4ade80; margin-bottom:20px;">СКАЙНУЙТЕ МАРШРУТ</h3>
+        <div id="qrcode-box" style="background:#fff; padding:15px; border-radius:10px;"></div>
+        <button onclick="closeQR()" class="tactical-btn" style="width:200px; margin-top:30px; background:#333;">ЗАКРИТИ</button>
+    </div>
+
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v9.0</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.0</h3>
         <hr style="border: 0.5px solid #222;">
-        <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #f1c40f;">📖 ІНСТРУКЦІЯ</a>
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-eye'); closeNav()">👁 ОПТИКА / ШІ</a>
         <a href="#" onclick="showModule('mod-shield'); closeNav()">🛡 ЩИТ / СЕЙСМІКА</a>
+        <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #888;">📖 ІНСТРУКЦІЯ</a>
         <hr style="border: 0.5px solid #222; margin-top: 30px;">
-        <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; font-size: 1.3rem;">💥 ПРОТОКОЛ: ЗНИЩИТИ</a>
+        <a href="#" onclick="killApp()" style="color: #f1c40f; font-weight: bold;">🛑 ВИМКНУТИ ДОДАТОК</a>
+        <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; margin-top: 10px;">💥 ЗНИЩИТИ ДАНІ</a>
     </div>
 
     <div id="menu-trigger" onclick="openNav()">&#9776;</div>
@@ -50,52 +66,10 @@
     </div>
 
     <div id="main-content">
-        <section id="mod-manual" class="module active">
-            <h2 style="color: var(--glow); text-align: center; margin-bottom: 10px;">ТАКТИЧНИЙ МАНУАЛ</h2>
-            <div class="manual-content">
-                <p><b>RA_MOBILE</b> — автономний навігаційно-тактичний комплекс. Не випромінює сигналів, працює без інтернету.</p>
-                
-                <h3>⚙️ БАЗОВА ПІДГОТОВКА (З ІНТЕРНЕТОМ!)</h3>
-                <ul>
-                    <li>Відкрийте програму через іконку на екрані.</li>
-                    <li>Обов'язково надайте дозвіл на <b>Камеру</b> та <b>GPS</b>.</li>
-                    <li>Зайдіть у вкладку <span class="manual-highlight">👁 ОПТИКА / ШІ</span> та натисніть <b>🤖 ШІ SCAN</b>. Дочекайтеся розпізнавання будь-якого об'єкта (це збереже нейромережу в пам'ять).</li>
-                    <li>Все. Можна вмикати Авіарежим.</li>
-                </ul>
-
-                <h3>📍 МАРШРУТ ТА МАПА</h3>
-                <ul>
-                    <li><b>Подвійний тап по мапі:</b> поставити точку маршруту.</li>
-                    <li><b>🎯 СЛІДКУВАТИ:</b> мапа автоматично рухається за вами.</li>
-                    <li><b>Блакитний пунктир:</b> слід ваших останніх 50 метрів руху.</li>
-                    <li><b>💾 КЕШ 2х2 км:</b> зберігає мапу квадрата для офлайн роботи (потрібен інтернет).</li>
-                </ul>
-
-                <h3>🧭 КОМПАС ТА ПОВОДИР</h3>
-                <ul>
-                    <li><b>Стрілка</b> завжди вказує на наступну ціль.</li>
-                    <li><b>Клінометр (шкала збоку):</b> показує рівень нахилу телефону. Тримайте горизонтально для точності!</li>
-                    <li><span class="manual-highlight">☀ Мітка Сонця:</span> показує, де зараз має бути сонце. Якщо не збігається з небом — ваш GPS заглушено або підмінено РЕБом!</li>
-                    <li><b>🌑 ЕКО-БЛЕКАУТ:</b> вимикає екран для маскування. Торкніться екрана, щоб підсвітити край, куди треба повернути.</li>
-                    <li><b>ПОВОДИР:</b> вібрує, коли ви дивитесь на ціль (Пошук) або коли відхиляєтесь від курсу (Коридор).</li>
-                </ul>
-
-                <h3>👁 ОПТИКА / ШІ ТА АСТРО-НАВІГАЦІЯ</h3>
-                <ul>
-                    <li><b>🤖 ШІ SCAN:</b> розпізнає людей (зелений) та техніку (червоний) + рахує дистанцію.</li>
-                    <li><b>АСТРО-КОРЕКЦІЯ:</b> якщо РЕБ заглушив GPS, наведіть перехрестя камери на Сонце або Полярну зірку і натисніть кнопку. Компас відновиться на основі гіроскопа.</li>
-                </ul>
-
-                <h3 class="manual-danger">💥 ПРОТОКОЛ: ЗНИЩИТИ</h3>
-                <ul>
-                    <li>Миттєво видаляє весь маршрут і сліди перебування з пам'яті телефону.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="mod-map" class="module">
+        <section id="mod-map" class="module active">
             <div id="map-container"></div>
             <div class="map-overlay-controls">
+                <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;">✖ ОСТАННЯ ТОЧКА</button>
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;">🗑 ОЧИСТИТИ ВСЕ</button>
@@ -113,13 +87,8 @@
                     <div class="compass-mark" style="transform: translate(-50%, -50%) translateX(-135px);">W</div>
                     <div id="sun-mark" class="compass-mark" style="display:none; text-shadow: 0 0 10px #f1c40f;">☀</div>
                 </div>
-                
                 <div id="tc-arrow"></div>
-
-                <div id="clinometer-wrap">
-                    <div id="clino-bar"></div>
-                </div>
-                
+                <div id="clinometer-wrap"><div id="clino-bar"></div></div>
                 <div class="compass-data">
                     <div id="tc-deg">0°</div>
                     <div id="tc-dist">--- м</div>
@@ -139,7 +108,6 @@
             </div>
 
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
-
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
             <div id="cal-offset-info" style="text-align:center; margin-top:10px; font-size:0.8rem; color:#0cf;"></div>
         </section>
@@ -151,9 +119,11 @@
                 <canvas id="ui-canvas"></canvas>
                 <div id="ai-stats">ШІ НЕ АКТИВНИЙ</div>
             </div>
+            <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;">📥 СКАЙНУВАТИ QR-МАРШРУТ</button>
+            
             <div class="flex-row">
-                <button id="btn-cam" class="tactical-btn">🔴 КАМЕРА</button>
-                <button id="btn-ai-cam" class="tactical-btn">🤖 ШІ SCAN</button>
+                <button id="btn-cam" class="tactical-btn" style="margin-top:0;">🔴 КАМЕРА</button>
+                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;">🤖 ШІ SCAN</button>
             </div>
             <div class="flex-row">
                 <button id="btn-ir" class="tactical-btn">🔭 ІЧ-ФІЛЬТР</button>
@@ -161,21 +131,15 @@
             </div>
             
             <div class="control-group">
-                <label style="color:#0cf;">АСТРО-НАВІГАЦІЯ (ЯКЩО РЕБ ЗГЛУШИВ GPS)</label>
-                <p style="font-size:0.7rem; color:#aaa; margin-top:0;">Увімкніть камеру, наведіть перехрестя на об'єкт і натисніть кнопку.</p>
+                <label style="color:#0cf;">АСТРО-НАВІГАЦІЯ (Анти-РЕБ)</label>
                 <div class="flex-row" style="margin-top: 10px;">
-                    <button id="btn-cal-sun" class="tactical-btn" style="color:#f1c40f; border-color:#880;">☀ СОНЦЕ</button>
-                    <button id="btn-cal-star" class="tactical-btn" style="color:#0cf; border-color:#048;">⭐ ПОЛЯРНА</button>
+                    <button id="btn-cal-sun" class="tactical-btn" style="color:#f1c40f; border-color:#880; margin-top:0;">☀ СОНЦЕ</button>
+                    <button id="btn-cal-star" class="tactical-btn" style="color:#0cf; border-color:#048; margin-top:0;">⭐ ПОЛЯРНА</button>
                 </div>
             </div>
-
             <div class="control-group">
                 <label>ЧУТЛИВІСТЬ ШІ</label>
                 <input type="range" id="ai-sens" min="10" max="90" value="50">
-                <label>КАЛІБРУВАННЯ ДАЛЕКОМІРА</label>
-                <input type="range" id="ai-focal" min="0.5" max="2.5" step="0.1" value="1.0">
-                <label>ПОРІГ ІЧ-ФІЛЬТРА</label>
-                <input type="range" id="ir-sens" min="50" max="255" value="200">
             </div>
         </section>
 
@@ -183,6 +147,33 @@
             <h2>ЩИТ (СЕЙСМІКА ТЕЛЕФОНА)</h2>
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
+        </section>
+
+        <section id="mod-manual" class="module">
+            <h2 style="color: var(--glow); text-align: center; margin-bottom: 10px;">ТАКТИЧНИЙ МАНУАЛ (v10)</h2>
+            <div class="manual-content">
+                <p><b>RA_MOBILE</b> — автономний Стелс-навігатор.</p>
+                <h3>📍 МАРШРУТ ТА МАПА</h3>
+                <ul>
+                    <li><b>Додати точку:</b> подвійний тап по мапі.</li>
+                    <li><b>Передати маршрут (QR):</b> натисніть '📤 ПЕРЕДАТИ QR' на мапі. Ваш побратим має відкрити '👁 ОПТИКА', увімкнути камеру і натиснути '📥 СКАЙНУВАТИ QR'.</li>
+                    <li><b>🎯 СЛІДКУВАТИ:</b> автоцентрування мапи.</li>
+                    <li><b>💾 КЕШ:</b> зберігає квадрат для офлайну.</li>
+                </ul>
+                <h3>🧭 КОМПАС ТА ПОВОДИР</h3>
+                <ul>
+                    <li><b>🌑 ЕКО-БЛЕКАУТ:</b> вимикає екран. Дотик підсвічує край екрана для вказівки курсу.</li>
+                    <li><span class="manual-highlight">☀ Мітка Сонця:</span> звірка з реальним сонцем для виявлення спуфінгу РЕБ.</li>
+                </ul>
+                <h3 class="manual-danger">🛑 ВИМКНУТИ ДОДАТОК</h3>
+                <ul>
+                    <li>Повністю зупиняє всі датчики та фон програми для економії батареї.</li>
+                </ul>
+                <h3 class="manual-danger">💥 ПРОТОКОЛ: ЗНИЩИТИ</h3>
+                <ul>
+                    <li>Миттєво зачищає маршрут з пам'яті телефону.</li>
+                </ul>
+            </div>
         </section>
     </div>
 
@@ -196,37 +187,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=9.1"></script>
+    <script src="app.js?v=10.0"></script>
 </body>
 </html>
-/* ІНСТРУКЦІЯ (МАНУАЛ) */
-.manual-content {
-    color: #ccc;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    padding-bottom: 40px;
-}
-.manual-content h3 { 
-    color: var(--accent); 
-    margin: 25px 0 10px; 
-    border-bottom: 1px solid #333; 
-    padding-bottom: 5px;
-    font-size: 1.1rem;
-}
-.manual-content ul { 
-    padding-left: 20px; 
-    margin-bottom: 15px; 
-}
-.manual-content li { 
-    margin-bottom: 10px; 
-}
-.manual-content b { 
-    color: #fff; 
-}
-.manual-highlight { 
-    color: var(--glow); 
-    font-weight: bold; 
-}
-.manual-danger { 
-    color: var(--danger) !important; 
-}
