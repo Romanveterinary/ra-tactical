@@ -1,25 +1,22 @@
 // ==========================================
 // 0. СИСТЕМА БЕЗПЕКИ ТА АВТОРИЗАЦІЯ
 // ==========================================
-const SECRET_PIN = "4567"; // ТУТ МОЖЕШ ЗМІНИТИ ПАРОЛЬ
+const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 
 function checkPin() {
     let input = document.getElementById('pin-input').value;
     if (input === SECRET_PIN) {
         document.getElementById('pin-screen').style.display = 'none';
-        initSystem(); // Запуск програми тільки після пароля
+        initSystem(); 
     } else {
         pinAttempts++;
         document.getElementById('pin-error').style.display = 'block';
         if(navigator.vibrate) navigator.vibrate([100, 100, 100]);
-        if (pinAttempts >= 3) {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:40vh; font-family:monospace;'>404 NOT FOUND</h1>";
-        }
+        if (pinAttempts >= 3) document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:40vh; font-family:monospace;'>404 NOT FOUND</h1>";
     }
 }
 
-// PWA ОФЛАЙН РЕЖИМ
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => { 
         navigator.serviceWorker.register('sw.js').catch(e => console.error('[SW] Error:', e)); 
@@ -35,6 +32,7 @@ let hardwareHeading = 0, compassOffset = 0, currentBearing = null;
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
+let currentVideoTrack = null; // Для зуму камери
 
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
@@ -48,7 +46,7 @@ let traceLineLayer = null;
 let guideMode = false, guideType = 'search', navAudioEnabled = false;
 let lastVibroTime = 0, lastWarnTime = 0, lastGpsPing = 0;
 let isSignalLost = true, firstFix = true;
-let lastGpsProcessTime = 0; // Для розумного пінгу
+let lastGpsProcessTime = 0; 
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 
@@ -62,31 +60,25 @@ function initSystem() {
     try{initMap();}catch(e){} 
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
-    setInterval(traceVanishing, 3000); // Таймер зникнення сліду
+    setInterval(traceVanishing, 3000);
 }
 
 function checkStealthMode() {
     const statusEl = document.getElementById('stealth-status');
     if(!statusEl) return;
-    if (navigator.onLine) {
-        statusEl.innerText = "⚠️ РАДІОСЛІД"; statusEl.className = "stealth-danger";
-    } else {
-        statusEl.innerText = "[ СТЕЛС АКТИВНО ]"; statusEl.className = "stealth-safe";
-    }
+    if (navigator.onLine) { statusEl.innerText = "⚠️ РАДІОСЛІД"; statusEl.className = "stealth-danger"; } 
+    else { statusEl.innerText = "[ СТЕЛС АКТИВНО ]"; statusEl.className = "stealth-safe"; }
 }
 setInterval(checkStealthMode, 1000); 
 
 document.addEventListener("visibilitychange", () => { if (document.hidden) turnOffCamera(); });
-
 function vibrateError() { if (navigator.vibrate) navigator.vibrate([300, 100, 300]); }
 
-// ПРОТОКОЛ ЗНИЩЕННЯ ДАНИХ
 function triggerDestroyProtocol() {
     if (confirm("УВАГА! ЗНИЩИТИ ВЕСЬ МАРШРУТ ТА ДАНІ ПРОГРАМИ?")) {
         routePoints = []; tracePoints = []; updateRoute();
         if(traceLineLayer && map) map.removeLayer(traceLineLayer);
-        localStorage.removeItem('savedRoute');
-        currentBearing = null;
+        localStorage.removeItem('savedRoute'); currentBearing = null;
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         document.getElementById('tc-arrow').style.display = 'none';
@@ -96,12 +88,11 @@ function triggerDestroyProtocol() {
     }
 }
 
-// ЗУПИНКА ДОДАТКУ (Збереження енергії)
 function killApp() {
-    if (confirm("ВИМКНУТИ ДОДАТОК? Це зупинить всі датчики та зекономить батарею.")) {
+    if (confirm("ВИМКНУТИ ДОДАТОК?")) {
         if(watchId) navigator.geolocation.clearWatch(watchId);
         turnOffCamera();
-        document.body.innerHTML = "<div style='color:#555; text-align:center; margin-top:40vh; font-family:monospace; font-size:1.5rem;'>СИСТЕМА ЗУПИНЕНА<br><br><span style='font-size:0.8rem;'>Закрийте вкладку браузера</span></div>";
+        document.body.innerHTML = "<div style='color:#555; text-align:center; margin-top:40vh; font-family:monospace; font-size:1.5rem;'>СИСТЕМА ЗУПИНЕНА</div>";
     }
 }
 
@@ -121,12 +112,13 @@ function showModule(id) {
 function turnOffCamera() {
     try {
         const v = document.getElementById('v-stream');
-        if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; }
+        if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; currentVideoTrack = null; }
     } catch(e) {}
     isAiLive = false; isScanning = false; isScanningQR = false;
     let btnCam = document.getElementById('btn-cam'); if(btnCam) btnCam.innerText = "🔴 КАМЕРА";
     let btnAiCam = document.getElementById('btn-ai-cam'); if(btnAiCam) { btnAiCam.innerText = "🤖 ШІ SCAN"; btnAiCam.style.color = "#fff"; }
     let btnScanQR = document.getElementById('btn-scan-qr'); if(btnScanQR) btnScanQR.style.color = "#0cf";
+    let btnScan = document.getElementById('btn-scan'); if(btnScan) { btnScan.innerText = "📉 ДЕТЕКТОР РУХУ"; btnScan.style.color = "#fff"; }
     let aiStats = document.getElementById('ai-stats'); if(aiStats) aiStats.innerText = "ШІ НЕ АКТИВНИЙ";
     const canvas = document.getElementById('ui-canvas');
     if(canvas) canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
@@ -147,16 +139,21 @@ function playNavTone(freq, duration) {
     if (!audioCtx || (!navAudioEnabled && !shieldSound)) return;
     try {
         let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination);
-        o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
-        o.start(); g.gain.setTargetAtTime(0, audioCtx.currentTime + duration/1000, 0.05);
-        setTimeout(() => o.stop(), duration + 100);
+        o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
+        o.start(); g.gain.setTargetAtTime(0, audioCtx.currentTime + duration/1000, 0.05); setTimeout(() => o.stop(), duration + 100);
     } catch(e) {}
 }
 
 // ==========================================
 // 4. МАПА, QR ТА СЛІД
 // ==========================================
+function toggleMapMenu() {
+    const m = document.getElementById('map-controls-panel');
+    const btn = document.getElementById('btn-map-menu');
+    if (m.style.display === 'none') { m.style.display = 'flex'; btn.style.color = '#0cf'; btn.style.borderColor = '#0cf'; } 
+    else { m.style.display = 'none'; btn.style.color = '#fff'; btn.style.borderColor = '#333'; }
+}
+
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
@@ -188,22 +185,16 @@ function updateRoute() {
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         document.getElementById('tc-arrow').style.display = 'none';
-        currentBearing = null; localStorage.removeItem('savedRoute');
-        return;
+        currentBearing = null; localStorage.removeItem('savedRoute'); return;
     }
 
-    routePoints.forEach((p, i) => {
-        let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : '#f0f', radius: 8, fillOpacity: 1 }).addTo(map);
-        routeMarkers.push(m);
-    });
-
+    routePoints.forEach((p, i) => { let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : '#f0f', radius: 8, fillOpacity: 1 }).addTo(map); routeMarkers.push(m); });
     if(routePoints.length > 1) { routeLine = L.polyline(routePoints, { color: '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); }
     document.getElementById('route-info').innerText = `ЦІЛЬ: ТОЧКА 1 З ${routePoints.length}`;
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
 
 function traceVanishing() {
-    // Якщо слід є, і з моменту останнього руху пройшло більше 5 секунд — слід тане
     if (tracePoints.length > 0 && (Date.now() - lastGpsProcessTime > 5000)) {
         tracePoints.shift();
         if(traceLineLayer && map) {
@@ -213,7 +204,7 @@ function traceVanishing() {
     }
 }
 
-// --- QR ЛОГІКА ---
+// ПРАВИЛЬНА ГЕНЕРАЦІЯ QR
 document.getElementById('btn-share-qr').onclick = () => {
     if (routePoints.length === 0) return alert("Немає точок для передачі!");
     let data = JSON.stringify(routePoints.map(p => [p.lat, p.lng]));
@@ -221,14 +212,15 @@ document.getElementById('btn-share-qr').onclick = () => {
     if(typeof QRCode !== 'undefined') {
         new QRCode(document.getElementById('qrcode-box'), { text: data, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
         document.getElementById('qr-modal').style.display = 'flex';
-    } else { alert("Бібліотека QR не завантажена. Потрібен інтернет для першого запуску."); }
+        toggleMapMenu(); // ховаємо меню
+    } else { alert("Помилка генератора QR. Перевірте з'єднання при першому запуску."); }
 };
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
-    if (typeof jsQR === 'undefined') return alert("Бібліотека сканера не завантажена.");
+    if (typeof jsQR === 'undefined') return alert("Бібліотека сканера відсутня.");
     
     isScanningQR = !isScanningQR;
     document.getElementById('btn-scan-qr').style.color = isScanningQR ? "#4ade80" : "#0cf";
@@ -241,8 +233,7 @@ function scanQRFrame() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         const canvas = document.createElement("canvas");
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext("2d"); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
         
@@ -250,15 +241,13 @@ function scanQRFrame() {
             try {
                 let pts = JSON.parse(code.data);
                 if (Array.isArray(pts)) {
-                    routePoints = pts.map(p => L.latLng(p[0], p[1]));
-                    updateRoute();
+                    routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
                     isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
                     alert("МАРШРУТ УСПІШНО ОТРИМАНО!");
-                    showModule('mod-map'); // Автоматично перекидаємо на мапу
-                    return;
+                    showModule('mod-map'); return;
                 }
-            } catch(e) { console.log("QR parse fail"); }
+            } catch(e) { console.log("QR error"); }
         }
     }
     requestAnimationFrame(scanQRFrame);
@@ -266,17 +255,18 @@ function scanQRFrame() {
 
 document.getElementById('btn-follow').onclick = () => {
     isMapFollowing = true; document.getElementById('btn-follow').style.color = '#4ade80';
-    if (lastGoodGPS && map) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]);
+    if (lastGoodGPS && map) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]); toggleMapMenu();
 };
 
 document.getElementById('btn-layer-toggle').onclick = () => {
     if(!map || !topoLayer || !darkLayer) return;
     if(currentLayer === 'topo') { map.removeLayer(topoLayer); darkLayer.addTo(map); currentLayer = 'dark'; }
     else { map.removeLayer(darkLayer); topoLayer.addTo(map); currentLayer = 'topo'; }
+    toggleMapMenu();
 };
 
-document.getElementById('btn-del-last').onclick = () => { if (routePoints.length > 0) { routePoints.pop(); updateRoute(); } };
-document.getElementById('btn-clear-map').onclick = () => { if (confirm("Видалити весь маршрут?")) { routePoints = []; updateRoute(); } };
+document.getElementById('btn-del-last').onclick = () => { if (routePoints.length > 0) { routePoints.pop(); updateRoute(); } toggleMapMenu(); };
+document.getElementById('btn-clear-map').onclick = () => { if (confirm("Видалити весь маршрут?")) { routePoints = []; updateRoute(); } toggleMapMenu(); };
 
 document.getElementById('btn-cache-map').onclick = async () => {
     if (!map || !lastGoodGPS) return alert("Немає GPS!");
@@ -290,7 +280,7 @@ document.getElementById('btn-cache-map').onclick = async () => {
         map.setView(origCenter, origZoom, {animate: false}); 
         btn.innerText = "КВАДРАТ ЗБЕРЕЖЕНО"; btn.style.color = "#4ade80";
         if(navigator.vibrate) navigator.vibrate(200);
-        setTimeout(() => { btn.innerText = "💾 КЕШ 2х2 км"; btn.style.color = "#fff"; }, 4000);
+        setTimeout(() => { btn.innerText = "💾 КЕШ 2х2 км"; btn.style.color = "#var(--glow)"; toggleMapMenu(); }, 4000);
     } catch(e) { btn.innerText = "ПОМИЛКА"; btn.style.color = "#f33"; vibrateError(); }
 };
 
@@ -307,24 +297,18 @@ function initGPS() {
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
-            // Розумний Пінг (Тротлінг): В ЕКО-режимі обробляємо дані не частіше ніж раз на 3 секунди
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return;
             lastGpsProcessTime = now;
 
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc } = pos.coords;
             lastGoodGPS = { lat, lon };
             
-            // Швидкість
             let speedKmH = spd ? (spd * 3.6).toFixed(1) : "0.0";
-            let speedEl = document.getElementById('speed-val');
-            if(speedEl) speedEl.innerText = `ШВИД: ${speedKmH} км/г`;
+            let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `ШВИД: ${speedKmH} км/г`;
             
-            let coordsEl = document.getElementById('tc-coords-small');
-            if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
-            let accEl = document.getElementById('tc-acc');
-            if(accEl) accEl.innerText = `ТОЧН: ${Math.round(acc)}м`;
+            let coordsEl = document.getElementById('tc-coords-small'); if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
+            let accEl = document.getElementById('tc-acc'); if(accEl) accEl.innerText = `ТОЧН: ${Math.round(acc)}м`;
 
-            // Малювання довгого сліду (до 50 крапок)
             tracePoints.push([lat, lon]);
             if(tracePoints.length > 50) tracePoints.shift();
             if(map) {
@@ -340,7 +324,7 @@ function initGPS() {
                 if(!isSignalLost) { if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); isSignalLost = true; }
             } else {
                 if(stat) { stat.innerText = "GPS: OK"; stat.style.color = "#4ade80"; }
-                if(isSignalLost) { if(navigator.vibrate) navigator.vibrate([100, 100, 100]); } // Швидке сповіщення про відновлення
+                if(isSignalLost) { if(navigator.vibrate) navigator.vibrate([100, 100, 100]); } 
                 isSignalLost = false;
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
@@ -357,9 +341,8 @@ function initGPS() {
                 let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " м";
                 let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " м";
                 
-                if(d <= 20) { 
-                    routePoints.shift(); updateRoute(); if(navigator.vibrate) navigator.vibrate([500,200,500]); 
-                } else { currentBearing = calcBearing(lat, lon, target.lat, target.lng); }
+                if(d <= 20) { routePoints.shift(); updateRoute(); if(navigator.vibrate) navigator.vibrate([500,200,500]); } 
+                else { currentBearing = calcBearing(lat, lon, target.lat, target.lng); }
             }
 
             if(isWalkCalibrating && walkStartPoint && map) {
@@ -378,38 +361,33 @@ function initGPS() {
             let stat = document.getElementById('gps-status');
             if(stat) { stat.innerText = "❌ GPS БЛОКОВАНО/ВТРАЧЕНО"; stat.style.color = "#f33"; }
             isSignalLost = true;
-        }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }); // timeout 5 сек для швидшої реакції на втрату
+        }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
     }
 }
 
+// КОМПАС ТА ПОВОДИР
 document.getElementById('btn-guide-type').onclick = () => {
     guideType = guideType === 'corridor' ? 'search' : 'corridor';
     let btn = document.getElementById('btn-guide-type');
     btn.innerText = guideType === 'corridor' ? "РЕЖИМ: КОРИДОР" : "РЕЖИМ: ПОШУК";
     btn.style.color = guideType === 'search' ? "#f1c40f" : "#ccc";
 };
-
 document.getElementById('btn-guide-audio').onclick = async () => {
     await initSensors(); navAudioEnabled = !navAudioEnabled;
     let btn = document.getElementById('btn-guide-audio');
     btn.innerText = navAudioEnabled ? "ЗВУК: УВІМК" : "ЗВУК: ВИМК"; btn.style.color = navAudioEnabled ? "#4ade80" : "#ccc";
 };
-
 document.getElementById('btn-guide').onclick = async () => { 
     await initSensors(); guideMode = !guideMode; 
     let btn = document.getElementById('btn-guide');
     btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558";
 };
 
-// ==========================================
-// 6. КОМПАС, ВІБРАЦІЯ ТА ЕКО-БЛЕКАУТ
-// ==========================================
 function toggleEcoMode(state) {
     isEcoMode = state; const overlay = document.getElementById('eco-overlay');
     if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); } 
     else { overlay.style.display = 'none'; isEcoPeeking = false; }
 }
-
 function peekEco() {
     if (!isEcoMode || isEcoPeeking) return;
     isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000';
@@ -433,10 +411,7 @@ window.addEventListener('deviceorientationabsolute', e => {
     let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${trueH}deg)`;
 
     let pitch = e.beta || 0; let clinoBar = document.getElementById('clino-bar');
-    if(clinoBar) {
-        let boundedPitch = Math.max(-90, Math.min(90, pitch));
-        clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%';
-    }
+    if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
 
     if (currentBearing !== null) {
         let relAngle = (currentBearing - trueH + 360) % 360;
@@ -455,15 +430,8 @@ window.addEventListener('deviceorientationabsolute', e => {
             const timeNow = Date.now();
             let absDiff = Math.abs((relAngle + 540) % 360 - 180); 
             if (guideType === 'corridor') {
-                if (absDiff <= 15) {
-                    if (timeNow - lastVibroTime > 30000) { 
-                        if (navigator.vibrate) navigator.vibrate([40, 100, 40]); playNavTone(800, 150); lastVibroTime = timeNow;
-                    }
-                } else {
-                    if (timeNow - lastWarnTime > 5000) { 
-                        if (navigator.vibrate) navigator.vibrate([150, 50, 150]); playNavTone(300, 300); lastWarnTime = timeNow;
-                    }
-                }
+                if (absDiff <= 15) { if (timeNow - lastVibroTime > 30000) { if (navigator.vibrate) navigator.vibrate([40, 100, 40]); playNavTone(800, 150); lastVibroTime = timeNow; } } 
+                else { if (timeNow - lastWarnTime > 5000) { if (navigator.vibrate) navigator.vibrate([150, 50, 150]); playNavTone(300, 300); lastWarnTime = timeNow; } }
             } else {
                 if (absDiff <= 7) { if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); playNavTone(1200, 50); lastVibroTime = timeNow; } } 
                 else if (absDiff <= 20) { if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); playNavTone(800, 50); lastVibroTime = timeNow; } } 
@@ -477,7 +445,7 @@ window.addEventListener('deviceorientationabsolute', e => {
 });
 
 // ==========================================
-// 7. ОПТИКА ТА ШІ
+// 7. ОПТИКА, ЗУМ ТА ШІ
 // ==========================================
 let prevFrame = null;
 function processCamera() {
@@ -505,7 +473,8 @@ function processCamera() {
             }
 
             if (irMode && !isAiLive) { 
-                uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height); let threshold = parseInt(document.getElementById('ir-sens') ? document.getElementById('ir-sens').value : 200);
+                uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height); 
+                let threshold = parseInt(document.getElementById('ir-sens') ? document.getElementById('ir-sens').value : 200);
                 for (let i = 0; i < currFrame.length; i += 8) {
                     if (currFrame[i] > threshold && currFrame[i+2] > threshold) {
                         uiCtx.strokeStyle = "red"; uiCtx.lineWidth = 2; uiCtx.strokeRect((i/4 % 128) * (uiCanvas.width/128), (i/4 / 128) * (uiCanvas.height/96), 10, 10);
@@ -546,12 +515,29 @@ document.getElementById('btn-cal-star').onclick = () => {
     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
 };
 
+// КАМЕРА ТА ЗУМ
 document.getElementById('btn-cam').onclick = async () => {
     await initSensors(); let btn = document.getElementById('btn-cam'); const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
     if (video.srcObject) { turnOffCamera(); } else { 
         btn.innerText = "ЗАПУСК...";
         try {
-            video.srcObject = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
+            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
+            video.srcObject = stream;
+            currentVideoTrack = stream.getVideoTracks()[0];
+            
+            // Налаштування зуму
+            setTimeout(() => {
+                const capabilities = currentVideoTrack.getCapabilities();
+                if (capabilities.zoom) {
+                    const zoomSlider = document.getElementById('cam-zoom');
+                    zoomSlider.min = capabilities.zoom.min;
+                    zoomSlider.max = capabilities.zoom.max;
+                    zoomSlider.step = capabilities.zoom.step;
+                    zoomSlider.value = currentVideoTrack.getSettings().zoom || 1;
+                    zoomSlider.oninput = (e) => { currentVideoTrack.applyConstraints({advanced: [{zoom: e.target.value}]}); };
+                }
+            }, 500);
+
             video.onloadedmetadata = () => { if(uiCanvas) { uiCanvas.width = video.clientWidth; uiCanvas.height = video.clientHeight; } };
             btn.innerText = "⏹ ВИМКНУТИ КАМЕРУ"; btn.style.color = "#f33";
         } catch(e) { btn.innerText = "❌ КАМЕРА БЛОКОВАНА"; vibrateError(); setTimeout(() => { btn.innerText = "🔴 КАМЕРА"; }, 3000); }
@@ -566,7 +552,7 @@ document.getElementById('btn-ir').onclick = () => {
 
 document.getElementById('btn-scan').onclick = () => { 
     isScanning = !isScanning; let btn = document.getElementById('btn-scan');
-    btn.innerText = isScanning ? "СЕЙСМІКА: УВІМК" : "СЕЙСМІКА: ВИМК"; btn.style.color = isScanning ? "#f33" : "#fff";
+    btn.innerText = isScanning ? "ДЕТЕКТОР РУХУ: УВІМК" : "ДЕТЕКТОР РУХУ: ВИМК"; btn.style.color = isScanning ? "#f33" : "#fff";
 };
 
 document.getElementById('btn-ai-cam').onclick = async () => {
@@ -588,13 +574,14 @@ async function detectAI() {
         const predictions = await aiModel.detect(video);
         if(uiCtx) uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
         let threshold = (document.getElementById('ai-sens') ? document.getElementById('ai-sens').value : 50) / 100;
+        let focal = (document.getElementById('ai-focal') ? document.getElementById('ai-focal').value : 1.0);
         let pCount = 0, vCount = 0;
         predictions.forEach(p => {
             if(p.score < threshold) return;
             if(p.class === 'person') pCount++;
             if(['car','truck','bus', 'motorcycle'].includes(p.class)) vCount++;
             if(p.class === 'person' || ['car','truck','bus', 'motorcycle'].includes(p.class)) {
-                const [x,y,w,h] = p.bbox; let realH = REAL_HEIGHTS[p.class] || 1.7; let dist = (realH * (video.videoHeight * 1.0)) / h;
+                const [x,y,w,h] = p.bbox; let realH = REAL_HEIGHTS[p.class] || 1.7; let dist = (realH * (video.videoHeight * focal)) / h;
                 let scaleX = uiCanvas.width / video.videoWidth; let scaleY = uiCanvas.height / video.videoHeight;
                 if(uiCtx) {
                     uiCtx.strokeStyle = p.class === 'person' ? "#0f0" : "#f33"; uiCtx.lineWidth = 3;
