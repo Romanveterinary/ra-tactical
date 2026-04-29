@@ -28,6 +28,9 @@ let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 
+// Запобіжник для стрибків на Півночі (360 -> 0)
+let previousTrueH = null, currentDisplayAngle = 0;
+
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
 let currentVideoTrack = null; 
@@ -159,22 +162,17 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
 
-        // НЕПРОБИВНА ЛОГІКА ДЛЯ APPLE (ІМІТАЦІЯ ДОВГОГО ТАПУ)
         let pressTimer;
-        map.on('mousedown', (e) => {
+        map.on('mousedown contextmenu', (e) => {
             pressTimer = setTimeout(() => {
                 if(routePoints.length >= 10) return alert("Максимум 10 точок!");
                 if(navigator.vibrate) navigator.vibrate(50);
                 routePoints.push(e.latlng); updateRoute();
-            }, 700); // 0.7 секунди утримання пальця
+            }, 700); 
         });
         
-        // Якщо палець поїхав по мапі або відпустив - скасовуємо таймер
-        map.on('mouseup mousemove dragstart', () => {
-            clearTimeout(pressTimer);
-        });
+        map.on('mouseup mousemove dragstart', () => { clearTimeout(pressTimer); });
 
-        // Залишаємо подвійний тап для Андроїдів
         map.on('dblclick', (e) => {
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(navigator.vibrate) navigator.vibrate(50);
@@ -380,7 +378,7 @@ function initGPS() {
     }
 }
 
-// КОМПАС (УНІВЕРСАЛЬНИЙ IOS/ANDROID)
+// КОМПАС (Анти-стрибок на Півночі)
 window.addEventListener('deviceorientationabsolute', handleOrientation);
 window.addEventListener('deviceorientation', handleOrientation);
 
@@ -396,11 +394,22 @@ function handleOrientation(e) {
     let trueH = (hardwareHeading + compassOffset) % 360;
     if (trueH < 0) trueH += 360;
     
-    let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
-    if(ring) ring.style.transform = `rotate(${-trueH}deg)`;
-    if(deg) deg.innerText = Math.round(trueH) + "°";
+    // Плавний перехід через 0 градусів
+    if (previousTrueH === null) { 
+        currentDisplayAngle = trueH; 
+    } else {
+        let delta = trueH - previousTrueH;
+        if (delta > 180) delta -= 360;
+        else if (delta < -180) delta += 360;
+        currentDisplayAngle += delta;
+    }
+    previousTrueH = trueH;
     
-    let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${trueH}deg)`;
+    let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
+    if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
+    if(deg) deg.innerText = Math.round(trueH) + "°"; // Текст показує нормальні 0-360
+    
+    let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
 
     let pitch = e.beta || 0; let clinoBar = document.getElementById('clino-bar');
     if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
