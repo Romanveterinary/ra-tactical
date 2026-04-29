@@ -28,8 +28,8 @@ let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 
-// Запобіжник для стрибків на Півночі (360 -> 0)
 let previousTrueH = null, currentDisplayAngle = 0;
+let usingAbsolute = false; // Запобіжник для датчиків
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -378,23 +378,31 @@ function initGPS() {
     }
 }
 
-// КОМПАС (Анти-стрибок на Півночі)
-window.addEventListener('deviceorientationabsolute', handleOrientation);
-window.addEventListener('deviceorientation', handleOrientation);
-
-function handleOrientation(e) {
-    if (e.webkitCompassHeading !== undefined) {
-        hardwareHeading = e.webkitCompassHeading; 
-    } else if (e.alpha !== null) {
-        hardwareHeading = 360 - e.alpha; 
-    } else {
-        return;
+// ==========================================
+// 6. КОМПАС (Без конфліктів)
+// ==========================================
+window.addEventListener('deviceorientationabsolute', e => {
+    if (e.alpha !== null) {
+        usingAbsolute = true;
+        processCompass(360 - e.alpha, e.beta);
     }
-    
+});
+
+window.addEventListener('deviceorientation', e => {
+    if (usingAbsolute) return; // ІГНОРУЄМО ЦЕЙ ДАТЧИК, ЯКЩО ПРАЦЮЄ АБСОЛЮТНИЙ!
+    if (e.webkitCompassHeading !== undefined) {
+        processCompass(e.webkitCompassHeading, e.beta);
+    } else if (e.alpha !== null) {
+        processCompass(360 - e.alpha, e.beta);
+    }
+});
+
+function processCompass(hHeading, pitch) {
+    hardwareHeading = hHeading;
     let trueH = (hardwareHeading + compassOffset) % 360;
     if (trueH < 0) trueH += 360;
     
-    // Плавний перехід через 0 градусів
+    // Плавний перехід
     if (previousTrueH === null) { 
         currentDisplayAngle = trueH; 
     } else {
@@ -407,12 +415,12 @@ function handleOrientation(e) {
     
     let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
     if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
-    if(deg) deg.innerText = Math.round(trueH) + "°"; // Текст показує нормальні 0-360
+    if(deg) deg.innerText = Math.round(trueH) + "°";
     
     let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
 
-    let pitch = e.beta || 0; let clinoBar = document.getElementById('clino-bar');
-    if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
+    let clinoBar = document.getElementById('clino-bar');
+    if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch || 0)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
 
     if (currentBearing !== null) {
         let relAngle = (currentBearing - trueH + 360) % 360;
