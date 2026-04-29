@@ -63,7 +63,7 @@ let traceLineLayer = null;
 let guideMode = false, guideType = 'search', navAudioEnabled = false;
 let lastVibroTime = 0, lastWarnTime = 0, lastGpsPing = 0;
 let isSignalLost = true, firstFix = true;
-let lastGpsProcessTime = 0; 
+let lastGpsProcessTime = Date.now(); 
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 
@@ -78,6 +78,16 @@ function initSystem() {
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
     setInterval(traceVanishing, 3000);
+    
+    // СТОРОЖОВИЙ ТАЙМЕР GPS (реагує за 3 секунди повної тиші)
+    setInterval(() => {
+        if (!isEcoMode && Date.now() - lastGpsProcessTime > 3000) {
+            let stat = document.getElementById('gps-status');
+            if (stat && stat.innerText === "GPS: OK") {
+                stat.innerText = "⚠️ GPS ЗАТРИМКА"; stat.style.color = "#f1c40f";
+            }
+        }
+    }, 1000);
 }
 
 function checkStealthMode() {
@@ -232,7 +242,6 @@ function traceVanishing() {
     }
 }
 
-// КНОПКИ МАПИ (ЯКІ БУЛИ ВТРАЧЕНІ)
 document.getElementById('btn-share-qr').onclick = () => {
     if (routePoints.length === 0) return alert("Немає точок для передачі!");
     let data = JSON.stringify(routePoints.map(p => [p.lat, p.lng]));
@@ -331,6 +340,8 @@ function initGPS() {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc } = pos.coords;
             
+            lastGpsProcessTime = now; // Оновлюємо таймер свіжості для Watchdog
+
             // МИТТЄВА ПЕРЕВІРКА СИГНАЛУ НА ВТРАТУ > 200М
             let stat = document.getElementById('gps-status');
             if(acc > 200) {
@@ -350,9 +361,8 @@ function initGPS() {
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            // ЕКО-РЕЖИМ ОБМЕЖЕННЯ (Тротлінг 3 сек для економії)
+            // ЕКО-РЕЖИМ ОБМЕЖЕННЯ (Тротлінг малювання 3 сек для економії екрана)
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return;
-            lastGpsProcessTime = now;
 
             lastGoodGPS = { lat, lon };
             
@@ -399,14 +409,15 @@ function initGPS() {
                 }
             }
         }, err => {
+            // МИТТЄВА РЕАКЦІЯ ПРИ ПОВНІЙ ВТРАТІ (TIMEOUT АБО ВИМКНЕНО ФІЗИЧНО)
             let stat = document.getElementById('gps-status');
-            if(stat) { stat.innerText = "❌ GPS БЛОКОВАНО/ВТРАЧЕНО"; stat.style.color = "#f33"; }
+            if(stat) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
             if(!isSignalLost) { 
                 if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
                 playNavTone(300, 500); 
                 isSignalLost = true; 
             }
-        }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
+        }, { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 }); // ТАЙМЕР ЗМЕНШЕНО ДО 2 СЕКУНД
     }
 }
 
