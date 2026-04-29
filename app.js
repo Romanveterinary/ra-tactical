@@ -159,7 +159,8 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
 
-        map.on('dblclick', (e) => {
+        // ДОДАНО: 'contextmenu' - це довгий тап на смартфонах
+        map.on('dblclick contextmenu', (e) => {
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(navigator.vibrate) navigator.vibrate(50);
             routePoints.push(e.latlng); updateRoute();
@@ -284,7 +285,6 @@ function updateSunPosition(lat, lon) {
     if(sunMark) { sunMark.style.display = 'block'; sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; }
 }
 
-// КАЛІБРУВАННЯ ПРОХОДОМ
 document.getElementById('btn-cal-walk').onclick = () => {
     if (!lastGoodGPS) return alert("Немає сигналу GPS!");
     isWalkCalibrating = true;
@@ -371,9 +371,9 @@ window.addEventListener('deviceorientation', handleOrientation);
 
 function handleOrientation(e) {
     if (e.webkitCompassHeading !== undefined) {
-        hardwareHeading = e.webkitCompassHeading; // iOS
+        hardwareHeading = e.webkitCompassHeading; 
     } else if (e.alpha !== null) {
-        hardwareHeading = 360 - e.alpha; // Android
+        hardwareHeading = 360 - e.alpha; 
     } else {
         return;
     }
