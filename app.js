@@ -159,8 +159,23 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
 
-        // ДОДАНО: 'contextmenu' - це довгий тап на смартфонах
-        map.on('dblclick contextmenu', (e) => {
+        // НЕПРОБИВНА ЛОГІКА ДЛЯ APPLE (ІМІТАЦІЯ ДОВГОГО ТАПУ)
+        let pressTimer;
+        map.on('mousedown', (e) => {
+            pressTimer = setTimeout(() => {
+                if(routePoints.length >= 10) return alert("Максимум 10 точок!");
+                if(navigator.vibrate) navigator.vibrate(50);
+                routePoints.push(e.latlng); updateRoute();
+            }, 700); // 0.7 секунди утримання пальця
+        });
+        
+        // Якщо палець поїхав по мапі або відпустив - скасовуємо таймер
+        map.on('mouseup mousemove dragstart', () => {
+            clearTimeout(pressTimer);
+        });
+
+        // Залишаємо подвійний тап для Андроїдів
+        map.on('dblclick', (e) => {
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(navigator.vibrate) navigator.vibrate(50);
             routePoints.push(e.latlng); updateRoute();
