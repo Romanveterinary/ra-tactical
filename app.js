@@ -18,9 +18,7 @@ function checkPin() {
 }
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => { 
-        navigator.serviceWorker.register('sw.js').catch(e => console.error('[SW] Error:', e)); 
-    });
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); });
 }
 
 // ==========================================
@@ -32,7 +30,7 @@ let hardwareHeading = 0, compassOffset = 0, currentBearing = null;
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
-let currentVideoTrack = null; // Для зуму камери
+let currentVideoTrack = null; 
 
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
@@ -148,8 +146,7 @@ function playNavTone(freq, duration) {
 // 4. МАПА, QR ТА СЛІД
 // ==========================================
 function toggleMapMenu() {
-    const m = document.getElementById('map-controls-panel');
-    const btn = document.getElementById('btn-map-menu');
+    const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
     if (m.style.display === 'none') { m.style.display = 'flex'; btn.style.color = '#0cf'; btn.style.borderColor = '#0cf'; } 
     else { m.style.display = 'none'; btn.style.color = '#fff'; btn.style.borderColor = '#333'; }
 }
@@ -204,16 +201,14 @@ function traceVanishing() {
     }
 }
 
-// ПРАВИЛЬНА ГЕНЕРАЦІЯ QR
 document.getElementById('btn-share-qr').onclick = () => {
     if (routePoints.length === 0) return alert("Немає точок для передачі!");
     let data = JSON.stringify(routePoints.map(p => [p.lat, p.lng]));
     document.getElementById('qrcode-box').innerHTML = '';
     if(typeof QRCode !== 'undefined') {
         new QRCode(document.getElementById('qrcode-box'), { text: data, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
-        document.getElementById('qr-modal').style.display = 'flex';
-        toggleMapMenu(); // ховаємо меню
-    } else { alert("Помилка генератора QR. Перевірте з'єднання при першому запуску."); }
+        document.getElementById('qr-modal').style.display = 'flex'; toggleMapMenu();
+    } else { alert("Помилка генератора QR."); }
 };
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
@@ -231,8 +226,7 @@ function scanQRFrame() {
     if (!isScanningQR) return;
     const video = document.getElementById('v-stream');
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        const canvas = document.createElement("canvas"); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         const ctx = canvas.getContext("2d"); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
@@ -244,10 +238,9 @@ function scanQRFrame() {
                     routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
                     isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-                    alert("МАРШРУТ УСПІШНО ОТРИМАНО!");
-                    showModule('mod-map'); return;
+                    alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); return;
                 }
-            } catch(e) { console.log("QR error"); }
+            } catch(e) {}
         }
     }
     requestAnimationFrame(scanQRFrame);
@@ -270,17 +263,15 @@ document.getElementById('btn-clear-map').onclick = () => { if (confirm("Вида
 
 document.getElementById('btn-cache-map').onclick = async () => {
     if (!map || !lastGoodGPS) return alert("Немає GPS!");
-    let btn = document.getElementById('btn-cache-map');
-    btn.innerText = "ЗАВАНТАЖЕННЯ..."; btn.style.color = "#f33";
+    let btn = document.getElementById('btn-cache-map'); btn.innerText = "ЗАВАНТАЖЕННЯ..."; btn.style.color = "#f33";
     try {
         const c = [lastGoodGPS.lat, lastGoodGPS.lon]; const offset = 0.012; 
         const pts = [ [c[0]+offset, c[1]+offset], [c[0]-offset, c[1]-offset], [c[0]+offset, c[1]-offset], [c[0]-offset, c[1]+offset] ];
         let origZoom = map.getZoom(); let origCenter = map.getCenter();
         for (let p of pts) { map.setView(p, 15, {animate: false}); await new Promise(r => setTimeout(r, 1500)); }
         map.setView(origCenter, origZoom, {animate: false}); 
-        btn.innerText = "КВАДРАТ ЗБЕРЕЖЕНО"; btn.style.color = "#4ade80";
-        if(navigator.vibrate) navigator.vibrate(200);
-        setTimeout(() => { btn.innerText = "💾 КЕШ 2х2 км"; btn.style.color = "#var(--glow)"; toggleMapMenu(); }, 4000);
+        btn.innerText = "КВАДРАТ ЗБЕРЕЖЕНО"; btn.style.color = "#4ade80"; if(navigator.vibrate) navigator.vibrate(200);
+        setTimeout(() => { btn.innerText = "💾 КЕШ 2х2 км"; btn.style.color = "var(--glow)"; toggleMapMenu(); }, 4000);
     } catch(e) { btn.innerText = "ПОМИЛКА"; btn.style.color = "#f33"; vibrateError(); }
 };
 
@@ -292,6 +283,16 @@ function updateSunPosition(lat, lon) {
     let sunMark = document.getElementById('sun-mark');
     if(sunMark) { sunMark.style.display = 'block'; sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; }
 }
+
+// КАЛІБРУВАННЯ ПРОХОДОМ
+document.getElementById('btn-cal-walk').onclick = () => {
+    if (!lastGoodGPS) return alert("Немає сигналу GPS!");
+    isWalkCalibrating = true;
+    walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
+    let calBtn = document.getElementById('btn-cal-walk');
+    if(calBtn) { calBtn.innerText = "ЙДІТЬ ПРЯМО (0 / 15м)"; calBtn.style.color = "#f1c40f"; }
+    if(navigator.vibrate) navigator.vibrate([100, 100]);
+};
 
 function initGPS() {
     if ('geolocation' in navigator) {
@@ -349,8 +350,7 @@ function initGPS() {
                 let d = map.distance([walkStartPoint.lat, walkStartPoint.lon], [lat, lon]);
                 let calBtn = document.getElementById('btn-cal-walk'); if(calBtn) calBtn.innerText = `ПРОЙДЕНО: ${Math.round(d)} / 15м`;
                 if(d >= 15) {
-                    compassOffset = (calcBearing(walkStartPoint.lat, walkStartPoint.lon, lat, lon) - (360 - hardwareHeading)) % 360;
-                    if(compassOffset < 0) compassOffset += 360;
+                    compassOffset = (calcBearing(walkStartPoint.lat, walkStartPoint.lon, lat, lon) - hardwareHeading + 360) % 360;
                     isWalkCalibrating = false;
                     if(calBtn) { calBtn.innerText = "КАЛІБР: ГОТОВО"; calBtn.style.color = "#4ade80"; }
                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -365,44 +365,21 @@ function initGPS() {
     }
 }
 
-// КОМПАС ТА ПОВОДИР
-document.getElementById('btn-guide-type').onclick = () => {
-    guideType = guideType === 'corridor' ? 'search' : 'corridor';
-    let btn = document.getElementById('btn-guide-type');
-    btn.innerText = guideType === 'corridor' ? "РЕЖИМ: КОРИДОР" : "РЕЖИМ: ПОШУК";
-    btn.style.color = guideType === 'search' ? "#f1c40f" : "#ccc";
-};
-document.getElementById('btn-guide-audio').onclick = async () => {
-    await initSensors(); navAudioEnabled = !navAudioEnabled;
-    let btn = document.getElementById('btn-guide-audio');
-    btn.innerText = navAudioEnabled ? "ЗВУК: УВІМК" : "ЗВУК: ВИМК"; btn.style.color = navAudioEnabled ? "#4ade80" : "#ccc";
-};
-document.getElementById('btn-guide').onclick = async () => { 
-    await initSensors(); guideMode = !guideMode; 
-    let btn = document.getElementById('btn-guide');
-    btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558";
-};
+// КОМПАС (УНІВЕРСАЛЬНИЙ IOS/ANDROID)
+window.addEventListener('deviceorientationabsolute', handleOrientation);
+window.addEventListener('deviceorientation', handleOrientation);
 
-function toggleEcoMode(state) {
-    isEcoMode = state; const overlay = document.getElementById('eco-overlay');
-    if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); } 
-    else { overlay.style.display = 'none'; isEcoPeeking = false; }
-}
-function peekEco() {
-    if (!isEcoMode || isEcoPeeking) return;
-    isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000';
-    if(navigator.vibrate) navigator.vibrate(50);
-    clearTimeout(ecoPeekTimer);
-    ecoPeekTimer = setTimeout(() => {
-        document.getElementById('eco-content').style.opacity = '0';
-        document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
-        document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false;
-    }, 3000);
-}
-
-window.addEventListener('deviceorientationabsolute', e => {
-    hardwareHeading = e.alpha || e.webkitCompassHeading || 0;
-    let trueH = (360 - hardwareHeading + compassOffset) % 360;
+function handleOrientation(e) {
+    if (e.webkitCompassHeading !== undefined) {
+        hardwareHeading = e.webkitCompassHeading; // iOS
+    } else if (e.alpha !== null) {
+        hardwareHeading = 360 - e.alpha; // Android
+    } else {
+        return;
+    }
+    
+    let trueH = (hardwareHeading + compassOffset) % 360;
+    if (trueH < 0) trueH += 360;
     
     let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
     if(ring) ring.style.transform = `rotate(${-trueH}deg)`;
@@ -442,7 +419,14 @@ window.addEventListener('deviceorientationabsolute', e => {
         let arr = document.getElementById('tc-arrow'); if (arr) arr.style.display = 'none';
         if (isEcoMode) document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
     }
-});
+}
+
+document.getElementById('btn-guide-type').onclick = () => { guideType = guideType === 'corridor' ? 'search' : 'corridor'; let btn = document.getElementById('btn-guide-type'); btn.innerText = guideType === 'corridor' ? "РЕЖИМ: КОРИДОР" : "РЕЖИМ: ПОШУК"; btn.style.color = guideType === 'search' ? "#f1c40f" : "#ccc"; };
+document.getElementById('btn-guide-audio').onclick = async () => { await initSensors(); navAudioEnabled = !navAudioEnabled; let btn = document.getElementById('btn-guide-audio'); btn.innerText = navAudioEnabled ? "ЗВУК: УВІМК" : "ЗВУК: ВИМК"; btn.style.color = navAudioEnabled ? "#4ade80" : "#ccc"; };
+document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558"; };
+
+function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
+function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
 
 // ==========================================
 // 7. ОПТИКА, ЗУМ ТА ШІ
@@ -506,16 +490,13 @@ function getSunAzimuth(lat, lon, date) {
 document.getElementById('btn-cal-sun').onclick = () => {
     if(!lastGoodGPS) return alert("Потрібні координати GPS!");
     let az = getSunAzimuth(lastGoodGPS.lat, lastGoodGPS.lon, new Date());
-    compassOffset = (az - (360 - hardwareHeading)) % 360; if(compassOffset < 0) compassOffset += 360;
-    if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    compassOffset = (az - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
 };
 
 document.getElementById('btn-cal-star').onclick = () => {
-    compassOffset = (0 - (360 - hardwareHeading)) % 360; if(compassOffset < 0) compassOffset += 360;
-    if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    compassOffset = (0 - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
 };
 
-// КАМЕРА ТА ЗУМ
 document.getElementById('btn-cam').onclick = async () => {
     await initSensors(); let btn = document.getElementById('btn-cam'); const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
     if (video.srcObject) { turnOffCamera(); } else { 
@@ -524,36 +505,23 @@ document.getElementById('btn-cam').onclick = async () => {
             const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
             video.srcObject = stream;
             currentVideoTrack = stream.getVideoTracks()[0];
-            
-            // Налаштування зуму
             setTimeout(() => {
                 const capabilities = currentVideoTrack.getCapabilities();
                 if (capabilities.zoom) {
                     const zoomSlider = document.getElementById('cam-zoom');
-                    zoomSlider.min = capabilities.zoom.min;
-                    zoomSlider.max = capabilities.zoom.max;
-                    zoomSlider.step = capabilities.zoom.step;
-                    zoomSlider.value = currentVideoTrack.getSettings().zoom || 1;
+                    zoomSlider.min = capabilities.zoom.min; zoomSlider.max = capabilities.zoom.max;
+                    zoomSlider.step = capabilities.zoom.step; zoomSlider.value = currentVideoTrack.getSettings().zoom || 1;
                     zoomSlider.oninput = (e) => { currentVideoTrack.applyConstraints({advanced: [{zoom: e.target.value}]}); };
                 }
             }, 500);
-
             video.onloadedmetadata = () => { if(uiCanvas) { uiCanvas.width = video.clientWidth; uiCanvas.height = video.clientHeight; } };
             btn.innerText = "⏹ ВИМКНУТИ КАМЕРУ"; btn.style.color = "#f33";
         } catch(e) { btn.innerText = "❌ КАМЕРА БЛОКОВАНА"; vibrateError(); setTimeout(() => { btn.innerText = "🔴 КАМЕРА"; }, 3000); }
     }
 };
 
-document.getElementById('btn-ir').onclick = () => {
-    irMode = !irMode; let btn = document.getElementById('btn-ir'); const video = document.getElementById('v-stream');
-    btn.innerText = irMode ? "ІЧ-ФІЛЬТР: УВІМК" : "ІЧ-ФІЛЬТР: ВИМК"; btn.style.color = irMode ? "#f33" : "#fff";
-    if(video) video.style.filter = irMode ? "contrast(3) brightness(0.4) grayscale(1)" : "none";
-};
-
-document.getElementById('btn-scan').onclick = () => { 
-    isScanning = !isScanning; let btn = document.getElementById('btn-scan');
-    btn.innerText = isScanning ? "ДЕТЕКТОР РУХУ: УВІМК" : "ДЕТЕКТОР РУХУ: ВИМК"; btn.style.color = isScanning ? "#f33" : "#fff";
-};
+document.getElementById('btn-ir').onclick = () => { irMode = !irMode; let btn = document.getElementById('btn-ir'); const video = document.getElementById('v-stream'); btn.innerText = irMode ? "ІЧ-ФІЛЬТР: УВІМК" : "ІЧ-ФІЛЬТР: ВИМК"; btn.style.color = irMode ? "#f33" : "#fff"; if(video) video.style.filter = irMode ? "contrast(3) brightness(0.4) grayscale(1)" : "none"; };
+document.getElementById('btn-scan').onclick = () => { isScanning = !isScanning; let btn = document.getElementById('btn-scan'); btn.innerText = isScanning ? "ДЕТЕКТОР РУХУ: УВІМК" : "ДЕТЕКТОР РУХУ: ВИМК"; btn.style.color = isScanning ? "#f33" : "#fff"; };
 
 document.getElementById('btn-ai-cam').onclick = async () => {
     const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
@@ -606,11 +574,7 @@ document.getElementById('btn-shield').onclick = async () => {
     btn.innerText = isShielded ? "ОХОРОНА АКТИВНА" : "АКТИВУВАТИ ЗАХИСТ";
 };
 
-document.getElementById('btn-shield-sound').onclick = async () => {
-    await initSensors(); shieldSound = !shieldSound; 
-    let btn = document.getElementById('btn-shield-sound');
-    btn.innerText = shieldSound ? "ЗВУК СИРЕНИ: УВІМК" : "ЗВУК СИРЕНИ: ВИМК"; btn.style.color = shieldSound ? "#4ade80" : "#fff";
-};
+document.getElementById('btn-shield-sound').onclick = async () => { await initSensors(); shieldSound = !shieldSound; let btn = document.getElementById('btn-shield-sound'); btn.innerText = shieldSound ? "ЗВУК СИРЕНИ: УВІМК" : "ЗВУК СИРЕНИ: ВИМК"; btn.style.color = shieldSound ? "#4ade80" : "#fff"; };
 
 window.addEventListener('devicemotion', e => {
     if (isShielded && e.accelerationIncludingGravity) {
