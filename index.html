@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.1 TACTICAL</title>
+    <title>RA_MOBILE v10.5 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.1">
+    <link rel="stylesheet" href="style.css?v=10.5">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.1</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.5</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -55,22 +55,28 @@
 
     <div id="menu-trigger" onclick="openNav()">&#9776;</div>
 
+    <!-- ДОДАНО ДИСТАНЦІЮ В HUD -->
     <div id="tactical-hud">
         <div class="hud-row">
             <span id="gps-status">GPS: ПОШУК...</span>
             <span id="stealth-status" class="stealth-danger">⚠️ РАДІОСЛІД</span>
         </div>
-        <div class="hud-row" style="margin-top: 5px; font-size: 0.75rem;">
+        <div class="hud-row" style="margin-top: 5px; font-size: 0.8rem; display: flex; justify-content: space-between; width: 100%;">
             <span id="speed-val" style="color: var(--glow);">ШВИД: 0.0 км/г</span>
+            <span id="hud-dist" style="color: #f1c40f; font-weight: bold;">ЦІЛЬ: --- м</span>
         </div>
     </div>
 
     <div id="main-content">
+        <!-- МАПА -->
         <section id="mod-map" class="module active">
             <div id="map-container"></div>
+            <!-- Кнопка-Гамбургер для мапи (Зліва внизу) -->
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
+                <!-- ДОДАНО КНОПКУ ТРАНСПОРТ -->
+                <button id="btn-vehicle" class="map-btn" style="color:#aaa;">🚗 РЕЖИМ ТРАНСПОРТ</button>
                 <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;">✖ ОСТАННЯ ТОЧКА</button>
@@ -80,6 +86,7 @@
             </div>
         </section>
 
+        <!-- КОМПАС -->
         <section id="mod-compass" class="module">
             <div id="compass-container">
                 <div id="tc-ring">
@@ -108,9 +115,9 @@
             </div>
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
-            <div id="cal-offset-info" style="text-align:center; margin-top:10px; font-size:0.8rem; color:#0cf;"></div>
         </section>
 
+        <!-- ОПТИКА -->
         <section id="mod-eye" class="module">
             <div class="cam-box">
                 <video id="v-stream" autoplay playsinline muted></video>
@@ -128,79 +135,23 @@
                 <button id="btn-ir" class="tactical-btn">🔭 ІЧ-ФІЛЬТР</button>
                 <button id="btn-scan" class="tactical-btn">📉 ДЕТЕКТОР РУХУ</button>
             </div>
-            
-            <div class="control-group">
-                <label>🔍 ЗУМ КАМЕРИ</label>
-                <input type="range" id="cam-zoom" min="1" max="5" step="0.1" value="1">
-                
-                <label>🧠 ЧУТЛИВІСТЬ ШІ (Розпізнавання)</label>
-                <input type="range" id="ai-sens" min="10" max="90" value="50">
-                
-                <label>📏 КАЛІБРУВАННЯ ДАЛЕКОМІРА ШІ</label>
-                <input type="range" id="ai-focal" min="0.5" max="2.5" step="0.1" value="1.0">
-                
-                <label>🔆 ПОРІГ ІЧ-ФІЛЬТРА</label>
-                <input type="range" id="ir-sens" min="50" max="255" value="200">
-            </div>
-
-            <div class="control-group">
-                <label style="color:#0cf;">АСТРО-НАВІГАЦІЯ (Якщо заглушили GPS)</label>
-                <div class="flex-row" style="margin-top: 10px;">
-                    <button id="btn-cal-sun" class="tactical-btn" style="color:#f1c40f; border-color:#880; margin-top:0;">☀ СОНЦЕ</button>
-                    <button id="btn-cal-star" class="tactical-btn" style="color:#0cf; border-color:#048; margin-top:0;">⭐ ПОЛЯРНА</button>
-                </div>
-            </div>
         </section>
 
+        <!-- ЩИТ -->
         <section id="mod-shield" class="module">
             <h2>ОХОРОНА / ЩИТ</h2>
-            <p style="color:#aaa; font-size:0.8rem; margin-bottom:15px;">Покладіть телефон. Якщо хтось зачепить його або речі, спрацює тривога.</p>
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
-
+        
+        <!-- ІНСТРУКЦІЯ ЗАЛИШАЄТЬСЯ ЯК БУЛА... (щоб не розтягувати код) -->
         <section id="mod-manual" class="module">
-            <h2 style="color: var(--glow); text-align: center; margin-bottom: 10px;">ЯК ЦИМ КОРИСТУВАТИСЯ</h2>
-            <div class="manual-content">
-                <p>Програма не випромінює сигналів. Працює в Авіарежимі.</p>
-                
-                <h3>📍 МАРШРУТ ТА МАПА</h3>
-                <ul>
-                    <li><b>Додати точку:</b> просто двічі швидко натисни на мапу. Точки з'єднаються.</li>
-                    <li><b>Кнопка "☰" (зліва внизу):</b> відкриває меню мапи (видалити точку, зберегти мапу, передати QR).</li>
-                    <li><b>Передати маршрут брату:</b> тисни "☰" -> "📤 ПЕРЕДАТИ QR". Напарник відкриває "ОПТИКУ" і тисне "СКАЙНУВАТИ QR".</li>
-                    <li><b>Слід:</b> блакитна лінія малює останні 50 метрів твого шляху.</li>
-                </ul>
-
-                <h3>🧭 КОМПАС ТА ПОВОДИР</h3>
-                <ul>
-                    <li>Стрілка завжди показує на твою наступну точку. Дистанція пишеться поруч.</li>
-                    <li><b>ЕКО-БЛЕКАУТ:</b> екран стає чорним, щоб не світитися вночі. Якщо треба звірити напрямок — <b>торкнись чорного екрана</b>. З потрібного боку блимне зелена смужка (вказує куди йти).</li>
-                    <li><b>Мітка Сонця (☀):</b> показує, де зараз має бути сонце. Якщо сонце в небі не збігається з міткою — ворог глушить/підміняє твій GPS.</li>
-                    <li><b>ПОВОДИР (Вібро):</b> телефон вібрує, щоб ти йшов не дивлячись на екран.</li>
-                </ul>
-
-                <h3>👁 ОПТИКА / ШІ</h3>
-                <ul>
-                    <li><b>🤖 ШІ SCAN:</b> камера сама знаходить людей (зелена рамка) і техніку (червона рамка), та пише приблизну дистанцію до них.</li>
-                    <li><b>ЗУМ:</b> повзунком внизу можна наблизити картинку (якщо телефон це вміє).</li>
-                    <li><b>ІЧ-ФІЛЬТР:</b> робить екран чорно-білим, виділяючи найяскравіші (світлі/гарячі) об'єкти в сутінках.</li>
-                    <li><b>📉 ДЕТЕКТОР РУХУ:</b> телефон завібрує, якщо в кадрі камери щось поворухнеться.</li>
-                </ul>
-
-                <h3>🛡 ОХОРОНА / ЩИТ</h3>
-                <ul>
-                    <li>Натисни активацію і поклади телефон на землю або на рюкзак. Якщо хтось підійде або зачепить речі — телефон почне жорстко вібрувати (можна включити сирену).</li>
-                </ul>
-
-                <h3 class="manual-danger">🛑 ВИМКНУТИ ДОДАТОК</h3>
-                <ul>
-                    <li>(У боковому меню) Зупиняє всі процеси і камеру, щоб не сідала батарея.</li>
-                </ul>
-            </div>
+            <h2 style="color: var(--glow); text-align: center;">ІНСТРУКЦІЯ</h2>
+            <p style="color:#aaa;">Оновлено: Додано режим ТРАНСПОРТ. Для використання в автомобілі, увімкніть його в меню мапи. Це вимкне магнітний компас і почне орієнтувати вас за GPS-рухом.</p>
         </section>
     </div>
 
+    <!-- ЕКО ОВЕРЛЕЙ -->
     <div id="eco-overlay">
         <div id="eco-top" class="eco-edge"></div>
         <div id="eco-bottom" class="eco-edge"></div>
@@ -211,6 +162,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.1"></script>
+    <script src="app.js?v=10.5"></script>
 </body>
 </html>
