@@ -21,7 +21,6 @@ async function checkPin() {
                 }
             } catch (e) { console.log(e); }
         } else {
-            // ПРОСЛУХОВУЄМО ОБИДВА, АЛЕ В ЛОГІЦІ БУДЕМО ФІЛЬТРУВАТИ
             window.addEventListener('deviceorientationabsolute', handleOrientation);
             window.addEventListener('deviceorientation', handleOrientation);
         }
@@ -48,7 +47,7 @@ let hardwareHeading = 0, compassOffset = 0, currentBearing = null;
 
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
-let hasAbsoluteOrientation = false; // НОВИЙ ПРАПОРЕЦЬ ДЛЯ АНДРОЇДА
+let hasAbsoluteOrientation = false; 
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -149,6 +148,7 @@ function triggerDestroyProtocol() {
         localStorage.removeItem('savedRoute'); currentBearing = null;
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
+        let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = "ЦІЛЬ: --- м";
         document.getElementById('tc-arrow').style.display = 'none';
         closeNav();
         if(navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]); 
@@ -253,6 +253,8 @@ function updateRoute() {
         document.getElementById('route-info').innerText = "ЦІЛЬ: НЕМАЄ";
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
+        // ОНОВЛЕНО: обнулення відстані на HUD
+        let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = "ЦІЛЬ: --- м";
         document.getElementById('tc-arrow').style.display = 'none';
         currentBearing = null; localStorage.removeItem('savedRoute'); return;
     }
@@ -450,6 +452,9 @@ function initGPS() {
                 let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " м";
                 let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " м";
                 
+                // ОНОВЛЕНО: Відображення відстані на HUD
+                let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `ЦІЛЬ: ${Math.round(d)} м`;
+                
                 if(d <= 20) { routePoints.shift(); updateRoute(); if(navigator.vibrate) navigator.vibrate([500,200,500]); playNavTone(1200, 300); } 
                 else { currentBearing = calcBearing(lat, lon, target.lat, target.lng); }
             }
@@ -477,26 +482,21 @@ function initGPS() {
     }
 }
 
-// ОНОВЛЕНО: Суворий контроль сенсорів Android
+// ОНОВЛЕНО: Безкінечний розрахунок кута (без стрибка 360 -> 0)
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
     let hw = null;
 
-    // ПЕРЕВІРКА №1: iOS або Абсолютна Північ
     if (e.webkitCompassHeading !== undefined) {
         hw = e.webkitCompassHeading;
     } else {
-        // ПЕРЕВІРКА №2: Android Ізоляція
         if (e.type === 'deviceorientationabsolute' || e.absolute === true) {
             hasAbsoluteOrientation = true;
         }
-        
-        // Якщо система надсилає сміттєві "відносні" дані, а ми вже знайшли Абсолютну Північ - ІГНОРУЄМО ЇХ!
         if (e.type === 'deviceorientation' && hasAbsoluteOrientation) {
             return;
         }
-        
         if (e.alpha !== null) {
             hw = 360 - e.alpha; 
         } else {
@@ -512,41 +512,51 @@ function handleOrientation(e) {
         currentDisplayAngle = trueH;
         isFirstCompassUpdate = false;
     } else {
-        let delta = trueH - currentDisplayAngle;
-        if (delta > 180) delta -= 360; else if (delta < -180) delta += 360;
+        // Знаходимо найкоротший шлях до trueH
+        let currentMod = ((currentDisplayAngle % 360) + 360) % 360;
+        let delta = trueH - currentMod;
         
-        // ОНОВЛЕНО: Фільтр зроблено ще жорсткішим (0.08 замість 0.15)
+        if (delta > 180) delta -= 360;
+        else if (delta < -180) delta += 360;
+        
+        // Збільшуємо або зменшуємо кут безперервно (без обнулення)
         currentDisplayAngle += delta * 0.08; 
-        
-        if (currentDisplayAngle < 0) currentDisplayAngle += 360;
-        else if (currentDisplayAngle >= 360) currentDisplayAngle -= 360;
     }
+    
+    // Для тексту на екрані використовуємо нормальний кут 0-360
+    let displayDeg = Math.round(((currentDisplayAngle % 360) + 360) % 360);
     
     let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
     if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
-    if(deg) deg.innerText = Math.round(currentDisplayAngle) + "°"; 
+    if(deg) deg.innerText = displayDeg + "°"; 
     
     let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
 
     let pitch = e.beta || 0; let clinoBar = document.getElementById('clino-bar');
     if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
 
+    // ОНОВЛЕНО: Напрямок стрілки теж без стрибка
     if (currentBearing !== null) {
-        let relAngle = (currentBearing - currentDisplayAngle + 360) % 360;
+        let relAngle = currentBearing - currentDisplayAngle;
         let arr = document.getElementById('tc-arrow');
         if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; }
 
+        // Математика для вібрацій та ЕКО режиму
+        let relMod = (((currentBearing - displayDeg) % 360) + 360) % 360;
+
         if (isEcoMode && isEcoPeeking) {
             document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
-            if (relAngle >= 315 || relAngle < 45) document.getElementById('eco-top').style.opacity = '1';
-            else if (relAngle >= 45 && relAngle < 135) document.getElementById('eco-right').style.opacity = '1';
-            else if (relAngle >= 135 && relAngle < 225) document.getElementById('eco-bottom').style.opacity = '1';
-            else if (relAngle >= 225 && relAngle < 315) document.getElementById('eco-left').style.opacity = '1';
+            if (relMod >= 315 || relMod < 45) document.getElementById('eco-top').style.opacity = '1';
+            else if (relMod >= 45 && relMod < 135) document.getElementById('eco-right').style.opacity = '1';
+            else if (relMod >= 135 && relMod < 225) document.getElementById('eco-bottom').style.opacity = '1';
+            else if (relMod >= 225 && relMod < 315) document.getElementById('eco-left').style.opacity = '1';
         }
 
         if (guideMode && !isSignalLost) {
             const timeNow = Date.now();
-            let absDiff = Math.abs((relAngle + 540) % 360 - 180); 
+            let absDiff = Math.abs((((currentBearing - displayDeg) % 360) + 360) % 360);
+            if (absDiff > 180) absDiff = 360 - absDiff;
+
             if (guideType === 'corridor') {
                 if (absDiff <= 15) { if (timeNow - lastVibroTime > 30000) { if (navigator.vibrate) navigator.vibrate([40, 100, 40]); playNavTone(800, 150); lastVibroTime = timeNow; } } 
                 else { if (timeNow - lastWarnTime > 5000) { if (navigator.vibrate) navigator.vibrate([150, 50, 150]); playNavTone(300, 300); lastWarnTime = timeNow; } }
