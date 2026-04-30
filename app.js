@@ -45,7 +45,8 @@ let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 
-let previousTrueH = null, currentDisplayAngle = 0;
+let currentDisplayAngle = 0;
+let isFirstCompassUpdate = true; // Для плавного старту компаса
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -67,10 +68,15 @@ let lastGpsProcessTime = Date.now();
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 
+// НОВЕ: Змінні для керування екраном та транспортом
+let wakeLock = null;
+let isTransportMode = false;
+let lastGpsCoordsForTransport = null;
+
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
 
 // ==========================================
-// 2. ІНІЦІАЛІЗАЦІЯ ТА ЗВУК
+// 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
 // ==========================================
 function initSystem() {
     checkStealthMode(); 
@@ -79,7 +85,7 @@ function initSystem() {
     try{processCamera();}catch(e){}
     setInterval(traceVanishing, 3000);
     
-    // СТОРОЖОВИЙ ТАЙМЕР GPS (реагує за 3 секунди повної тиші)
+    // СТОРОЖОВИЙ ТАЙМЕР GPS
     setInterval(() => {
         if (!isEcoMode && Date.now() - lastGpsProcessTime > 3000) {
             let stat = document.getElementById('gps-status');
@@ -90,6 +96,24 @@ function initSystem() {
     }, 1000);
 }
 
+// НОВЕ: Утримання екрана увімкненим
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); }
+        catch (err) { console.log(err); }
+    }
+}
+function releaseWakeLock() {
+    if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); }
+}
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) turnOffCamera();
+    // Якщо ми повертаємося і відкрита мапа — знову тримаємо екран
+    if (!document.hidden && wakeLock !== null && document.getElementById('mod-map').classList.contains('active')) {
+        requestWakeLock();
+    }
+});
+
 function checkStealthMode() {
     const statusEl = document.getElementById('stealth-status');
     if(!statusEl) return;
@@ -98,7 +122,6 @@ function checkStealthMode() {
 }
 setInterval(checkStealthMode, 1000); 
 
-document.addEventListener("visibilitychange", () => { if (document.hidden) turnOffCamera(); });
 function vibrateError() { if (navigator.vibrate) navigator.vibrate([300, 100, 300]); }
 
 async function initSensors() {
@@ -152,8 +175,20 @@ function closeNav() { document.getElementById("side-menu").style.width = "0"; }
 function showModule(id) {
     document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if (id !== 'mod-eye') turnOffCamera();
-    if (id === 'mod-map' && map) setTimeout(() => map.invalidateSize(), 200);
+
+    if (id === 'mod-map') {
+        // ОНОВЛЕНО: Ізоляція Мапи. Вмикаємо екран, вимикаємо все інше.
+        requestWakeLock();
+        turnOffCamera();
+        if (guideMode) { guideMode = false; document.getElementById('btn-guide').innerText = "ПОВОДИР: ВИМК"; document.getElementById('btn-guide').style.color = "#558"; }
+        if (isShielded) { isShielded = false; document.getElementById('btn-shield').style.backgroundColor = "#111"; document.getElementById('btn-shield').style.color = "#f44"; document.getElementById('btn-shield').innerText = "АКТИВУВАТИ ЗАХИСТ"; }
+        if (isEcoMode) toggleEcoMode(false);
+        if (map) setTimeout(() => map.invalidateSize(), 200);
+    } else {
+        // Якщо пішли з мапи — екран може гаснути для економії
+        releaseWakeLock();
+        if (id !== 'mod-eye') turnOffCamera();
+    }
 }
 
 function turnOffCamera() {
@@ -172,7 +207,7 @@ function turnOffCamera() {
 }
 
 // ==========================================
-// 4. МАПА, QR ТА СЛІД
+// 4. МАПА, QR, ТРАНСПОРТ ТА СЛІД
 // ==========================================
 function toggleMapMenu() {
     const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
@@ -316,6 +351,22 @@ document.getElementById('btn-cache-map').onclick = async () => {
     } catch(e) { btn.innerText = "ПОМИЛКА"; btn.style.color = "#f33"; vibrateError(); }
 };
 
+// НОВЕ: Логіка кнопки Транспорт
+let btnTransport = document.getElementById('btn-transport');
+if(btnTransport) {
+    btnTransport.onclick = () => {
+        isTransportMode = !isTransportMode;
+        if (isTransportMode) {
+            btnTransport.style.color = '#4ade80'; btnTransport.style.borderColor = '#4ade80';
+            compassOffset = 0; // В авто калібрування не діє
+            alert("🚗 ТРАНСПОРТ УВІМКНЕНО\nМагнітний компас вимкнено (щоб кузов авто не заважав). Стрілка покаже напрямок, як тільки ви почнете рух.");
+        } else {
+            btnTransport.style.color = '#fff'; btnTransport.style.borderColor = '#333';
+        }
+        toggleMapMenu();
+    };
+}
+
 // ==========================================
 // 5. РОЗУМНИЙ GPS ТА ПОВОДИР
 // ==========================================
@@ -340,29 +391,42 @@ function initGPS() {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc } = pos.coords;
             
-            lastGpsProcessTime = now; // Оновлюємо таймер свіжості для Watchdog
+            lastGpsProcessTime = now; 
 
-            // МИТТЄВА ПЕРЕВІРКА СИГНАЛУ НА ВТРАТУ > 200М
             let stat = document.getElementById('gps-status');
             if(acc > 200) {
                 if(stat) { stat.innerText = "❌ GPS ЗГЛУШЕНО (>200м)"; stat.style.color = "#f33"; }
                 if(!isSignalLost) { 
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                    playNavTone(300, 500); // Низький тривожний звук втрати
+                    playNavTone(300, 500); 
                     isSignalLost = true; 
                 }
             } else {
                 if(stat) { stat.innerText = "GPS: OK"; stat.style.color = "#4ade80"; }
                 if(isSignalLost) { 
                     if(navigator.vibrate) navigator.vibrate([100, 100, 100]); 
-                    playNavTone(1200, 200); // Високий звук відновлення
+                    playNavTone(1200, 200); 
                     isSignalLost = false; 
                 } 
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            // ЕКО-РЕЖИМ ОБМЕЖЕННЯ (Тротлінг малювання 3 сек для економії екрана)
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return;
+
+            // ОНОВЛЕНО: Розрахунок напрямку для режиму Транспорт
+            if (isTransportMode && lastGpsCoordsForTransport) {
+                let speedMs = spd || 0;
+                if (speedMs > 1.1) { // Тільки якщо швидкість > ~4 км/год
+                    let gpsH = pos.coords.heading;
+                    if (gpsH === null || isNaN(gpsH)) {
+                        gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon);
+                    }
+                    // Передаємо штучний сигнал у наш компас
+                    let fakeAlpha = (360 - gpsH) % 360;
+                    handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
+                }
+            }
+            lastGpsCoordsForTransport = { lat, lon };
 
             lastGoodGPS = { lat, lon };
             
@@ -409,7 +473,6 @@ function initGPS() {
                 }
             }
         }, err => {
-            // МИТТЄВА РЕАКЦІЯ ПРИ ПОВНІЙ ВТРАТІ (TIMEOUT АБО ВИМКНЕНО ФІЗИЧНО)
             let stat = document.getElementById('gps-status');
             if(stat) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
             if(!isSignalLost) { 
@@ -417,12 +480,15 @@ function initGPS() {
                 playNavTone(300, 500); 
                 isSignalLost = true; 
             }
-        }, { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 }); // ТАЙМЕР ЗМЕНШЕНО ДО 2 СЕКУНД
+        }, { enableHighAccuracy: true, timeout: 2000, maximumAge: 0 }); 
     }
 }
 
-// КОМПАС (Анти-стрибок на Півночі)
+// ОНОВЛЕНО: Компас з плавним математичним фільтром (Low-Pass Filter)
 function handleOrientation(e) {
+    // Якщо увімкнено Транспорт, ігноруємо реальний магніт
+    if (isTransportMode && !e.isGpsSimulated) return;
+
     let hw = null;
     if (e.webkitCompassHeading !== undefined) { hw = e.webkitCompassHeading; } 
     else if (e.alpha !== null) { hw = 360 - e.alpha; } 
@@ -432,17 +498,23 @@ function handleOrientation(e) {
     let trueH = (hardwareHeading + compassOffset) % 360;
     if (trueH < 0) trueH += 360;
     
-    if (previousTrueH === null) { currentDisplayAngle = trueH; } 
-    else {
-        let delta = trueH - previousTrueH;
+    if (isFirstCompassUpdate) {
+        currentDisplayAngle = trueH;
+        isFirstCompassUpdate = false;
+    } else {
+        // Згладжування: беремо лише 15% від нового стрибка. Інше - інертність.
+        let delta = trueH - currentDisplayAngle;
         if (delta > 180) delta -= 360; else if (delta < -180) delta += 360;
-        currentDisplayAngle += delta;
+        
+        currentDisplayAngle += delta * 0.15; 
+        
+        if (currentDisplayAngle < 0) currentDisplayAngle += 360;
+        else if (currentDisplayAngle >= 360) currentDisplayAngle -= 360;
     }
-    previousTrueH = trueH;
     
     let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
     if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
-    if(deg) deg.innerText = Math.round(trueH) + "°"; 
+    if(deg) deg.innerText = Math.round(currentDisplayAngle) + "°"; 
     
     let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
 
@@ -450,7 +522,7 @@ function handleOrientation(e) {
     if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
 
     if (currentBearing !== null) {
-        let relAngle = (currentBearing - trueH + 360) % 360;
+        let relAngle = (currentBearing - currentDisplayAngle + 360) % 360;
         let arr = document.getElementById('tc-arrow');
         if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; }
 
