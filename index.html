@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.5 TACTICAL</title>
+    <title>RA_MOBILE v10.7 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.5">
+    <link rel="stylesheet" href="style.css?v=10.7">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.5</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.7</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -55,7 +55,6 @@
 
     <div id="menu-trigger" onclick="openNav()">&#9776;</div>
 
-    <!-- ДОДАНО ДИСТАНЦІЮ В HUD -->
     <div id="tactical-hud">
         <div class="hud-row">
             <span id="gps-status">GPS: ПОШУК...</span>
@@ -71,11 +70,9 @@
         <!-- МАПА -->
         <section id="mod-map" class="module active">
             <div id="map-container"></div>
-            <!-- Кнопка-Гамбургер для мапи (Зліва внизу) -->
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
-                <!-- ДОДАНО КНОПКУ ТРАНСПОРТ -->
                 <button id="btn-transport" class="map-btn">🚙 ТРАНСПОРТ</button>
                 <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
@@ -144,10 +141,16 @@
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
-        <!-- ІНСТРУКЦІЯ -->
+        <!-- ІНСТРУКЦІЯ (ПОВНІСТЮ ВІДНОВЛЕНА) -->
         <section id="mod-manual" class="module">
-            <h2 style="color: var(--glow); text-align: center;">ІНСТРУКЦІЯ</h2>
-            <p style="color:#aaa;">Оновлено: Додано режим ТРАНСПОРТ. Для використання в автомобілі, увімкніть його в меню мапи. Це вимкне магнітний компас і почне орієнтувати вас за GPS-рухом.</p>
+            <h2 style="color: var(--glow); text-align: center;">ІНСТРУКЦІЯ СИСТЕМИ</h2>
+            <div style="color:#aaa; font-size: 0.9rem; line-height: 1.5; padding: 0 10px;">
+                <p><strong style="color:#4ade80;">1. МАРШРУТ / МАПА:</strong> Довге натискання створює точку маршруту. Кнопка "☰" відкриває тактичне меню: кешування мапи, зміна шарів, створення QR-коду маршруту. <strong>РЕЖИМ ТРАНСПОРТ:</strong> вимикає магнітний компас, розраховує азимут за рухом GPS (ефективно в авто). Мапа завжди тримає максимальний зум для тактичної деталізації.</p>
+                <p><strong style="color:#f1c40f;">2. КОМПАС / ПОВОДИР:</strong> Показує напрямок до мітки (дистанція скидається на 15 метрах). <strong>ПОВОДИР:</strong> вібрація та звук підказують напрямок (Коридор - тримає на лінії, Пошук - пікає частіше ближче до цілі). Звук поводиря можна вимкнути окремо від вібрації. <strong>ЕКО-БЛЕКАУТ:</strong> гасить екран для нічних переходів та економії АКБ.</p>
+                <p><strong style="color:#0cf;">3. ОПТИКА / ШІ:</strong> Камера для аналізу. <strong>ШІ SCAN:</strong> розпізнає людей і техніку. <strong>ІЧ-ФІЛЬТР:</strong> контрастний режим. <strong>ДЕТЕКТОР РУХУ:</strong> фіксує найменші зміни в кадрі.</p>
+                <p><strong style="color:#f44;">4. ОХОРОНА / ЩИТ:</strong> Активація гіроскопа. Якщо телефон лежить нерухомо і його різко зрушити (наприклад, вібрація землі або хтось взяв) — спрацює тривога.</p>
+                <p><strong>БЕЗПЕКА:</strong> Система працює автономно. Для екстреного видалення всіх даних використовуйте червону кнопку 💥 ЗНИЩИТИ ДАНІ у головному меню.</p>
+            </div>
         </section>
     </div>
 
@@ -162,6 +165,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.5"></script>
+    <script src="app.js?v=10.7"></script>
 </body>
 </html>
