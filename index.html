@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.8 TACTICAL</title>
+    <title>RA_MOBILE v10.9 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.8">
+    <link rel="stylesheet" href="style.css?v=10.9">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.8</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.9</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -111,13 +111,7 @@
                 <button id="btn-guide" class="tactical-btn" style="color:#558; border-color:#224;">ПОВОДИР: ВИМК</button>
             </div>
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
-            
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
-            <!-- ПОВЕРНЕНО КНОПКИ СОНЦЕ ТА ЗІРКА -->
-            <div class="flex-row" style="margin-top: 10px;">
-                <button id="btn-cal-sun" class="tactical-btn" style="flex:1; background:#222; color:#f1c40f;">☀ КАЛІБР (СОНЦЕ)</button>
-                <button id="btn-cal-star" class="tactical-btn" style="flex:1; background:#222; color:#fff;">⭐ КАЛІБР (ЗІРКА)</button>
-            </div>
         </section>
 
         <!-- ОПТИКА -->
@@ -128,6 +122,28 @@
                 <canvas id="ui-canvas"></canvas>
                 <div id="ai-stats">ШІ НЕ АКТИВНИЙ</div>
             </div>
+
+            <!-- ВІДНОВЛЕНА ПАНЕЛЬ ПОВЗУНКІВ -->
+            <div class="sliders-panel" style="margin-bottom: 15px; padding: 10px; background: #111; border-radius: 8px; border: 1px solid #333;">
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЗУМ КАМЕРИ</label></div>
+                <input type="range" id="cam-zoom" min="1" max="5" step="0.1" value="1" style="width:100%; margin-bottom:10px;">
+                
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЧУТЛИВІСТЬ ШІ (%)</label></div>
+                <input type="range" id="ai-sens" min="10" max="90" step="5" value="50" style="width:100%; margin-bottom:10px;">
+                
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ДАЛЬНІСТЬ ШІ (ФОКУС)</label></div>
+                <input type="range" id="ai-focal" min="0.5" max="3" step="0.1" value="1.0" style="width:100%; margin-bottom:10px;">
+                
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЧУТЛИВІСТЬ ІЧ / РУХУ</label></div>
+                <input type="range" id="ir-sens" min="50" max="250" step="10" value="200" style="width:100%;">
+            </div>
+
+            <!-- КАЛІБРУВАННЯ ПО ПРИЦІЛУ КАМЕРИ -->
+            <div class="flex-row" style="margin-bottom: 15px;">
+                <button id="btn-cal-sun" class="tactical-btn" style="flex:1; background:#222; color:#f1c40f; margin-top:0;">☀ КАЛІБР (СОНЦЕ)</button>
+                <button id="btn-cal-star" class="tactical-btn" style="flex:1; background:#222; color:#fff; margin-top:0;">⭐ КАЛІБР (ЗІРКА)</button>
+            </div>
+
             <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;">📥 СКАЙНУВАТИ QR-МАРШРУТ</button>
             
             <div class="flex-row">
@@ -151,11 +167,10 @@
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center;">ІНСТРУКЦІЯ СИСТЕМИ</h2>
             <div style="color:#aaa; font-size: 0.9rem; line-height: 1.5; padding: 0 10px;">
-                <p><strong style="color:#4ade80;">1. МАРШРУТ / МАПА:</strong> Довге натискання створює точку маршруту. Кнопка "☰" відкриває тактичне меню: кешування мапи, зміна шарів, створення QR-коду маршруту. <strong>РЕЖИМ ТРАНСПОРТ:</strong> вимикає магнітний компас, розраховує азимут за рухом GPS (ефективно в авто). Мапа завжди тримає максимальний зум для тактичної деталізації.</p>
-                <p><strong style="color:#f1c40f;">2. КОМПАС / ПОВОДИР:</strong> Показує напрямок до мітки (дистанція скидається на 15 метрах). <strong>ПОВОДИР:</strong> вібрація та звук підказують напрямок (Коридор - тримає на лінії, Пошук - пікає частіше ближче до цілі). Звук поводиря можна вимкнути окремо від вібрації. <strong>ЕКО-БЛЕКАУТ:</strong> гасить екран для нічних переходів та економії АКБ.</p>
-                <p><strong style="color:#0cf;">3. ОПТИКА / ШІ:</strong> Камера для аналізу. <strong>ШІ SCAN:</strong> розпізнає людей і техніку. <strong>ІЧ-ФІЛЬТР:</strong> контрастний режим. <strong>ДЕТЕКТОР РУХУ:</strong> фіксує найменші зміни в кадрі.</p>
-                <p><strong style="color:#f44;">4. ОХОРОНА / ЩИТ:</strong> Активація гіроскопа. Якщо телефон лежить нерухомо і його різко зрушити (наприклад, вібрація землі або хтось взяв) — спрацює тривога.</p>
-                <p><strong>БЕЗПЕКА:</strong> Система працює автономно. Для екстреного видалення всіх даних використовуйте червону кнопку 💥 ЗНИЩИТИ ДАНІ у головному меню.</p>
+                <p><strong style="color:#4ade80;">1. МАРШРУТ / МАПА:</strong> Довге натискання створює точку. Кнопка "☰" відкриває тактичне меню: кешування мапи, зміна шарів, створення QR. <strong>РЕЖИМ ТРАНСПОРТ:</strong> вимикає магнітний компас, розраховує азимут за рухом GPS (для авто).</p>
+                <p><strong style="color:#f1c40f;">2. КОМПАС / ПОВОДИР:</strong> Показує напрямок до мітки (скидається на 15м). Навігація працює навіть при втраті GPS (за останніми координатами). <strong>ПОВОДИР:</strong> вібро/звук підказують напрямок.</p>
+                <p><strong style="color:#0cf;">3. ОПТИКА / ШІ:</strong> Камера з прицілом. Використовуйте повзунки для налаштування ЗУМУ та чутливості сканерів. Калібрування по Сонцю/Зірці робиться через наведення зеленого прицілу на світило.</p>
+                <p><strong style="color:#f44;">4. ОХОРОНА / ЩИТ:</strong> Активація гіроскопа. Реагує на найменший рух телефону.</p>
             </div>
         </section>
     </div>
@@ -171,6 +186,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.8"></script>
+    <script src="app.js?v=10.9"></script>
 </body>
 </html>
