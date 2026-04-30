@@ -133,17 +133,9 @@ async function initSensors() {
     } catch (e) {}
 }
 
+// ОРИГІНАЛЬНА ФУНКЦІЯ ЗВУКУ (ВІДНОВЛЕНА, БЕЗ БЛОКУВАННЯ)
 function playNavTone(freq, duration) {
-    if (!audioCtx || !navAudioEnabled) return; // ПОВНІСТЮ ВІДДІЛЕНО ЗВУК
-    try {
-        let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
-        o.start(); g.gain.setTargetAtTime(0, audioCtx.currentTime + duration/1000, 0.05); setTimeout(() => o.stop(), duration + 100);
-    } catch(e) {}
-}
-// Окрема функція для системних звуків (тривога, калібрування), які не залежать від кнопки поводиря
-function playSystemTone(freq, duration) {
-    if (!audioCtx) return; 
+    if (!audioCtx) return;
     try {
         let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
         o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
@@ -186,11 +178,7 @@ function showModule(id) {
 
     if (id === 'mod-map') {
         requestWakeLock();
-        turnOffCamera();
-        if (guideMode) { guideMode = false; document.getElementById('btn-guide').innerText = "ПОВОДИР: ВИМК"; document.getElementById('btn-guide').style.color = "#558"; }
-        if (isShielded) { isShielded = false; document.getElementById('btn-shield').style.backgroundColor = "#111"; document.getElementById('btn-shield').style.color = "#f44"; document.getElementById('btn-shield').innerText = "АКТИВУВАТИ ЗАХИСТ"; }
-        if (isEcoMode) toggleEcoMode(false);
-        // МАКСИМАЛЬНИЙ ЗУМ ПРИ ПЕРЕХОДІ НА МАПУ
+        // ВІДНОВЛЕНО МАКСИМАЛЬНИЙ ЗУМ БЕЗ ЗАЙВОГО ВІДКЛЮЧЕННЯ КАМЕРИ
         if (map) { 
             setTimeout(() => { 
                 map.invalidateSize(); 
@@ -199,8 +187,10 @@ function showModule(id) {
         }
     } else {
         releaseWakeLock();
-        if (id !== 'mod-eye') turnOffCamera();
     }
+    
+    // ВІДНОВЛЕНА ОРИГІНАЛЬНА ЛОГІКА: Камера вимикається ТІЛЬКИ якщо ми йдемо з вкладки Оптика
+    if (id !== 'mod-eye') turnOffCamera();
 }
 
 function turnOffCamera() {
@@ -240,7 +230,7 @@ function initMap() {
             pressTimer = setTimeout(() => {
                 if(routePoints.length >= 10) return alert("Максимум 10 точок!");
                 if(navigator.vibrate) navigator.vibrate(50);
-                playSystemTone(800, 100);
+                playNavTone(800, 100);
                 routePoints.push(e.latlng); updateRoute();
             }, 700); 
         });
@@ -280,7 +270,6 @@ function updateRoute() {
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
 
-// ЗБІЛЬШЕНО ПАМ'ЯТЬ СЛІДУ МАРШРУТУ ДО 200 ТОЧОК
 function traceVanishing() {
     if (tracePoints.length > 0 && (Date.now() - lastGpsProcessTime > 5000)) {
         tracePoints.shift();
@@ -327,7 +316,7 @@ function scanQRFrame() {
                 if (Array.isArray(pts)) {
                     routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
                     isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
-                    if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
+                    if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playNavTone(800, 300);
                     alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); return;
                 }
             } catch(e) {}
@@ -338,7 +327,6 @@ function scanQRFrame() {
 
 document.getElementById('btn-follow').onclick = () => {
     isMapFollowing = true; document.getElementById('btn-follow').style.color = '#4ade80';
-    // МАКСИМАЛЬНИЙ ЗУМ ПРИ НАТИСКАННІ "СЛІДКУВАТИ"
     if (lastGoodGPS && map) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); toggleMapMenu();
 };
 
@@ -361,7 +349,7 @@ document.getElementById('btn-cache-map').onclick = async () => {
         let origZoom = map.getZoom(); let origCenter = map.getCenter();
         for (let p of pts) { map.setView(p, 15, {animate: false}); await new Promise(r => setTimeout(r, 1500)); }
         map.setView(origCenter, origZoom, {animate: false}); 
-        btn.innerText = "КВАДРАТ ЗБЕРЕЖЕНО"; btn.style.color = "#4ade80"; if(navigator.vibrate) navigator.vibrate(200); playSystemTone(800, 100);
+        btn.innerText = "КВАДРАТ ЗБЕРЕЖЕНО"; btn.style.color = "#4ade80"; if(navigator.vibrate) navigator.vibrate(200); playNavTone(800, 100);
         setTimeout(() => { btn.innerText = "💾 КЕШ 2х2 км"; btn.style.color = "var(--glow)"; toggleMapMenu(); }, 4000);
     } catch(e) { btn.innerText = "ПОМИЛКА"; btn.style.color = "#f33"; vibrateError(); }
 };
@@ -396,12 +384,11 @@ document.getElementById('btn-cal-walk').onclick = () => {
     walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
     let calBtn = document.getElementById('btn-cal-walk');
     if(calBtn) { calBtn.innerText = "ЙДІТЬ ПРЯМО (0 / 15м)"; calBtn.style.color = "#f1c40f"; }
-    if(navigator.vibrate) navigator.vibrate([100, 100]); playSystemTone(500, 100);
+    if(navigator.vibrate) navigator.vibrate([100, 100]); playNavTone(500, 100);
 };
 
 function initGPS() {
     if ('geolocation' in navigator) {
-        // Збалансований таймер (10 сек замість 2), щоб GPS мав час знайти супутники
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc } = pos.coords;
@@ -413,20 +400,19 @@ function initGPS() {
                 if(stat) { stat.innerText = "❌ GPS ЗГЛУШЕНО (>200м)"; stat.style.color = "#f33"; }
                 if(!isSignalLost) { 
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                    playSystemTone(300, 500); 
+                    playNavTone(300, 500); 
                     isSignalLost = true; 
                 }
             } else {
                 if(stat) { stat.innerText = "GPS: OK"; stat.style.color = "#4ade80"; }
                 if(isSignalLost) { 
                     if(navigator.vibrate) navigator.vibrate([100, 100, 100]); 
-                    playSystemTone(1200, 200); 
+                    playNavTone(1200, 200); 
                     isSignalLost = false; 
                 } 
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            // ОНОВЛЕННЯ ДИСТАНЦІЇ ПЕРЕД БЛОКУВАННЯМ ЕКО-РЕЖИМУ (Вирішує проблему зависання цифр!)
             if(routePoints.length > 0 && map) {
                 let target = routePoints[0]; let d = map.distance([lat, lon], target);
                 
@@ -434,15 +420,14 @@ function initGPS() {
                 let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " м";
                 let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `ЦІЛЬ: ${Math.round(d)} м`;
                 
-                // РАДІУС 15 МЕТРІВ ДО МІТКИ
                 if(d <= 15) { 
                     routePoints.shift(); updateRoute(); 
-                    if(navigator.vibrate) navigator.vibrate([500,200,500]); playSystemTone(1200, 300); 
+                    if(navigator.vibrate) navigator.vibrate([500,200,500]); playNavTone(1200, 300); 
                 } 
                 else { currentBearing = calcBearing(lat, lon, target.lat, target.lng); }
             }
 
-            if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; // Блокуємо тільки малювання мапи
+            if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
             if (isTransportMode && lastGpsCoordsForTransport) {
                 let speedMs = spd || 0;
@@ -466,7 +451,7 @@ function initGPS() {
             let accEl = document.getElementById('tc-acc'); if(accEl) accEl.innerText = `ТОЧН: ${Math.round(acc)}м`;
 
             tracePoints.push([lat, lon]);
-            if(tracePoints.length > 200) tracePoints.shift(); // 200 точок для довгого сліду
+            if(tracePoints.length > 200) tracePoints.shift(); 
             if(map) {
                 if(traceLineLayer) map.removeLayer(traceLineLayer);
                 traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map);
@@ -474,7 +459,6 @@ function initGPS() {
             
             updateSunPosition(lat, lon);
 
-            // МАКСИМАЛЬНИЙ ЗУМ ПРИ ПЕРШОМУ ПОШУКУ
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
             if (isMapFollowing && !firstFix && map) map.panTo([lat, lon]);
 
@@ -489,7 +473,7 @@ function initGPS() {
                     compassOffset = (calcBearing(walkStartPoint.lat, walkStartPoint.lon, lat, lon) - hardwareHeading + 360) % 360;
                     isWalkCalibrating = false;
                     if(calBtn) { calBtn.innerText = "КАЛІБР: ГОТОВО"; calBtn.style.color = "#4ade80"; }
-                    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 200);
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playNavTone(800, 200);
                     setTimeout(() => { if(calBtn) { calBtn.innerText = "КАЛІБРУВАТИ ПРОХОДОМ (15м)"; calBtn.style.color = "#fff"; } }, 5000);
                 }
             }
@@ -498,10 +482,10 @@ function initGPS() {
             if(stat) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
             if(!isSignalLost) { 
                 if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                playSystemTone(300, 500); 
+                playNavTone(300, 500); 
                 isSignalLost = true; 
             }
-        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }); // ТАЙМЕР ЗБІЛЬШЕНО
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }); 
     }
 }
 
@@ -574,13 +558,14 @@ function handleOrientation(e) {
             let absDiff = Math.abs((((currentBearing - displayDeg) % 360) + 360) % 360);
             if (absDiff > 180) absDiff = 360 - absDiff;
 
+            // ВІДНОВЛЕНЕ БЕЗПЕЧНЕ ВІДДІЛЕННЯ ЗВУКУ ПОВОДИРЯ (ТІЛЬКИ ТУТ ПЕРЕВІРЯЄТЬСЯ navAudioEnabled)
             if (guideType === 'corridor') {
-                if (absDiff <= 15) { if (timeNow - lastVibroTime > 30000) { if (navigator.vibrate) navigator.vibrate([40, 100, 40]); playNavTone(800, 150); lastVibroTime = timeNow; } } 
-                else { if (timeNow - lastWarnTime > 5000) { if (navigator.vibrate) navigator.vibrate([150, 50, 150]); playNavTone(300, 300); lastWarnTime = timeNow; } }
+                if (absDiff <= 15) { if (timeNow - lastVibroTime > 30000) { if (navigator.vibrate) navigator.vibrate([40, 100, 40]); if(navAudioEnabled) playNavTone(800, 150); lastVibroTime = timeNow; } } 
+                else { if (timeNow - lastWarnTime > 5000) { if (navigator.vibrate) navigator.vibrate([150, 50, 150]); if(navAudioEnabled) playNavTone(300, 300); lastWarnTime = timeNow; } }
             } else {
-                if (absDiff <= 7) { if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); playNavTone(1200, 50); lastVibroTime = timeNow; } } 
-                else if (absDiff <= 20) { if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); playNavTone(800, 50); lastVibroTime = timeNow; } } 
-                else if (absDiff <= 45) { if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); playNavTone(400, 50); lastVibroTime = timeNow; } }
+                if (absDiff <= 7) { if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); if(navAudioEnabled) playNavTone(1200, 50); lastVibroTime = timeNow; } } 
+                else if (absDiff <= 20) { if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); if(navAudioEnabled) playNavTone(800, 50); lastVibroTime = timeNow; } } 
+                else if (absDiff <= 45) { if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); if(navAudioEnabled) playNavTone(400, 50); lastVibroTime = timeNow; } }
             }
         }
     } else {
@@ -593,8 +578,8 @@ document.getElementById('btn-guide-type').onclick = () => { guideType = guideTyp
 document.getElementById('btn-guide-audio').onclick = async () => { await initSensors(); navAudioEnabled = !navAudioEnabled; let btn = document.getElementById('btn-guide-audio'); btn.innerText = navAudioEnabled ? "ЗВУК: УВІМК" : "ЗВУК: ВИМК"; btn.style.color = navAudioEnabled ? "#4ade80" : "#ccc"; };
 document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558"; };
 
-function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
-function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
+function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playNavTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
+function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playNavTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
 
 // ==========================================
 // 7. ОПТИКА, ЗУМ ТА ШІ
@@ -614,7 +599,7 @@ function processCamera() {
                 let lvl = (diff / 3133440) * 1000;
                 if (lvl > 20) {
                     if(navigator.vibrate) navigator.vibrate(50);
-                    playSystemTone(900, 100);
+                    playNavTone(900, 100);
                     let scanBtn = document.getElementById('btn-scan');
                     if(scanBtn) { scanBtn.style.backgroundColor = "#f00"; setTimeout(()=>{ scanBtn.style.backgroundColor = "#111"; }, 150); }
                 }
@@ -663,13 +648,14 @@ function getSunAzimuth(lat, lon, date) {
 document.getElementById('btn-cal-sun').onclick = () => {
     if(!lastGoodGPS) return alert("Потрібні координати GPS!");
     let az = getSunAzimuth(lastGoodGPS.lat, lastGoodGPS.lon, new Date());
-    compassOffset = (az - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 100);
+    compassOffset = (az - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playNavTone(800, 100);
 };
 
 document.getElementById('btn-cal-star').onclick = () => {
-    compassOffset = (0 - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 100);
+    compassOffset = (0 - hardwareHeading + 360) % 360; if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playNavTone(800, 100);
 };
 
+// ВІДНОВЛЕНА ОРИГІНАЛЬНА БЕЗПЕЧНА КАМЕРА
 document.getElementById('btn-cam').onclick = async () => {
     await initSensors(); let btn = document.getElementById('btn-cam'); const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
     if (video.srcObject) { turnOffCamera(); } else { 
@@ -742,7 +728,7 @@ async function detectAI() {
 // ==========================================
 // 8. ЩИТ ТА МАТЕМАТИКА
 // ==========================================
-// ВІДНОВЛЕНО СТАБІЛЬНИЙ СТАРТИЙ КОД ОХОРОНИ
+// ВІДНОВЛЕНА ОРИГІНАЛЬНА РОБОЧА ОХОРОНА
 document.getElementById('btn-shield').onclick = async () => { 
     await initSensors(); isShielded = !isShielded; 
     let btn = document.getElementById('btn-shield');
@@ -755,7 +741,7 @@ document.getElementById('btn-shield-sound').onclick = async () => { await initSe
 window.addEventListener('devicemotion', e => {
     if (isShielded && e.accelerationIncludingGravity) {
         let a = e.accelerationIncludingGravity; let f = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
-        if (Math.abs(f - 9.8) > 3) { if(navigator.vibrate) navigator.vibrate([500, 200, 500]); if(shieldSound) playSystemTone(1000, 1000); }
+        if (Math.abs(f - 9.8) > 3) { if(navigator.vibrate) navigator.vibrate([500, 200, 500]); if(shieldSound) playNavTone(1000, 1000); }
     }
 });
 
