@@ -21,6 +21,7 @@ async function checkPin() {
                 }
             } catch (e) { console.log(e); }
         } else {
+            // ПРОСЛУХОВУЄМО ОБИДВА, АЛЕ В ЛОГІЦІ БУДЕМО ФІЛЬТРУВАТИ
             window.addEventListener('deviceorientationabsolute', handleOrientation);
             window.addEventListener('deviceorientation', handleOrientation);
         }
@@ -46,7 +47,8 @@ let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 
 let currentDisplayAngle = 0;
-let isFirstCompassUpdate = true; // Для плавного старту компаса
+let isFirstCompassUpdate = true;
+let hasAbsoluteOrientation = false; // НОВИЙ ПРАПОРЕЦЬ ДЛЯ АНДРОЇДА
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -68,7 +70,6 @@ let lastGpsProcessTime = Date.now();
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 
-// НОВЕ: Змінні для керування екраном та транспортом
 let wakeLock = null;
 let isTransportMode = false;
 let lastGpsCoordsForTransport = null;
@@ -85,7 +86,6 @@ function initSystem() {
     try{processCamera();}catch(e){}
     setInterval(traceVanishing, 3000);
     
-    // СТОРОЖОВИЙ ТАЙМЕР GPS
     setInterval(() => {
         if (!isEcoMode && Date.now() - lastGpsProcessTime > 3000) {
             let stat = document.getElementById('gps-status');
@@ -96,7 +96,6 @@ function initSystem() {
     }, 1000);
 }
 
-// НОВЕ: Утримання екрана увімкненим
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
         try { wakeLock = await navigator.wakeLock.request('screen'); }
@@ -108,7 +107,6 @@ function releaseWakeLock() {
 }
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) turnOffCamera();
-    // Якщо ми повертаємося і відкрита мапа — знову тримаємо екран
     if (!document.hidden && wakeLock !== null && document.getElementById('mod-map').classList.contains('active')) {
         requestWakeLock();
     }
@@ -177,7 +175,6 @@ function showModule(id) {
     document.getElementById(id).classList.add('active');
 
     if (id === 'mod-map') {
-        // ОНОВЛЕНО: Ізоляція Мапи. Вмикаємо екран, вимикаємо все інше.
         requestWakeLock();
         turnOffCamera();
         if (guideMode) { guideMode = false; document.getElementById('btn-guide').innerText = "ПОВОДИР: ВИМК"; document.getElementById('btn-guide').style.color = "#558"; }
@@ -185,7 +182,6 @@ function showModule(id) {
         if (isEcoMode) toggleEcoMode(false);
         if (map) setTimeout(() => map.invalidateSize(), 200);
     } else {
-        // Якщо пішли з мапи — екран може гаснути для економії
         releaseWakeLock();
         if (id !== 'mod-eye') turnOffCamera();
     }
@@ -351,14 +347,13 @@ document.getElementById('btn-cache-map').onclick = async () => {
     } catch(e) { btn.innerText = "ПОМИЛКА"; btn.style.color = "#f33"; vibrateError(); }
 };
 
-// НОВЕ: Логіка кнопки Транспорт
 let btnTransport = document.getElementById('btn-transport');
 if(btnTransport) {
     btnTransport.onclick = () => {
         isTransportMode = !isTransportMode;
         if (isTransportMode) {
             btnTransport.style.color = '#4ade80'; btnTransport.style.borderColor = '#4ade80';
-            compassOffset = 0; // В авто калібрування не діє
+            compassOffset = 0; 
             alert("🚗 ТРАНСПОРТ УВІМКНЕНО\nМагнітний компас вимкнено (щоб кузов авто не заважав). Стрілка покаже напрямок, як тільки ви почнете рух.");
         } else {
             btnTransport.style.color = '#fff'; btnTransport.style.borderColor = '#333';
@@ -413,15 +408,13 @@ function initGPS() {
 
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return;
 
-            // ОНОВЛЕНО: Розрахунок напрямку для режиму Транспорт
             if (isTransportMode && lastGpsCoordsForTransport) {
                 let speedMs = spd || 0;
-                if (speedMs > 1.1) { // Тільки якщо швидкість > ~4 км/год
+                if (speedMs > 1.1) { 
                     let gpsH = pos.coords.heading;
                     if (gpsH === null || isNaN(gpsH)) {
                         gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon);
                     }
-                    // Передаємо штучний сигнал у наш компас
                     let fakeAlpha = (360 - gpsH) % 360;
                     handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
                 }
@@ -484,15 +477,32 @@ function initGPS() {
     }
 }
 
-// ОНОВЛЕНО: Компас з плавним математичним фільтром (Low-Pass Filter)
+// ОНОВЛЕНО: Суворий контроль сенсорів Android
 function handleOrientation(e) {
-    // Якщо увімкнено Транспорт, ігноруємо реальний магніт
     if (isTransportMode && !e.isGpsSimulated) return;
 
     let hw = null;
-    if (e.webkitCompassHeading !== undefined) { hw = e.webkitCompassHeading; } 
-    else if (e.alpha !== null) { hw = 360 - e.alpha; } 
-    else { return; }
+
+    // ПЕРЕВІРКА №1: iOS або Абсолютна Північ
+    if (e.webkitCompassHeading !== undefined) {
+        hw = e.webkitCompassHeading;
+    } else {
+        // ПЕРЕВІРКА №2: Android Ізоляція
+        if (e.type === 'deviceorientationabsolute' || e.absolute === true) {
+            hasAbsoluteOrientation = true;
+        }
+        
+        // Якщо система надсилає сміттєві "відносні" дані, а ми вже знайшли Абсолютну Північ - ІГНОРУЄМО ЇХ!
+        if (e.type === 'deviceorientation' && hasAbsoluteOrientation) {
+            return;
+        }
+        
+        if (e.alpha !== null) {
+            hw = 360 - e.alpha; 
+        } else {
+            return;
+        }
+    }
     
     hardwareHeading = hw;
     let trueH = (hardwareHeading + compassOffset) % 360;
@@ -502,11 +512,11 @@ function handleOrientation(e) {
         currentDisplayAngle = trueH;
         isFirstCompassUpdate = false;
     } else {
-        // Згладжування: беремо лише 15% від нового стрибка. Інше - інертність.
         let delta = trueH - currentDisplayAngle;
         if (delta > 180) delta -= 360; else if (delta < -180) delta += 360;
         
-        currentDisplayAngle += delta * 0.15; 
+        // ОНОВЛЕНО: Фільтр зроблено ще жорсткішим (0.08 замість 0.15)
+        currentDisplayAngle += delta * 0.08; 
         
         if (currentDisplayAngle < 0) currentDisplayAngle += 360;
         else if (currentDisplayAngle >= 360) currentDisplayAngle -= 360;
