@@ -188,13 +188,22 @@ function showModule(id) {
         if (map) { setTimeout(() => { map.invalidateSize(); if (lastGoodGPS) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); }, 200); }
     } else { releaseWakeLock(); }
     
-    if (id !== 'mod-eye') turnOffCamera();
+    if (id !== 'mod-eye' && id !== 'mod-chat') turnOffCamera();
 }
 
 function turnOffCamera() {
     try {
         const v = document.getElementById('v-stream');
         if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; currentVideoTrack = null; }
+        
+        const vChat = document.getElementById('v-chat-stream');
+        if (vChat && vChat.srcObject) { 
+            vChat.srcObject.getTracks().forEach(t => t.stop()); 
+            vChat.srcObject = null; 
+            vChat.style.display = 'none';
+            let btnChatCam = document.getElementById('btn-chat-cam');
+            if(btnChatCam) btnChatCam.innerText = "📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ";
+        }
     } catch(e) {}
     isAiLive = false; isScanning = false; isScanningQR = false;
     let btnCam = document.getElementById('btn-cam'); if(btnCam) btnCam.innerText = "🔴 КАМЕРА";
@@ -301,18 +310,15 @@ function encryptData(text) {
     let encrypted = "";
     let safeText = encodeURIComponent(text); 
     for (let i = 0; i < safeText.length; i++) {
-        // Застосовуємо XOR шифрування
         encrypted += String.fromCharCode(safeText.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
     }
-    // btoa робить з цього безпечну строку для QR-коду
     return btoa(encrypted); 
 }
 
 function decryptData(encodedText) {
     let decrypted = "";
-    let decodedStr = atob(encodedText); // Розшифровуємо з бази
+    let decodedStr = atob(encodedText); 
     for (let i = 0; i < decodedStr.length; i++) {
-        // Знімаємо XOR шифрування
         decrypted += String.fromCharCode(decodedStr.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
     }
     return decodeURIComponent(decrypted);
@@ -324,7 +330,6 @@ function generateChatQR() {
     
     document.getElementById('qrcode-box').innerHTML = '';
     if(typeof QRCode !== 'undefined') {
-        // Шифруємо і додаємо маркер "SEC:" (Секретно)
         let safeText = "SEC:" + encryptData(text);
         new QRCode(document.getElementById('qrcode-box'), { text: safeText, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
         document.getElementById('qr-modal').style.display = 'flex';
@@ -340,10 +345,61 @@ function closeQR() { document.getElementById('qr-modal').style.display = 'none';
 
 
 // ==========================================
-// БЛОК СКАНУВАННЯ (КАМЕРА ТА ФОТО)
+// БЛОК СКАНУВАННЯ (ОПТИКА, ФОТО ТА НОВИЙ ЧАТ)
 // ==========================================
 
-// 1. ЗАПУСК ЖИВОЇ КАМЕРИ
+// 1. ЗАПУСК КАМЕРИ НА ВКЛАДЦІ ЧАТУ (НОВЕ)
+document.getElementById('btn-chat-cam').onclick = async () => {
+    const video = document.getElementById('v-chat-stream');
+    let btn = document.getElementById('btn-chat-cam');
+    
+    if (video.srcObject) { 
+        video.srcObject.getTracks().forEach(t => t.stop()); 
+        video.srcObject = null;
+        video.style.display = 'none';
+        btn.innerText = "📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ";
+        isScanningQR = false;
+    } else {
+        btn.innerText = "ЗАПУСК...";
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
+            video.srcObject = stream;
+            video.play();
+            video.style.display = 'block';
+            btn.innerText = "⏹ ВИМКНУТИ КАМЕРУ";
+            isScanningQR = true;
+            scanQRChatFrame(); 
+        } catch(e) { 
+            btn.innerText = "❌ КАМЕРА БЛОКОВАНА"; 
+            setTimeout(() => { btn.innerText = "📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ"; }, 3000); 
+        }
+    }
+};
+
+function scanQRChatFrame() {
+    if (!isScanningQR) return;
+    const video = document.getElementById('v-chat-stream');
+    if (video.readyState === video.HAVE_ENOUGH_DATA && video.srcObject) {
+        const canvas = document.createElement("canvas"); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d"); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+        
+        if (code) {
+            isScanningQR = false; 
+            document.getElementById('btn-chat-cam').innerText = "📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ";
+            video.srcObject.getTracks().forEach(t => t.stop()); 
+            video.srcObject = null;
+            video.style.display = 'none';
+            processDecodedQR(code.data);
+            return;
+        }
+    }
+    requestAnimationFrame(scanQRChatFrame);
+}
+
+
+// 2. ЗАПУСК ЖИВОЇ КАМЕРИ НА ВКЛАДЦІ ОПТИКИ
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
@@ -351,10 +407,10 @@ document.getElementById('btn-scan-qr').onclick = () => {
     
     isScanningQR = !isScanningQR;
     document.getElementById('btn-scan-qr').style.color = isScanningQR ? "#4ade80" : "#0cf";
-    if (isScanningQR) scanQRFrame();
+    if (isScanningQR) scanQROpticsFrame();
 };
 
-function scanQRFrame() {
+function scanQROpticsFrame() {
     if (!isScanningQR) return;
     const video = document.getElementById('v-stream');
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -370,10 +426,10 @@ function scanQRFrame() {
             return;
         }
     }
-    requestAnimationFrame(scanQRFrame);
+    requestAnimationFrame(scanQROpticsFrame);
 }
 
-// 2. ЗАПУСК З ФОТОГРАФІЇ
+// 3. ЗАПУСК З ФОТОГРАФІЇ
 document.getElementById('btn-scan-photo').onclick = () => {
     document.getElementById('qr-file-input').click();
 };
@@ -408,12 +464,11 @@ document.getElementById('qr-file-input').addEventListener('change', function(e) 
     reader.readAsDataURL(file);
 });
 
-// 3. ЗАГАЛЬНА ФУНКЦІЯ РОЗШИФРОВКИ
+// 4. ЗАГАЛЬНА ФУНКЦІЯ РОЗШИФРОВКИ (ЗВУК ПРИБРАНО)
 function processDecodedQR(data) {
+    // ЗАЛИШИЛАСЯ ТІЛЬКИ ВІБРАЦІЯ (Абсолютна тиша)
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
-    playSystemTone(800, 300);
 
-    // Перевіряємо ЗАШИФРОВАНИЙ військовий чат (новий формат)
     if (data.startsWith("SEC:")) {
         try {
             let msg = decryptData(data.substring(4)); 
@@ -423,7 +478,6 @@ function processDecodedQR(data) {
         }
         return;
     }
-    // Залишив старі формати, раптом хтось з побратимів не оновив додаток
     if (data.startsWith("CHAT:")) {
         try { let msg = decodeURIComponent(data.substring(5)); alert("📥 ПОВІДОМЛЕННЯ (Без шифру):\n\n" + msg); } catch (err) {} return;
     }
@@ -431,7 +485,6 @@ function processDecodedQR(data) {
         alert("📥 ПОВІДОМЛЕННЯ (Без шифру):\n\n" + data.substring(4)); return;
     }
     
-    // Перевіряємо маршрут
     try {
         let pts = JSON.parse(data);
         if (Array.isArray(pts)) {
@@ -441,7 +494,6 @@ function processDecodedQR(data) {
         }
     } catch(e) {}
 
-    // Якщо це щось інше
     alert("⚠️ ПРОЧИТАНО НЕВІДОМИЙ КОД:\n" + data);
 }
 
