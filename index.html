@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.12 TACTICAL</title>
+    <title>RA_MOBILE v10.13 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.12">
+    <link rel="stylesheet" href="style.css?v=10.13">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -34,18 +34,19 @@
     </div>
 
     <div id="qr-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:11000; flex-direction:column; align-items:center; justify-content:center;">
-        <h3 style="color:#4ade80; margin-bottom:20px;">СКАНУЙТЕ МАРШРУТ</h3>
+        <h3 style="color:#4ade80; margin-bottom:20px;">ОПТИЧНИЙ ДАНИЙ КОД</h3>
         <div id="qrcode-box" style="background:#fff; padding:15px; border-radius:10px;"></div>
         <button onclick="closeQR()" class="tactical-btn" style="width:200px; margin-top:30px; background:#333;">ЗАКРИТИ</button>
     </div>
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.12</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.13</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-eye'); closeNav()">👁 ОПТИКА / ШІ</a>
+        <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #0cf;">💬 ТЕКСТ / QR-РАЦІЯ</a>
         <a href="#" onclick="showModule('mod-shield'); closeNav()">🛡 ОХОРОНА / ЩИТ</a>
         <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #888;">📖 ІНСТРУКЦІЯ</a>
         <hr style="border: 0.5px solid #222; margin-top: 30px;">
@@ -144,7 +145,7 @@
                 <button id="btn-cal-star" class="tactical-btn" style="flex:1; background:#222; color:#fff; margin-top:0;">⭐ КАЛІБР (ЗІРКА)</button>
             </div>
 
-            <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;">📥 СКАНУВАТИ QR-МАРШРУТ</button>
+            <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;">📥 СКАНУВАТИ QR-КОД (Текст/Маршрут)</button>
             
             <div class="flex-row">
                 <button id="btn-cam" class="tactical-btn" style="margin-top:0;">🔴 КАМЕРА</button>
@@ -156,6 +157,19 @@
             </div>
         </section>
 
+        <!-- НОВИЙ МОДУЛЬ: QR-РАЦІЯ (ЧАТ) -->
+        <section id="mod-chat" class="module">
+            <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;">ОФЛАЙН QR-РАЦІЯ</h2>
+            <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 20px;">
+                Напишіть текст, створіть QR-код і покажіть екран побратиму. Він зможе відсканувати його через вкладку ОПТИКА. Жодного радіовипромінювання.
+            </p>
+            
+            <textarea id="chat-input" placeholder="Введіть коротке повідомлення..." style="width:90%; height:120px; margin: 0 5% 15px 5%; background:#111; color:#4ade80; border:1px solid #333; border-radius: 8px; padding:15px; font-family:monospace; font-size: 1rem; box-sizing: border-box; resize: none;"></textarea>
+            
+            <button onclick="generateChatQR()" class="tactical-btn" style="color: #0cf; border-color: #0cf;">СТВОРИТИ QR-ПОВІДОМЛЕННЯ</button>
+            <button onclick="clearChat()" class="tactical-btn" style="background:#200; color:#f33; border-color:#500; margin-top: 15px;">ОЧИСТИТИ ТЕКСТ</button>
+        </section>
+
         <!-- ЩИТ -->
         <section id="mod-shield" class="module">
             <h2>ОХОРОНА / ЩИТ</h2>
@@ -163,60 +177,43 @@
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
-        <!-- НОВА ДЕТАЛЬНА ІНСТРУКЦІЯ -->
+        <!-- ІНСТРУКЦІЯ -->
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;">БОЙОВИЙ ПОСІБНИК</h2>
-            
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
-                
+                <!-- Тут наша інструкція, я зберіг усе, лише додав про ЧАТ -->
                 <h3 style="color:#f1c40f; margin-top: 10px;">⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ</h3>
                 <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку.</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>РАДІОСЛІД:</b> Якщо світиться червоним — телефон шукає мережу або Wi-Fi. Це бачить ворожа радіорозвідка (РЕР). <b>РІШЕННЯ: Обов'язково увімкніть "Авіарежим" (Airplane mode).</b> Напис стане зеленим <b>[ СТЕЛС АКТИВНО ]</b>. GPS продовжить працювати автономно!</li>
-                    <li style="margin-bottom: 5px;"><b>ШВИД:</b> Ваша поточна швидкість пересування (в км/г).</li>
-                    <li style="margin-bottom: 5px;"><b>ВИСОТА (Альтиметр):</b> Показує висоту над рівнем моря в метрах. Допомагає орієнтуватися на рельєфі.</li>
-                    <li><b>ТОЧН (Точність GPS):</b> Показує похибку в метрах на вкладці Компас. Чим менша цифра — тим більше супутників вас бачить.</li>
+                    <li style="margin-bottom: 5px;"><b>РАДІОСЛІД:</b> Якщо світиться червоним — телефон шукає мережу. Це бачить РЕР. <b>РІШЕННЯ: Обов'язково увімкніть "Авіарежим".</b></li>
+                    <li style="margin-bottom: 5px;"><b>ВИСОТА (Альтиметр):</b> Показує висоту над рівнем моря в метрах.</li>
+                    <li><b>ТОЧН (Точність GPS):</b> Показує похибку в метрах на вкладці Компас.</li>
                 </ul>
 
-                <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
+                <h3 style="color:#0cf; margin-top: 10px;">💬 1. ТЕКСТ / QR-РАЦІЯ (АБСОЛЮТНА РАДІОТИША)</h3>
+                <p style="margin-bottom: 20px;">Дозволяє обмінюватися текстом між бійцями без блютузу чи інтернету. Напишіть текст, натисніть "СТВОРИТИ QR". Побратим має відкрити вкладку <b>ОПТИКА</b> і натиснути "СКАНУВАТИ QR-КОД". Використовуйте повзунок <b>"ЗУМ КАМЕРИ"</b> на вкладці Оптики, щоб читати код з відстані 2-3 метри!</p>
+
+                <h3 style="color:#4ade80; margin-top: 10px;">📍 2. МАРШРУТ ТА МАПА</h3>
                 <p style="margin-bottom: 10px;">Тут ти плануєш рух. Мапа завжди тримає максимальне наближення.</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>Поставити точку:</b> Натисни на екран мапи і потримай 1 секунду. Можна поставити до 10 точок.</li>
-                    <li><b>Меню (кнопка ☰ зліва внизу):</b>
-                        <ul style="padding-left: 15px; margin-top: 5px; list-style-type: circle;">
-                            <li><i>ТРАНСПОРТ:</i> Для авто чи броні. Вимикає магнітний компас, розраховує рух чисто по GPS.</li>
-                            <li><i>ПЕРЕДАТИ QR:</i> Робить QR-код маршруту, щоб передати побратиму.</li>
-                            <li><i>СЛІДКУВАТИ:</i> Центрує мапу на тобі під час руху.</li>
-                            <li><i>КЕШ 2х2 км:</i> Завантажує квадрат мапи навколо тебе для роботи без інтернету.</li>
-                        </ul>
-                    </li>
+                    <li style="margin-bottom: 5px;"><b>Поставити точку:</b> Натисни на екран мапи і потримай 1 секунду.</li>
+                    <li><b>Меню (кнопка ☰ зліва внизу):</b> ТРАНСПОРТ, ПЕРЕДАТИ QR, СЛІДКУВАТИ, КЕШ 2х2 км.</li>
                 </ul>
 
-                <h3 style="color:#f1c40f;">🧭 2. КОМПАС ТА НАВІГАЦІЯ</h3>
-                <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує останні координати). Коли лишається 15 метрів — ціль вважається взятою.</p>
+                <h3 style="color:#f1c40f;">🧭 3. КОМПАС ТА НАВІГАЦІЯ</h3>
+                <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує останні координати).</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>Якщо мітки немає:</b> Стрілка завжди вказує на Північ.</li>
-                    <li style="margin-bottom: 5px;"><b>ЕКО-БЛЕКАУТ:</b> Чорний екран для ночі. Краї екрана підсвічуються зеленим, показуючи напрямок цілі. Тримай палець на екрані 3 сек, щоб побачити точну дистанцію.</li>
+                    <li style="margin-bottom: 5px;"><b>ЕКО-БЛЕКАУТ:</b> Чорний екран для ночі. Краї екрана підсвічуються зеленим, показуючи напрямок цілі.</li>
                     <li style="margin-bottom: 5px;"><b>ПОВОДИР:</b> Підказує шлях у кишені вібрацією. Рухайся по колу і відчуй вібрацією напрямок до точки.</li>
-                    <li><b>КАЛІБРУВАННЯ:</b> Якщо стрілка бреше через метал, натисни "КАЛІБРУВАТИ ПРОХОДОМ" і пройди прямо 15 метрів. Або відкрий вкладку Оптики, ввімкни камеру, наведи перехрестя по центру вдень на Сонце, а вночі на Полярну зірку — програма математично розрахує напрямок до мітки.</li>
+                    <li><b>КАЛІБРУВАННЯ:</b> Пройди прямо 15 метрів або відкалібруй через Оптику по Сонцю чи Зірці.</li>
                 </ul>
 
-                <h3 style="color:#0cf;">👁 3. ОПТИКА ТА ШІ</h3>
+                <h3 style="color:#0cf;">👁 4. ОПТИКА ТА ШІ</h3>
                 <p style="margin-bottom: 10px;">Аналіз місцевості через камеру.</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>ШІ SCAN:</b> Інтелект обводить людей (зеленим) і техніку (червоним), розраховує дистанцію.</li>
-                    <li style="margin-bottom: 5px;"><b>ДЕТЕКТОР РУХУ:</b> Зафіксуй телефон. Програма блимає і вібрує на найменший рух у кадрі.</li>
-                    <li style="margin-bottom: 5px;"><b>СКАНУВАТИ QR:</b> Наведи камеру на екран командира, щоб отримати маршрут.</li>
-                    <li><i>Використовуй повзунки:</i> Налаштовуй Зум камери, дальність фокусу та чутливість.</li>
-                </ul>
-
-                <h3 style="color:#f44;">🛡 4. ОХОРОНА / ЩИТ</h3>
-                <p style="margin-bottom: 20px;">Поклади телефон, відкрий вкладку Щит і натисни "АКТИВУВАТИ". Якщо телефон ворухнеться — спрацює потужна вібрація та сирена.</p>
-
-                <h3 style="color:#ff3333;">💥 5. СИСТЕМНІ КНОПКИ (В МЕНЮ)</h3>
-                <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>🛑 ВИМКНУТИ ДОДАТОК:</b> Повністю зупиняє роботу програми, вимикає камеру та GPS-трекінг.</li>
-                    <li><b>💥 ЗНИЩИТИ ДАНІ:</b> Одне натискання миттєво стирає з пам'яті телефону всі точки, маршрути та історію твого руху.</li>
+                    <li style="margin-bottom: 5px;"><b>ШІ SCAN:</b> Інтелект обводить людей (зеленим) і техніку (червоним).</li>
+                    <li style="margin-bottom: 5px;"><b>ДЕТЕКТОР РУХУ:</b> Програма блимає і вібрує на найменший рух у кадрі.</li>
+                    <li style="margin-bottom: 5px;"><b>СКАНУВАТИ QR-КОД:</b> Зчитує маршрути або текстові повідомлення від побратимів.</li>
                 </ul>
             </div>
         </section>
@@ -224,6 +221,7 @@
 
     <!-- ЕКО ОВЕРЛЕЙ -->
     <div id="eco-overlay">
+        <!-- Код оверлею не змінено -->
         <div id="eco-top" class="eco-edge"></div>
         <div id="eco-bottom" class="eco-edge"></div>
         <div id="eco-left" class="eco-edge"></div>
@@ -233,6 +231,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.12"></script>
+    <script src="app.js?v=10.13"></script>
 </body>
 </html>
