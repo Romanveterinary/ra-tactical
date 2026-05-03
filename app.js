@@ -282,7 +282,6 @@ function traceVanishing() {
     }
 }
 
-// ГЕНЕРАЦІЯ QR ДЛЯ МАРШРУТУ
 document.getElementById('btn-share-qr').onclick = () => {
     if (routePoints.length === 0) return alert("Немає точок для передачі!");
     let data = JSON.stringify(routePoints.map(p => [p.lat, p.lng]));
@@ -293,22 +292,26 @@ document.getElementById('btn-share-qr').onclick = () => {
     } else { alert("Помилка генератора QR."); }
 };
 
-// ГЕНЕРАЦІЯ QR ДЛЯ ТЕКСТОВОГО ЧАТУ (НОВЕ)
 function generateChatQR() {
     let text = document.getElementById('chat-input').value.trim();
     if (!text) return alert("Спочатку введіть текст повідомлення!");
     document.getElementById('qrcode-box').innerHTML = '';
     if(typeof QRCode !== 'undefined') {
-        // Додаємо спеціальну мітку "MSG:", щоб сканер зрозумів, що це текст
-        new QRCode(document.getElementById('qrcode-box'), { text: "MSG:" + text, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
+        let safeText = "CHAT:" + encodeURIComponent(text);
+        new QRCode(document.getElementById('qrcode-box'), { text: safeText, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
         document.getElementById('qr-modal').style.display = 'flex';
     } else { alert("Помилка генератора QR."); }
 }
-function clearChat() { document.getElementById('chat-input').value = ''; }
 
+function clearChat() { document.getElementById('chat-input').value = ''; }
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
-// РОБОТА СКАНЕРА (РОЗУМІЄ І МАРШРУТ І ТЕКСТ)
+
+// ==========================================
+// БЛОК СКАНУВАННЯ (КАМЕРА ТА ФОТО)
+// ==========================================
+
+// 1. ЗАПУСК ЖИВОЇ КАМЕРИ
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
@@ -329,29 +332,88 @@ function scanQRFrame() {
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
         
         if (code) {
-            // Перевіряємо, чи це ТЕКСТОВЕ повідомлення (має нашу мітку "MSG:")
-            if (code.data.startsWith("MSG:")) {
-                let msg = code.data.substring(4); // Відрізаємо мітку "MSG:"
-                isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
-                alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
-                return;
-            }
-            
-            // Якщо не текст, намагаємося прочитати як МАРШРУТ
-            try {
-                let pts = JSON.parse(code.data);
-                if (Array.isArray(pts)) {
-                    routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
-                    isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
-                    if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
-                    alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); return;
-                }
-            } catch(e) {}
+            isScanningQR = false; 
+            document.getElementById('btn-scan-qr').style.color = "#0cf";
+            processDecodedQR(code.data);
+            return;
         }
     }
     requestAnimationFrame(scanQRFrame);
 }
+
+// 2. ЗАПУСК З ФОТОГРАФІЇ
+document.getElementById('btn-scan-photo').onclick = () => {
+    document.getElementById('qr-file-input').click();
+};
+
+document.getElementById('qr-file-input').addEventListener('change', function(e) {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    // Скидаємо значення, щоб можна було вибрати те саме фото ще раз
+    e.target.value = '';
+
+    let reader = new FileReader();
+    reader.onload = function(event) {
+        let img = new Image();
+        img.onload = function() {
+            let canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            let imageData = ctx.getImageData(0, 0, img.width, img.height);
+            
+            const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+
+            if (code) {
+                processDecodedQR(code.data);
+            } else {
+                alert("❌ QR-код не знайдено на фото. Спробуйте збільшити код або обрати інше фото.");
+            }
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+// 3. ЗАГАЛЬНА ФУНКЦІЯ РОЗШИФРОВКИ
+function processDecodedQR(data) {
+    if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
+    playSystemTone(800, 300);
+
+    // Перевіряємо секретний чат
+    if (data.startsWith("CHAT:")) {
+        try {
+            let msg = decodeURIComponent(data.substring(5)); 
+            alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
+        } catch (err) {
+            alert("❌ Помилка розшифровки повідомлення.");
+        }
+        return;
+    }
+    // Старий формат тексту (на випадок, якщо хтось не оновився)
+    if (data.startsWith("MSG:")) {
+        let msg = data.substring(4); 
+        alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
+        return;
+    }
+    
+    // Перевіряємо маршрут
+    try {
+        let pts = JSON.parse(data);
+        if (Array.isArray(pts)) {
+            routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
+            alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); 
+            return;
+        }
+    } catch(e) {}
+
+    // Якщо це щось інше
+    alert("⚠️ ПРОЧИТАНО НЕВІДОМИЙ КОД:\n" + data);
+}
+
+// ==========================================
 
 document.getElementById('btn-follow').onclick = () => {
     isMapFollowing = true; document.getElementById('btn-follow').style.color = '#4ade80';
