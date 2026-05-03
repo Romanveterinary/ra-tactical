@@ -263,7 +263,6 @@ function updateRoute() {
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = "ЦІЛЬ: --- м";
-        // Стрілку більше не ховаємо, вона сама вкаже на Північ у handleOrientation
         currentBearing = null; localStorage.removeItem('savedRoute'); return;
     }
 
@@ -318,7 +317,8 @@ function scanQRFrame() {
                 let pts = JSON.parse(code.data);
                 if (Array.isArray(pts)) {
                     routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
-                    isScanningQR = false document.getElementById('btn-scan-qr').style.color = "#0cf";
+                    // ТУТ БУЛА ПОМИЛКА: додано крапку з комою після false
+                    isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
                     alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); return;
                 }
@@ -492,7 +492,6 @@ function initGPS() {
     }
 }
 
-// ОНОВЛЕНО: Сувора економія в ЕКО-режимі та стрілка на Північ
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
@@ -533,7 +532,6 @@ function handleOrientation(e) {
     
     let displayDeg = Math.round(((currentDisplayAngle % 360) + 360) % 360);
     
-    // ЕКОНОМІЯ БАТАРЕЇ: Малюємо красивий компас тільки якщо НЕ Еко-режим
     if (!isEcoMode) {
         let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
         if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
@@ -546,11 +544,9 @@ function handleOrientation(e) {
     }
 
     if (currentBearing !== null) {
-        // Є ЦІЛЬ - Рахуємо кут до мітки
         let relAngle = currentBearing - currentDisplayAngle;
         let relMod = (((currentBearing - displayDeg) % 360) + 360) % 360;
 
-        // Показуємо стрілку тільки якщо НЕ Еко-режим
         if (!isEcoMode) {
             let arr = document.getElementById('tc-arrow');
             if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; }
@@ -579,7 +575,6 @@ function handleOrientation(e) {
             }
         }
     } else {
-        // НЕМАЄ ЦІЛІ - Стрілка вказує на Північ (азимут 0)
         if (!isEcoMode) {
             let relAngle = 0 - currentDisplayAngle;
             let arr = document.getElementById('tc-arrow');
