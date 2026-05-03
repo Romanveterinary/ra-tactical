@@ -212,7 +212,7 @@ function turnOffCamera() {
 }
 
 // ==========================================
-// 4. МАПА, QR, ТРАНСПОРТ ТА СЛІД
+// 4. МАПА, QR-МАРШРУТИ ТА QR-РАЦІЯ
 // ==========================================
 function toggleMapMenu() {
     const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
@@ -282,6 +282,7 @@ function traceVanishing() {
     }
 }
 
+// ГЕНЕРАЦІЯ QR ДЛЯ МАРШРУТУ
 document.getElementById('btn-share-qr').onclick = () => {
     if (routePoints.length === 0) return alert("Немає точок для передачі!");
     let data = JSON.stringify(routePoints.map(p => [p.lat, p.lng]));
@@ -291,8 +292,23 @@ document.getElementById('btn-share-qr').onclick = () => {
         document.getElementById('qr-modal').style.display = 'flex'; toggleMapMenu();
     } else { alert("Помилка генератора QR."); }
 };
+
+// ГЕНЕРАЦІЯ QR ДЛЯ ТЕКСТОВОГО ЧАТУ (НОВЕ)
+function generateChatQR() {
+    let text = document.getElementById('chat-input').value.trim();
+    if (!text) return alert("Спочатку введіть текст повідомлення!");
+    document.getElementById('qrcode-box').innerHTML = '';
+    if(typeof QRCode !== 'undefined') {
+        // Додаємо спеціальну мітку "MSG:", щоб сканер зрозумів, що це текст
+        new QRCode(document.getElementById('qrcode-box'), { text: "MSG:" + text, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
+        document.getElementById('qr-modal').style.display = 'flex';
+    } else { alert("Помилка генератора QR."); }
+}
+function clearChat() { document.getElementById('chat-input').value = ''; }
+
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
+// РОБОТА СКАНЕРА (РОЗУМІЄ І МАРШРУТ І ТЕКСТ)
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
@@ -313,6 +329,16 @@ function scanQRFrame() {
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
         
         if (code) {
+            // Перевіряємо, чи це ТЕКСТОВЕ повідомлення (має нашу мітку "MSG:")
+            if (code.data.startsWith("MSG:")) {
+                let msg = code.data.substring(4); // Відрізаємо мітку "MSG:"
+                isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
+                if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
+                alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
+                return;
+            }
+            
+            // Якщо не текст, намагаємося прочитати як МАРШРУТ
             try {
                 let pts = JSON.parse(code.data);
                 if (Array.isArray(pts)) {
@@ -397,7 +423,6 @@ function initGPS() {
             
             lastGpsProcessTime = now; 
 
-            // ОНОВЛЕННЯ: Зчитування та виведення висоти (Альтиметр)
             let altText = (alt !== null && alt !== undefined) ? Math.round(alt) + " м" : "--- м";
             let tcAltEl = document.getElementById('tc-alt');
             let hudAltEl = document.getElementById('alt-val');
