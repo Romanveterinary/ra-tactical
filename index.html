@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.15 TACTICAL</title>
+    <title>RA_MOBILE v10.16 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.15">
+    <link rel="stylesheet" href="style.css?v=10.16">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.15</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.16</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -163,9 +163,13 @@
         <!-- QR-РАЦІЯ (ЧАТ) -->
         <section id="mod-chat" class="module">
             <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;">ОФЛАЙН QR-РАЦІЯ</h2>
-            <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 20px;">
-                Напишіть текст, створіть зашифрований QR-код (маркер). Прочитати його зможуть тільки ваші побратими через цю програму.
+            <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;">
+                Пишіть текст або скануйте мітки побратимів прямо тут. Жодних звуків.
             </p>
+
+            <!-- ШВИДКИЙ СКАНЕР ДЛЯ ЧАТУ -->
+            <button id="btn-chat-cam" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:10px;">📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ</button>
+            <video id="v-chat-stream" autoplay playsinline muted style="width:90%; margin: 0 5% 10px 5%; border:2px solid #0cf; border-radius:8px; display:none; max-height: 250px; object-fit: cover;"></video>
             
             <textarea id="chat-input" maxlength="200" oninput="updateCharCount()" placeholder="Введіть коротке повідомлення..." style="width:90%; height:120px; margin: 0 5% 5px 5%; background:#111; color:#4ade80; border:1px solid #333; border-radius: 8px; padding:15px; font-family:monospace; font-size: 1rem; box-sizing: border-box; resize: none;"></textarea>
             <div id="char-counter" style="color:#aaa; font-size:0.8rem; text-align:right; margin-bottom:15px; padding: 0 5%;">Залишилось: 200 символів</div>
@@ -197,7 +201,9 @@
                 <p style="margin-bottom: 20px;">
                     Дозволяє обмінюватися текстом або залишати мітки. Напишіть текст (до 200 символів), натисніть "СТВОРИТИ ЗАШИФРОВАНИЙ QR". 
                     <br><br>
-                    <b>🛡 СЕКРЕТНІСТЬ:</b> Код математично зашифровано алгоритмом XOR! Ворог зі звичайним сканером побачить лише безглуздий набір літер і цифр. Прочитати справжній текст можна <b>ТІЛЬКИ через вкладку ОПТИКА нашого додатка.</b>
+                    Щоб швидко прочитати відповідь побратима, натисніть <b>"УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ"</b> прямо на вкладці чату.
+                    <br><br>
+                    <b>🛡 СЕКРЕТНІСТЬ:</b> Код математично зашифровано алгоритмом XOR! Ворог зі звичайним сканером побачить лише безглуздий набір літер і цифр. Прочитати справжній текст можна <b>ТІЛЬКИ через наш додаток.</b> Звукові сигнали під час читання автоматично ВИМКНЕНІ задля маскування.
                 </p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;">📍 2. МАРШРУТ ТА МАПА</h3>
@@ -237,6 +243,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.15"></script>
+    <script src="app.js?v=10.16"></script>
 </body>
 </html>
