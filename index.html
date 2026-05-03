@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.10 TACTICAL</title>
+    <title>RA_MOBILE v10.11 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.10">
+    <link rel="stylesheet" href="style.css?v=10.11">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.10</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.11</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -161,14 +161,49 @@
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
-        <!-- ІНСТРУКЦІЯ -->
+        <!-- НОВА ДЕТАЛЬНА ІНСТРУКЦІЯ -->
         <section id="mod-manual" class="module">
-            <h2 style="color: var(--glow); text-align: center;">ІНСТРУКЦІЯ СИСТЕМИ</h2>
-            <div style="color:#aaa; font-size: 0.9rem; line-height: 1.5; padding: 0 10px;">
-                <p><strong style="color:#4ade80;">1. МАРШРУТ / МАПА:</strong> Довге натискання створює точку. Кнопка "☰" відкриває тактичне меню: кешування мапи, зміна шарів, створення QR. <strong>РЕЖИМ ТРАНСПОРТ:</strong> вимикає магнітний компас, розраховує азимут за рухом GPS (для авто).</p>
-                <p><strong style="color:#f1c40f;">2. КОМПАС / ПОВОДИР:</strong> Показує напрямок до мітки (скидається на 15м). <strong>Якщо ціль не задана, стрілка завжди вказує на Північ.</strong> Навігація працює навіть при втраті GPS (за останніми координатами). <strong>ПОВОДИР:</strong> вібро/звук підказують напрямок.</p>
-                <p><strong style="color:#0cf;">3. ОПТИКА / ШІ:</strong> Камера з прицілом. Використовуйте повзунки для налаштування ЗУМУ та чутливості сканерів. Калібрування по Сонцю/Зірці робиться через наведення зеленого прицілу на світило.</p>
-                <p><strong style="color:#f44;">4. ОХОРОНА / ЩИТ:</strong> Активація гіроскопа. Реагує на найменший рух телефону.</p>
+            <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;">БОЙОВИЙ ПОСІБНИК</h2>
+            
+            <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
+                
+                <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
+                <p style="margin-bottom: 10px;">Тут ти плануєш рух. Мапа завжди тримає максимальне наближення.</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 5px;"><b>Поставити точку:</b> Натисни на екран мапи і потримай 1 секунду. Можна поставити до 10 точок.</li>
+                    <li><b>Меню (кнопка ☰ зліва внизу):</b>
+                        <ul style="padding-left: 15px; margin-top: 5px; list-style-type: circle;">
+                            <li><i>ТРАНСПОРТ:</i> Для авто чи броні. Вимикає магнітний компас, розраховує рух чисто по GPS.</li>
+                            <li><i>ПЕРЕДАТИ QR:</i> Робить QR-код маршруту, щоб передати побратиму.</li>
+                            <li><i>СЛІДКУВАТИ:</i> Центрує мапу на тобі під час руху.</li>
+                            <li><i>КЕШ 2х2 км:</i> Завантажує квадрат мапи навколо тебе для роботи без інтернету.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 style="color:#f1c40f;">🧭 2. КОМПАС ТА НАВІГАЦІЯ</h3>
+                <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує останні координати). Коли лишається 15 метрів — ціль вважається взятою.</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 5px;"><b>Якщо мітки немає:</b> Стрілка завжди вказує на Північ.</li>
+                    <li style="margin-bottom: 5px;"><b>ЕКО-БЛЕКАУТ:</b> Чорний екран для ночі. Краї екрана підсвічуються зеленим, показуючи напрямок цілі. Тримай палець на екрані 3 сек, щоб побачити точну дистанцію.</li>
+                    <li style="margin-bottom: 5px;"><b>ПОВОДИР:</b> Підказує шлях у кишені вібрацією (чи звуком). <i>КОРИДОР</i> — вібрує тільки коли збився. <i>ПОШУК</i> — вібрує частіше, чим ближче ти до цілі.</li>
+                    <li><b>КАЛІБРУВАННЯ (якщо стрілка бреше через метал):</b> Натисни "КАЛІБРУВАТИ ПРОХОДОМ" і пройди прямо 15 метрів. Або відкрий вкладку Оптики і відкалібруй по Сонцю чи Зірці через приціл.</li>
+                </ul>
+
+                <h3 style="color:#0cf;">👁 3. ОПТИКА ТА ШІ</h3>
+                <p style="margin-bottom: 10px;">Аналіз місцевості через камеру.</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 5px;"><b>ШІ SCAN:</b> Інтелект обводить людей (зеленим) і техніку (червоним), розраховує дистанцію.</li>
+                    <li style="margin-bottom: 5px;"><b>ДЕТЕКТОР РУХУ:</b> Зафіксуй телефон. Програма блимає і вібрує на найменший рух у кадрі.</li>
+                    <li style="margin-bottom: 5px;"><b>СКАЙНУВАТИ QR:</b> Наведи камеру на екран командира, щоб отримати маршрут.</li>
+                    <li><i>Використовуй повзунки:</i> Налаштовуй Зум камери, дальність фокусу та чутливість (щоб прибрати хибні тривоги).</li>
+                </ul>
+
+                <h3 style="color:#f44;">🛡 4. ОХОРОНА / ЩИТ</h3>
+                <p style="margin-bottom: 20px;">Поклади телефон, відкрий вкладку Щит і натисни "АКТИВУВАТИ". Якщо телефон ворухнеться — спрацює потужна вібрація та сирена.</p>
+
+                <h3 style="color:#ff3333;">💥 5. ЕКСТРЕНЕ ЗНИЩЕННЯ ДАНИХ</h3>
+                <p style="margin-bottom: 20px;">У боковому меню (☰) є червона кнопка. Одне натискання миттєво стирає з пам'яті телефону всі точки, маршрути та історію твого руху.</p>
             </div>
         </section>
     </div>
@@ -184,6 +219,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.10"></script>
+    <script src="app.js?v=10.11"></script>
 </body>
 </html>
