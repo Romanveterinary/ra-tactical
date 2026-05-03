@@ -317,7 +317,6 @@ function scanQRFrame() {
                 let pts = JSON.parse(code.data);
                 if (Array.isArray(pts)) {
                     routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
-                    // ТУТ БУЛА ПОМИЛКА: додано крапку з комою після false
                     isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
                     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); playSystemTone(800, 300);
                     alert("МАРШРУТ УСПІШНО ОТРИМАНО!"); showModule('mod-map'); return;
@@ -373,7 +372,7 @@ if(btnTransport) {
 }
 
 // ==========================================
-// 5. РОЗУМНИЙ GPS ТА ПОВОДИР
+// 5. РОЗУМНИЙ GPS, АЛЬТИМЕТР ТА ПОВОДИР
 // ==========================================
 function updateSunPosition(lat, lon) {
     let sunAz = getSunAzimuth(lat, lon, new Date());
@@ -394,9 +393,16 @@ function initGPS() {
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
-            const { latitude: lat, longitude: lon, speed: spd, accuracy: acc } = pos.coords;
+            const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
             
             lastGpsProcessTime = now; 
+
+            // ОНОВЛЕННЯ: Зчитування та виведення висоти (Альтиметр)
+            let altText = (alt !== null && alt !== undefined) ? Math.round(alt) + " м" : "--- м";
+            let tcAltEl = document.getElementById('tc-alt');
+            let hudAltEl = document.getElementById('alt-val');
+            if (tcAltEl) tcAltEl.innerText = `ВИСОТА: ${altText}`;
+            if (hudAltEl) hudAltEl.innerText = `ВИС: ${altText}`;
 
             let stat = document.getElementById('gps-status');
             if(acc > 200) {
