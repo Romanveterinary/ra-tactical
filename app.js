@@ -39,8 +39,10 @@ if ('serviceWorker' in navigator) {
 }
 
 // ==========================================
-// 1. ГЛОБАЛЬНІ ЗМІННІ
+// 1. ГЛОБАЛЬНІ ЗМІННІ ТА ШИФРУВАННЯ
 // ==========================================
+const CRYPTO_KEY = "RA_STORM_2026"; // Наш секретний військовий ключ
+
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
@@ -183,15 +185,8 @@ function showModule(id) {
 
     if (id === 'mod-map') {
         requestWakeLock();
-        if (map) { 
-            setTimeout(() => { 
-                map.invalidateSize(); 
-                if (lastGoodGPS) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); 
-            }, 200); 
-        }
-    } else {
-        releaseWakeLock();
-    }
+        if (map) { setTimeout(() => { map.invalidateSize(); if (lastGoodGPS) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); }, 200); }
+    } else { releaseWakeLock(); }
     
     if (id !== 'mod-eye') turnOffCamera();
 }
@@ -212,7 +207,7 @@ function turnOffCamera() {
 }
 
 // ==========================================
-// 4. МАПА, QR-МАРШРУТИ ТА QR-РАЦІЯ
+// 4. МАПА, QR-МАРШРУТИ ТА ЗАШИФРОВАНА РАЦІЯ
 // ==========================================
 function toggleMapMenu() {
     const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
@@ -292,18 +287,55 @@ document.getElementById('btn-share-qr').onclick = () => {
     } else { alert("Помилка генератора QR."); }
 };
 
+// --- ФУНКЦІЇ ШИФРУВАННЯ ТА ЛІЧИЛЬНИКА ---
+function updateCharCount() {
+    let el = document.getElementById('chat-input');
+    let counter = document.getElementById('char-counter');
+    if(el && counter) {
+        let left = 200 - el.value.length;
+        counter.innerText = `Залишилось: ${left} символів`;
+    }
+}
+
+function encryptData(text) {
+    let encrypted = "";
+    let safeText = encodeURIComponent(text); 
+    for (let i = 0; i < safeText.length; i++) {
+        // Застосовуємо XOR шифрування
+        encrypted += String.fromCharCode(safeText.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
+    }
+    // btoa робить з цього безпечну строку для QR-коду
+    return btoa(encrypted); 
+}
+
+function decryptData(encodedText) {
+    let decrypted = "";
+    let decodedStr = atob(encodedText); // Розшифровуємо з бази
+    for (let i = 0; i < decodedStr.length; i++) {
+        // Знімаємо XOR шифрування
+        decrypted += String.fromCharCode(decodedStr.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
+    }
+    return decodeURIComponent(decrypted);
+}
+
 function generateChatQR() {
     let text = document.getElementById('chat-input').value.trim();
     if (!text) return alert("Спочатку введіть текст повідомлення!");
+    
     document.getElementById('qrcode-box').innerHTML = '';
     if(typeof QRCode !== 'undefined') {
-        let safeText = "CHAT:" + encodeURIComponent(text);
+        // Шифруємо і додаємо маркер "SEC:" (Секретно)
+        let safeText = "SEC:" + encryptData(text);
         new QRCode(document.getElementById('qrcode-box'), { text: safeText, width: 220, height: 220, colorDark : "#000000", colorLight : "#ffffff" });
         document.getElementById('qr-modal').style.display = 'flex';
     } else { alert("Помилка генератора QR."); }
 }
 
-function clearChat() { document.getElementById('chat-input').value = ''; }
+function clearChat() { 
+    document.getElementById('chat-input').value = ''; 
+    updateCharCount();
+}
+
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
 
@@ -350,7 +382,6 @@ document.getElementById('qr-file-input').addEventListener('change', function(e) 
     let file = e.target.files[0];
     if (!file) return;
 
-    // Скидаємо значення, щоб можна було вибрати те саме фото ще раз
     e.target.value = '';
 
     let reader = new FileReader();
@@ -382,21 +413,22 @@ function processDecodedQR(data) {
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
     playSystemTone(800, 300);
 
-    // Перевіряємо секретний чат
-    if (data.startsWith("CHAT:")) {
+    // Перевіряємо ЗАШИФРОВАНИЙ військовий чат (новий формат)
+    if (data.startsWith("SEC:")) {
         try {
-            let msg = decodeURIComponent(data.substring(5)); 
+            let msg = decryptData(data.substring(4)); 
             alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
         } catch (err) {
-            alert("❌ Помилка розшифровки повідомлення.");
+            alert("❌ Помилка: Неможливо розшифрувати. Код пошкоджено або ключ невірний.");
         }
         return;
     }
-    // Старий формат тексту (на випадок, якщо хтось не оновився)
+    // Залишив старі формати, раптом хтось з побратимів не оновив додаток
+    if (data.startsWith("CHAT:")) {
+        try { let msg = decodeURIComponent(data.substring(5)); alert("📥 ПОВІДОМЛЕННЯ (Без шифру):\n\n" + msg); } catch (err) {} return;
+    }
     if (data.startsWith("MSG:")) {
-        let msg = data.substring(4); 
-        alert("📥 СЕКРЕТНЕ ПОВІДОМЛЕННЯ:\n\n" + msg);
-        return;
+        alert("📥 ПОВІДОМЛЕННЯ (Без шифру):\n\n" + data.substring(4)); return;
     }
     
     // Перевіряємо маршрут
