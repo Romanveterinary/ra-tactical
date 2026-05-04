@@ -41,7 +41,7 @@ if ('serviceWorker' in navigator) {
 // ==========================================
 // 1. ГЛОБАЛЬНІ ЗМІННІ ТА ШИФРУВАННЯ
 // ==========================================
-const CRYPTO_KEY = "RA_STORM_2026"; // Наш секретний військовий ключ
+const CRYPTO_KEY = "RA_STORM_2026"; 
 
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
@@ -50,6 +50,14 @@ let hardwareHeading = 0, compassOffset = 0, currentBearing = null;
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
 let hasAbsoluteOrientation = false; 
+
+// Змінні для плавної та енергоефективної анімації компаса
+let targetDisplayAngle = 0;
+let isCompassAnimating = false;
+
+// Змінні для аудіо-рації
+let isListeningAudio = false;
+let audioListenTimer = null;
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -75,7 +83,6 @@ let wakeLock = null;
 let isTransportMode = false;
 let lastGpsCoordsForTransport = null;
 
-// Змінні Смарт-Штурмана (База та Реверс)
 let hasBase = false;
 let isReturnMode = false;
 let homeBasePoint = null;
@@ -238,7 +245,6 @@ function toggleMapMenu() {
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
-        // Повертаємо детальну супутникову мапу Google
         topoLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
         darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
@@ -274,7 +280,6 @@ function updateRoute() {
     routeMarkers.forEach(m => map.removeLayer(m)); routeMarkers = [];
     if(routeLine) map.removeLayer(routeLine);
     
-    // МАЛЮЄМО БАЗУ (Коричневу), якщо вона є
     if (homeBasePoint) {
         let baseMarker = L.circleMarker(homeBasePoint, { color: '#8B4513', radius: 10, fillOpacity: 1 }).addTo(map);
         routeMarkers.push(baseMarker);
@@ -286,7 +291,6 @@ function updateRoute() {
         document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = "ЦІЛЬ: --- м";
         
-        // Якщо йдемо назад і точок нема - ведемо на базу
         if (isReturnMode && homeBasePoint && lastGoodGPS) {
              currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, homeBasePoint.lat, homeBasePoint.lng);
         } else {
@@ -295,13 +299,11 @@ function updateRoute() {
         localStorage.removeItem('savedRoute'); return;
     }
 
-    // МАЛЮЄМО МАРШРУТ
     routePoints.forEach((p, i) => { 
         let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : (isReturnMode ? '#f1c40f' : '#f0f'), radius: 8, fillOpacity: 1 }).addTo(map); 
         routeMarkers.push(m); 
     });
     
-    // Лінія
     if(routePoints.length > 0 && homeBasePoint) { 
         let allPts = isReturnMode ? [...routePoints, homeBasePoint] : [homeBasePoint, ...routePoints];
         routeLine = L.polyline(allPts, { color: isReturnMode ? '#f1c40f' : '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); 
@@ -333,7 +335,6 @@ document.getElementById('btn-share-qr').onclick = () => {
     } else { alert("Помилка генератора QR."); }
 };
 
-// --- ФУНКЦІЇ ШИФРУВАННЯ ТА ЛІЧИЛЬНИКА ---
 function updateCharCount() {
     let el = document.getElementById('chat-input');
     let counter = document.getElementById('char-counter');
@@ -385,7 +386,6 @@ function closeQR() { document.getElementById('qr-modal').style.display = 'none';
 // БЛОК СКАНУВАННЯ (ОПТИКА, ФОТО ТА НОВИЙ ЧАТ)
 // ==========================================
 
-// 1. ЗАПУСК КАМЕРИ НА ВКЛАДЦІ ЧАТУ (НОВЕ)
 document.getElementById('btn-chat-cam').onclick = async () => {
     const video = document.getElementById('v-chat-stream');
     let btn = document.getElementById('btn-chat-cam');
@@ -435,8 +435,6 @@ function scanQRChatFrame() {
     requestAnimationFrame(scanQRChatFrame);
 }
 
-
-// 2. ЗАПУСК ЖИВОЇ КАМЕРИ НА ВКЛАДЦІ ОПТИКИ
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
@@ -466,7 +464,6 @@ function scanQROpticsFrame() {
     requestAnimationFrame(scanQROpticsFrame);
 }
 
-// 3. ЗАПУСК З ФОТОГРАФІЇ
 document.getElementById('btn-scan-photo').onclick = () => {
     document.getElementById('qr-file-input').click();
 };
@@ -501,7 +498,6 @@ document.getElementById('qr-file-input').addEventListener('change', function(e) 
     reader.readAsDataURL(file);
 });
 
-// 4. ЗАГАЛЬНА ФУНКЦІЯ РОЗШИФРОВКИ (ЗВУК ПРИБРАНО)
 function processDecodedQR(data) {
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
 
@@ -640,7 +636,6 @@ function initGPS() {
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            // ЛОГІКА НАВЕДЕННЯ НА ЦІЛЬ ТА ПОГЛИНАННЯ ТОЧОК
             let targetPoint = null;
             if (routePoints.length > 0) {
                 targetPoint = routePoints[0];
@@ -735,6 +730,7 @@ function initGPS() {
     }
 }
 
+// === ОНОВЛЕНИЙ БЛОК КОМПАСА (ПЛАВНІСТЬ ТА ЕКО-РЕЖИМ) ===
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
@@ -762,28 +758,58 @@ function handleOrientation(e) {
     
     if (isFirstCompassUpdate) {
         currentDisplayAngle = trueH;
+        targetDisplayAngle = trueH;
         isFirstCompassUpdate = false;
+        updateCompassUI(); 
     } else {
-        let currentMod = ((currentDisplayAngle % 360) + 360) % 360;
-        let delta = trueH - currentMod;
+        targetDisplayAngle = trueH;
         
-        if (delta > 180) delta -= 360;
-        else if (delta < -180) delta += 360;
-        
-        currentDisplayAngle += delta * 0.08; 
+        if (!isCompassAnimating) {
+            isCompassAnimating = true;
+            requestAnimationFrame(animateCompass);
+        }
     }
-    
+
+    if (!isEcoMode) {
+        let pitch = e.beta || 0; 
+        let clinoBar = document.getElementById('clino-bar');
+        if(clinoBar) { 
+            let boundedPitch = Math.max(-90, Math.min(90, pitch)); 
+            clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; 
+        }
+    }
+}
+
+function animateCompass() {
+    let delta = targetDisplayAngle - currentDisplayAngle;
+    delta = ((delta % 360) + 540) % 360 - 180; 
+
+    if (Math.abs(delta) < 0.5) {
+        currentDisplayAngle = targetDisplayAngle;
+        updateCompassUI(); 
+        isCompassAnimating = false; 
+        return;
+    }
+
+    currentDisplayAngle += delta * 0.15; 
+    updateCompassUI();
+
+    if (isCompassAnimating) {
+        requestAnimationFrame(animateCompass);
+    }
+}
+
+function updateCompassUI() {
     let displayDeg = Math.round(((currentDisplayAngle % 360) + 360) % 360);
     
     if (!isEcoMode) {
-        let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
+        let ring = document.getElementById('tc-ring'); 
+        let deg = document.getElementById('tc-deg');
         if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
         if(deg) deg.innerText = displayDeg + "°"; 
         
-        let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
-
-        let pitch = e.beta || 0; let clinoBar = document.getElementById('clino-bar');
-        if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, pitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
+        let tri = document.getElementById('user-tri'); 
+        if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
     }
 
     if (currentBearing !== null) {
@@ -1039,5 +1065,107 @@ function activateReturnMode() {
         alert("Вектор змінено! Стрілка компаса вказує на найближчу залишену вами точку (хлібну крихту).");
         
         showModule('mod-compass'); 
+    }
+}
+
+// ==========================================
+// 10. АУДІО-РАЦІЯ (ПЕРЕДАЧА ТА ПРИЙОМ)
+// ==========================================
+async function sendAudioMessage() {
+    let text = document.getElementById('chat-input').value.trim();
+    if (!text) return alert("Спочатку введіть текст повідомлення для передачі!");
+    
+    let btn = document.getElementById('btn-send-audio');
+    btn.innerText = "🔊 ПЕРЕДАЧА В ЕФІР...";
+    btn.style.color = "#f33";
+    btn.style.borderColor = "#f33";
+
+    // Шифруємо та додаємо маркер як у QR
+    let safeText = "SEC:" + encryptData(text);
+    
+    // Ініціалізація аудіо для генерації
+    const audioCtxTx = new (window.AudioContext || window.webkitAudioContext)();
+    const startTime = audioCtxTx.currentTime;
+    const FREQ_0 = 9000;
+    const FREQ_1 = 11000;
+    const BIT_DURATION = 0.05;
+
+    // Переводимо зашифрований текст у біти
+    let binaryData = [];
+    for (let i = 0; i < safeText.length; i++) {
+        let binChar = safeText.charCodeAt(i).toString(2).padStart(8, '0');
+        for (let b of binChar) binaryData.push(parseInt(b));
+    }
+
+    // Стартовий сигнал
+    playTone(audioCtxTx, FREQ_1, startTime, 0.2); 
+    
+    let currentTime = startTime + 0.25;
+    binaryData.forEach((bit) => {
+        let freq = (bit === 1) ? FREQ_1 : FREQ_0;
+        playTone(audioCtxTx, freq, currentTime, BIT_DURATION);
+        currentTime += BIT_DURATION;
+    });
+
+    setTimeout(() => {
+        btn.innerText = "🔊 ПЕРЕДАТИ ЗВУКОМ";
+        btn.style.color = "#4ade80";
+        btn.style.borderColor = "#4ade80";
+    }, (currentTime - startTime) * 1000);
+}
+
+function playTone(ctx, frequency, time, duration) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = frequency;
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.2, time + 0.01);
+    gain.gain.linearRampToValueAtTime(0, time + duration - 0.01);
+    osc.start(time);
+    osc.stop(time + duration);
+}
+
+async function toggleAudioReceiver() {
+    let btn = document.getElementById('btn-listen-audio');
+    
+    if (isListeningAudio) {
+        // Вимикаємо
+        isListeningAudio = false;
+        clearTimeout(audioListenTimer);
+        btn.innerText = "🎤 СЛУХАТИ ЕФІР (ЗВУК)";
+        btn.style.color = "#4ade80";
+        btn.style.borderColor = "#4ade80";
+        return;
+    }
+
+    // Вмикаємо
+    try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        isListeningAudio = true;
+        btn.innerText = "👂 СЛУХАЮ ЕФІР (10 сек)...";
+        btn.style.color = "#f1c40f";
+        btn.style.borderColor = "#f1c40f";
+
+        // ТИМЧАСОВА ЗАГЛУШКА ДЛЯ ТЕСТУ ІНТЕРФЕЙСУ:
+        audioListenTimer = setTimeout(() => {
+            if (!isListeningAudio) return;
+            
+            // Вимикаємо режим слухання
+            isListeningAudio = false;
+            btn.innerText = "🎤 СЛУХАТИ ЕФІР (ЗВУК)";
+            btn.style.color = "#4ade80";
+            btn.style.borderColor = "#4ade80";
+            
+            // Імітуємо отримання зашифрованого тексту
+            let testEncrypted = "SEC:" + encryptData("ТЕСТ: Зв'язок працює!");
+            processDecodedQR(testEncrypted); // Викликаємо існуюче спливаюче вікно
+            
+        }, 4000);
+
+    } catch (err) {
+        alert("❌ Мікрофон заблоковано!");
     }
 }
