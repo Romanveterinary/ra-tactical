@@ -41,7 +41,7 @@ if ('serviceWorker' in navigator) {
 // ==========================================
 // 1. ГЛОБАЛЬНІ ЗМІННІ ТА ШИФРУВАННЯ
 // ==========================================
-const CRYPTO_KEY = "RA_STORM_2026"; 
+const CRYPTO_KEY = "RA_STORM_2026"; // Наш секретний військовий ключ
 
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
@@ -75,7 +75,7 @@ let wakeLock = null;
 let isTransportMode = false;
 let lastGpsCoordsForTransport = null;
 
-// Змінні Смарт-Штурмана
+// Змінні Смарт-Штурмана (База та Реверс)
 let hasBase = false;
 let isReturnMode = false;
 let homeBasePoint = null;
@@ -160,21 +160,12 @@ function triggerDestroyProtocol() {
     if (confirm("УВАГА! ЗНИЩИТИ ВЕСЬ МАРШРУТ ТА ДАНІ ПРОГРАМИ?")) {
         routePoints = []; tracePoints = []; 
         hasBase = false; isReturnMode = false; homeBasePoint = null;
-        
-        let btn = document.getElementById('btn-smart-pilot');
-        if (btn) {
-            btn.innerText = "СТАРТ (ВСТАНОВИТИ БАЗУ)";
-            btn.style.background = "#4ade80";
-            btn.style.color = "#000";
-            btn.style.borderColor = "#333";
-        }
         let btnRet = document.getElementById('btn-return-home');
         if(btnRet) btnRet.style.display = 'none';
-
+        
         updateRoute();
         if(traceLineLayer && map) map.removeLayer(traceLineLayer);
         localStorage.removeItem('savedRoute');
-        localStorage.removeItem('savedBase');
         currentBearing = null;
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
@@ -236,7 +227,7 @@ function turnOffCamera() {
 }
 
 // ==========================================
-// 4. МАПА ТА QR
+// 4. МАПА, QR-МАРШРУТИ ТА ЗАШИФРОВАНА РАЦІЯ
 // ==========================================
 function toggleMapMenu() {
     const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
@@ -247,8 +238,7 @@ function toggleMapMenu() {
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
-        // Замінив мапу на супутникову від Google для максимальної деталізації в полі
-        topoLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
+        topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 });
         darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
@@ -274,24 +264,7 @@ function initMap() {
         map.on('dragstart', () => { isMapFollowing = false; document.getElementById('btn-follow').style.color = '#fff'; });
 
         const saved = localStorage.getItem('savedRoute');
-        if(saved) { routePoints = JSON.parse(saved); }
-        
-        const savedBase = localStorage.getItem('savedBase');
-        if (savedBase) {
-            homeBasePoint = L.latLng(JSON.parse(savedBase));
-            hasBase = true;
-            let btn = document.getElementById('btn-smart-pilot');
-            let btnRet = document.getElementById('btn-return-home');
-            if (btn) {
-                btn.innerText = "📍 Я ПРОЙШОВ КРОК";
-                btn.style.background = "#111";
-                btn.style.color = "#0cf";
-                btn.style.borderColor = "#0cf";
-            }
-            if (btnRet) btnRet.style.display = "block";
-        }
-        
-        updateRoute();
+        if(saved) { routePoints = JSON.parse(saved); updateRoute(); }
     } catch(e) {}
 }
 
@@ -300,44 +273,43 @@ function updateRoute() {
     routeMarkers.forEach(m => map.removeLayer(m)); routeMarkers = [];
     if(routeLine) map.removeLayer(routeLine);
     
-    // МАЛЮЄМО БАЗУ (Коричневу), якщо вона є. Вона не зникає!
+    // МАЛЮЄМО БАЗУ (Коричневу), якщо вона є
     if (homeBasePoint) {
-        let baseMarker = L.circleMarker(homeBasePoint, { color: '#8B4513', radius: 10, fillOpacity: 1, weight: 3 }).addTo(map);
+        let baseMarker = L.circleMarker(homeBasePoint, { color: '#8B4513', radius: 10, fillOpacity: 1 }).addTo(map);
         routeMarkers.push(baseMarker);
     }
 
     if (routePoints.length === 0) {
-        document.getElementById('route-info').innerText = isReturnMode ? "ЦІЛЬ: БАЗА!" : "ЦІЛЬ: НЕМАЄ";
+        document.getElementById('route-info').innerText = isReturnMode ? "ЦІЛЬ: БАЗА" : "ЦІЛЬ: НЕМАЄ";
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = "ЦІЛЬ: --- м";
         
+        // Якщо йдемо назад і точок нема - ведемо на базу
         if (isReturnMode && homeBasePoint && lastGoodGPS) {
-            currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, homeBasePoint.lat, homeBasePoint.lng);
+             currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, homeBasePoint.lat, homeBasePoint.lng);
         } else {
-            currentBearing = null; 
+             currentBearing = null; 
         }
-        localStorage.removeItem('savedRoute');
-        if (homeBasePoint) localStorage.setItem('savedBase', JSON.stringify(homeBasePoint));
-        else localStorage.removeItem('savedBase');
-        return;
+        localStorage.removeItem('savedRoute'); return;
     }
 
+    // МАЛЮЄМО МАРШРУТ
     routePoints.forEach((p, i) => { 
-        let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : (isReturnMode ? '#f1c40f' : '#0cf'), radius: 8, fillOpacity: 1 }).addTo(map); 
+        let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : (isReturnMode ? '#f1c40f' : '#f0f'), radius: 8, fillOpacity: 1 }).addTo(map); 
         routeMarkers.push(m); 
     });
     
+    // Лінія
     if(routePoints.length > 0 && homeBasePoint) { 
         let allPts = isReturnMode ? [...routePoints, homeBasePoint] : [homeBasePoint, ...routePoints];
-        routeLine = L.polyline(allPts, { color: isReturnMode ? '#f1c40f' : '#0cf', weight: 3, dashArray: '5, 10' }).addTo(map); 
+        routeLine = L.polyline(allPts, { color: isReturnMode ? '#f1c40f' : '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); 
     } else if(routePoints.length > 1) { 
-        routeLine = L.polyline(routePoints, { color: isReturnMode ? '#f1c40f' : '#0cf', weight: 3, dashArray: '5, 10' }).addTo(map); 
+        routeLine = L.polyline(routePoints, { color: '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); 
     }
     
     document.getElementById('route-info').innerText = isReturnMode ? `ПОВЕРНЕННЯ: ЗАЛИШИЛОСЬ ${routePoints.length} ТОЧОК` : `ЦІЛЬ: ТОЧКА 1 З ${routePoints.length}`;
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
-    if (homeBasePoint) localStorage.setItem('savedBase', JSON.stringify(homeBasePoint));
 }
 
 function traceVanishing() {
@@ -409,8 +381,10 @@ function closeQR() { document.getElementById('qr-modal').style.display = 'none';
 
 
 // ==========================================
-// БЛОК СКАНУВАННЯ
+// БЛОК СКАНУВАННЯ (ОПТИКА, ФОТО ТА НОВИЙ ЧАТ)
 // ==========================================
+
+// 1. ЗАПУСК КАМЕРИ НА ВКЛАДЦІ ЧАТУ (НОВЕ)
 document.getElementById('btn-chat-cam').onclick = async () => {
     const video = document.getElementById('v-chat-stream');
     let btn = document.getElementById('btn-chat-cam');
@@ -460,6 +434,8 @@ function scanQRChatFrame() {
     requestAnimationFrame(scanQRChatFrame);
 }
 
+
+// 2. ЗАПУСК ЖИВОЇ КАМЕРИ НА ВКЛАДЦІ ОПТИКИ
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
     if (!video.srcObject) return alert("Спочатку увімкніть КАМЕРУ!");
@@ -489,6 +465,7 @@ function scanQROpticsFrame() {
     requestAnimationFrame(scanQROpticsFrame);
 }
 
+// 3. ЗАПУСК З ФОТОГРАФІЇ
 document.getElementById('btn-scan-photo').onclick = () => {
     document.getElementById('qr-file-input').click();
 };
@@ -523,6 +500,7 @@ document.getElementById('qr-file-input').addEventListener('change', function(e) 
     reader.readAsDataURL(file);
 });
 
+// 4. ЗАГАЛЬНА ФУНКЦІЯ РОЗШИФРОВКИ (ЗВУК ПРИБРАНО)
 function processDecodedQR(data) {
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
 
@@ -575,13 +553,6 @@ document.getElementById('btn-clear-map').onclick = () => {
         hasBase = false;
         isReturnMode = false;
         homeBasePoint = null;
-        let btn = document.getElementById('btn-smart-pilot');
-        if (btn) {
-            btn.innerText = "СТАРТ (ВСТАНОВИТИ БАЗУ)";
-            btn.style.background = "#4ade80";
-            btn.style.color = "#000";
-            btn.style.borderColor = "#333";
-        }
         let btnRet = document.getElementById('btn-return-home');
         if(btnRet) btnRet.style.display = 'none';
         updateRoute(); 
@@ -692,13 +663,8 @@ function initGPS() {
                         hasBase = false;
                         homeBasePoint = null;
                         updateRoute();
+                        if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
                         alert("🎉 БАЗА ДОСЯГНУТА!");
-                        let btn = document.getElementById('btn-smart-pilot');
-                        if (btn) {
-                            btn.innerText = "СТАРТ (ВСТАНОВИТИ БАЗУ)";
-                            btn.style.background = "#4ade80";
-                            btn.style.color = "#000";
-                        }
                     }
                 } 
                 else { currentBearing = calcBearing(lat, lon, targetPoint.lat, targetPoint.lng); }
@@ -828,7 +794,6 @@ function handleOrientation(e) {
             if (arr) { 
                 arr.style.display = 'block'; 
                 arr.style.transform = `rotate(${relAngle}deg)`; 
-                // Жовта стрілка, якщо йдемо назад
                 arr.style.borderBottomColor = isReturnMode ? '#f1c40f' : 'var(--danger)';
             }
         }
@@ -871,86 +836,6 @@ document.getElementById('btn-guide').onclick = async () => { await initSensors()
 
 function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
 function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
-
-// ==========================================
-// 6. СМАРТ-ПІЛОТ (ОДНА КНОПКА) ТА РЕВЕРС
-// ==========================================
-
-function handleSmartPilot() {
-    let btn = document.getElementById('btn-smart-pilot');
-    let btnRet = document.getElementById('btn-return-home');
-    
-    if (!lastGoodGPS) return alert("❌ Немає координат! Спіймайте сигнал або вкажіть 'Я ТУТ' на мапі вручну.");
-    
-    let currentPos = L.latLng(lastGoodGPS.lat, lastGoodGPS.lon);
-
-    if (isReturnMode) {
-        alert("📍 Орієнтир пройдено. Напрямок на наступну точку оновлено.");
-        if (routePoints.length > 0) {
-            let distToNext = currentPos.distanceTo(routePoints[0]);
-            if (distToNext < 25) { 
-                routePoints.shift(); 
-                updateRoute();
-                if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            }
-        }
-        return;
-    }
-
-    if (!hasBase) {
-        homeBasePoint = currentPos;
-        hasBase = true;
-        
-        btn.innerText = "🎯 ВСТАНОВИТИ ЦІЛЬ";
-        btn.style.background = "#0cf"; 
-        btn.style.color = "#000";
-        btnRet.style.display = "block"; 
-        
-        if(navigator.vibrate) navigator.vibrate([200]);
-        updateRoute(); 
-        alert("🟤 БАЗА зафіксована. Тепер натисніть 'ЦІЛЬ', коли дійдете до важливого орієнтира.");
-        return;
-    }
-
-    if (routePoints.length === 0) {
-        routePoints.push(currentPos);
-        updateRoute();
-        
-        btn.innerText = "📍 Я ПРОЙШОВ КРОК";
-        btn.style.background = "#111"; 
-        btn.style.color = "#0cf";
-        btn.style.borderColor = "#0cf";
-        
-        if(navigator.vibrate) navigator.vibrate([100, 100]);
-        return;
-    }
-
-    routePoints.push(currentPos);
-    updateRoute();
-    btn.innerText = `📍 КРОК ${routePoints.length} ЗБЕРЕЖЕНО`;
-    if(navigator.vibrate) navigator.vibrate(50);
-}
-
-function activateReturnMode() {
-    if (!hasBase) return alert("❌ Немає встановленої бази для повернення.");
-    if (confirm("🔄 Активувати режим ПОВЕРНЕННЯ ДО БАЗИ?")) {
-        isReturnMode = true;
-        
-        routePoints.reverse();
-        updateRoute();
-        
-        let btn = document.getElementById('btn-smart-pilot');
-        btn.innerText = "✅ ПІДТВЕРДИТИ ПРОХОДЖЕННЯ ТОЧКИ";
-        btn.style.background = "#f1c40f"; 
-        btn.style.color = "#000";
-        btn.style.borderColor = "#f1c40f";
-        
-        document.getElementById('btn-return-home').style.display = "none";
-        
-        if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-        alert("Вектор змінено! Стрілка компаса вказує на найближчу залишену вами точку (хлібну крихту).");
-    }
-}
 
 // ==========================================
 // 7. ОПТИКА, ЗУМ ТА ШІ
@@ -1118,4 +1003,40 @@ function calcBearing(lat1, lon1, lat2, lon2) {
     const dL = (lon2 - lon1) * Math.PI / 180; const l1 = lat1 * Math.PI / 180; const l2 = lat2 * Math.PI / 180;
     const y = Math.sin(dL) * Math.cos(l2); const x = Math.cos(l1) * Math.sin(l2) - Math.sin(l1) * Math.cos(l2) * Math.cos(dL);
     return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+// ==========================================
+// 9. БАЗА ТА РЕВЕРС (Для меню мапи)
+// ==========================================
+
+function setBasePoint() {
+    if (!lastGoodGPS) return alert("❌ Немає GPS! Зачекайте на сигнал, щоб зафіксувати Базу на ваших поточних координатах.");
+    
+    homeBasePoint = L.latLng(lastGoodGPS.lat, lastGoodGPS.lon);
+    hasBase = true;
+    
+    document.getElementById('btn-return-home').style.display = "block";
+    updateRoute(); 
+    
+    if(navigator.vibrate) navigator.vibrate([200]);
+    alert("🟤 БАЗА зафіксована! Тепер можете прокладати маршрут тапами по мапі.");
+    toggleMapMenu(); 
+}
+
+function activateReturnMode() {
+    if (!hasBase || routePoints.length === 0) return alert("❌ Немає маршруту для повернення. Встановіть базу і поставте хоча б одну точку.");
+    
+    if (confirm("🔄 Активувати режим ПОВЕРНЕННЯ ДО БАЗИ?")) {
+        isReturnMode = true;
+        routePoints.reverse();
+        updateRoute();
+        
+        document.getElementById('btn-return-home').style.display = "none";
+        toggleMapMenu();
+        
+        if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+        alert("Вектор змінено! Стрілка компаса вказує на найближчу залишену вами точку (хлібну крихту).");
+        
+        showModule('mod-compass'); 
+    }
 }
