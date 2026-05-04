@@ -1071,6 +1071,13 @@ function activateReturnMode() {
 // ==========================================
 // 10. АУДІО-РАЦІЯ (ПЕРЕДАЧА ТА ПРИЙОМ)
 // ==========================================
+let isListeningAudio = false;
+let audioListenTimer = null;
+let rxAudioCtx = null;
+let analyser = null;
+let microphone = null;
+let demodulationReqId = null;
+
 async function sendAudioMessage() {
     let text = document.getElementById('chat-input').value.trim();
     if (!text) return alert("Спочатку введіть текст повідомлення для передачі!");
@@ -1097,7 +1104,7 @@ async function sendAudioMessage() {
         for (let b of binChar) binaryData.push(parseInt(b));
     }
 
-    // Стартовий сигнал
+    // Стартовий сигнал (довгий піск для пробудження приймача)
     playTone(audioCtxTx, FREQ_1, startTime, 0.2); 
     
     let currentTime = startTime + 0.25;
@@ -1128,44 +1135,139 @@ function playTone(ctx, frequency, time, duration) {
     osc.stop(time + duration);
 }
 
-async function toggleAudioReceiver() {
-    let btn = document.getElementById('btn-listen-audio');
+// === ЛОГІКА ПРИЙОМУ ТА ДЕКОДУВАННЯ ===
+
+function stopAudioReceiver() {
+    isListeningAudio = false;
+    clearTimeout(audioListenTimer);
+    cancelAnimationFrame(demodulationReqId);
     
-    if (isListeningAudio) {
-        // Вимикаємо
-        isListeningAudio = false;
-        clearTimeout(audioListenTimer);
+    let btn = document.getElementById('btn-listen-audio');
+    if (btn) {
         btn.innerText = "🎤 СЛУХАТИ ЕФІР (ЗВУК)";
         btn.style.color = "#4ade80";
         btn.style.borderColor = "#4ade80";
+    }
+    
+    if (microphone) { microphone.disconnect(); microphone = null; }
+    if (rxAudioCtx) { rxAudioCtx.close(); rxAudioCtx = null; }
+}
+
+async function toggleAudioReceiver() {
+    if (isListeningAudio) {
+        stopAudioReceiver();
         return;
     }
 
-    // Вмикаємо
     try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         isListeningAudio = true;
-        btn.innerText = "👂 СЛУХАЮ ЕФІР (10 сек)...";
+        
+        let btn = document.getElementById('btn-listen-audio');
+        btn.innerText = "👂 ОЧІКУВАННЯ СИГНАЛУ...";
         btn.style.color = "#f1c40f";
         btn.style.borderColor = "#f1c40f";
 
-        // ТИМЧАСОВА ЗАГЛУШКА ДЛЯ ТЕСТУ ІНТЕРФЕЙСУ:
+        rxAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = rxAudioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+        microphone = rxAudioCtx.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+
+        startDemodulation();
+
+        // Автовимкнення через 60 секунд (збільшено для довгих текстів)
         audioListenTimer = setTimeout(() => {
-            if (!isListeningAudio) return;
-            
-            // Вимикаємо режим слухання
-            isListeningAudio = false;
-            btn.innerText = "🎤 СЛУХАТИ ЕФІР (ЗВУК)";
-            btn.style.color = "#4ade80";
-            btn.style.borderColor = "#4ade80";
-            
-            // Імітуємо отримання зашифрованого тексту
-            let testEncrypted = "SEC:" + encryptData("ТЕСТ: Зв'язок працює!");
-            processDecodedQR(testEncrypted); // Викликаємо існуюче спливаюче вікно
-            
-        }, 4000);
+            if (isListeningAudio) {
+                stopAudioReceiver();
+                alert("⏱ Час вийшов. Ефір чистий або передача завершена.");
+            }
+        }, 60000);
 
     } catch (err) {
         alert("❌ Мікрофон заблоковано!");
+    }
+}
+
+function startDemodulation() {
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const sampleRate = rxAudioCtx.sampleRate;
+    const BIT_DURATION = 0.05; // Має збігатися з передавачем
+
+    // Знаходимо "кошики" еквалайзера для наших частот
+    const getBinIndex = (freq) => Math.round((freq * analyser.fftSize) / sampleRate);
+    const bin0 = getBinIndex(9000);
+    const bin1 = getBinIndex(11000);
+
+    let state = 'IDLE';
+    let startTime = 0;
+    let bitsVotes = []; 
+
+    function checkSignal() {
+        if (!isListeningAudio) return;
+
+        analyser.getByteFrequencyData(dataArray);
+
+        // Беремо максимальне значення поруч із частотою (щоб нівелювати шум мікрофона)
+        let vol0 = Math.max(dataArray[bin0-1]||0, dataArray[bin0], dataArray[bin0+1]||0);
+        let vol1 = Math.max(dataArray[bin1-1]||0, dataArray[bin1], dataArray[bin1+1]||0);
+
+        if (state === 'IDLE') {
+            // Очікування: шукаємо сильний сплеск на 11000 Гц (Стартовий маркер)
+            if (vol1 > 150 && vol0 < 100) {
+                state = 'SYNC';
+                document.getElementById('btn-listen-audio').innerText = "⚡ ПРИЙОМ ДАНИХ...";
+            }
+        } else if (state === 'SYNC') {
+            // Синхронізація: чекаємо завершення стартового сигналу для точного відліку
+            if (vol1 < 100) {
+                state = 'READ';
+                startTime = rxAudioCtx.currentTime;
+            }
+        } else if (state === 'READ') {
+            let elapsed = rxAudioCtx.currentTime - startTime;
+            let bitIndex = Math.floor(elapsed / BIT_DURATION);
+
+            // Кінець передачі: тиша тривалістю більше 3 бітів
+            if (vol0 < 50 && vol1 < 50 && elapsed > (bitsVotes.length + 3) * BIT_DURATION) {
+                finishDecoding(bitsVotes);
+                return;
+            }
+
+            // Накопичуємо статистику гучності для поточного біта
+            if (bitIndex >= 0) {
+                if (!bitsVotes[bitIndex]) bitsVotes[bitIndex] = { zero: 0, one: 0 };
+                bitsVotes[bitIndex].zero += vol0;
+                bitsVotes[bitIndex].one += vol1;
+            }
+        }
+
+        demodulationReqId = requestAnimationFrame(checkSignal);
+    }
+
+    checkSignal();
+}
+
+function finishDecoding(bitsVotes) {
+    stopAudioReceiver();
+
+    if (bitsVotes.length === 0) return;
+
+    // Визначаємо, яка частота домінувала у кожному біті
+    let bits = bitsVotes.map(vote => (vote.one > vote.zero) ? 1 : 0);
+    
+    // Перетворюємо біти на символи
+    let text = "";
+    for (let i = 0; i < bits.length; i += 8) {
+        let byteStr = bits.slice(i, i + 8).join('');
+        if (byteStr.length === 8) {
+            text += String.fromCharCode(parseInt(byteStr, 2));
+        }
+    }
+
+    // Передаємо розшифрований рядок у твій стандартний обробник
+    processDecodedQR(text);
+}
     }
 }
