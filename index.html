@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.16 TACTICAL</title>
+    <title>RA_MOBILE v10.18 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.16">
+    <link rel="stylesheet" href="style.css?v=10.18">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -41,7 +41,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.16</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.18</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -115,6 +115,11 @@
             </div>
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
+            
+            <!-- ПУЛЬТ АВТОНОМНОГО ШТУРМАНА -->
+            <button id="btn-smart-pilot" class="tactical-btn" style="margin-top:20px; background:#4ade80; color:#000; font-size: 1.2rem; height: 80px;" onclick="handleSmartPilot()">СТАРТ (ВСТАНОВИТИ БАЗУ)</button>
+            <button id="btn-return-home" class="tactical-btn" style="margin-top:10px; background:#111; color:#f1c40f; display:none;" onclick="activateReturnMode()">🔄 ПОВЕРНЕННЯ (НАЗАД)</button>
+
         </section>
 
         <!-- ОПТИКА -->
@@ -167,7 +172,6 @@
                 Пишіть текст або скануйте мітки побратимів прямо тут. Жодних звуків.
             </p>
 
-            <!-- ШВИДКИЙ СКАНЕР ДЛЯ ЧАТУ -->
             <button id="btn-chat-cam" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:10px;">📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ</button>
             <video id="v-chat-stream" autoplay playsinline muted style="width:90%; margin: 0 5% 10px 5%; border:2px solid #0cf; border-radius:8px; display:none; max-height: 250px; object-fit: cover;"></video>
             
@@ -198,36 +202,20 @@
                 </ul>
 
                 <h3 style="color:#0cf; margin-top: 10px;">💬 1. ТЕКСТ / QR-РАЦІЯ (АБСОЛЮТНА РАДІОТИША)</h3>
-                <p style="margin-bottom: 20px;">
-                    Дозволяє обмінюватися текстом або залишати мітки. Напишіть текст (до 200 символів), натисніть "СТВОРИТИ ЗАШИФРОВАНИЙ QR". 
-                    <br><br>
-                    Щоб швидко прочитати відповідь побратима, натисніть <b>"УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ"</b> прямо на вкладці чату.
-                    <br><br>
-                    <b>🛡 СЕКРЕТНІСТЬ:</b> Код математично зашифровано алгоритмом XOR! Ворог зі звичайним сканером побачить лише безглуздий набір літер і цифр. Прочитати справжній текст можна <b>ТІЛЬКИ через наш додаток.</b> Звукові сигнали під час читання автоматично ВИМКНЕНІ задля маскування.
-                </p>
+                <p style="margin-bottom: 20px;">Пишіть текст або скануйте мітки побратимів прямо тут. Код математично зашифровано алгоритмом XOR!</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;">📍 2. МАРШРУТ ТА МАПА</h3>
                 <p style="margin-bottom: 10px;">Тут ти плануєш рух. Мапа завжди тримає максимальне наближення.</p>
-                <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>Поставити точку:</b> Натисни на екран мапи і потримай 1 секунду.</li>
-                    <li><b>Меню (кнопка ☰ зліва внизу):</b> ТРАНСПОРТ, ПЕРЕДАТИ QR, СЛІДКУВАТИ, КЕШ 2х2 км.</li>
-                </ul>
 
-                <h3 style="color:#f1c40f;">🧭 3. КОМПАС ТА НАВІГАЦІЯ</h3>
-                <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує останні координати).</p>
+                <h3 style="color:#f1c40f;">🧭 3. СМАРТ-ШТУРМАН ТА ПОВОДИР</h3>
+                <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує сонце/зірки та ручний відлік).</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>ЕКО-БЛЕКАУТ:</b> Чорний екран для ночі. Краї екрана підсвічуються зеленим, показуючи напрямок цілі.</li>
-                    <li style="margin-bottom: 5px;"><b>ПОВОДИР:</b> Підказує шлях у кишені вібрацією. Рухайся по колу і відчуй вібрацією напрямок до точки.</li>
-                    <li><b>КАЛІБРУВАННЯ:</b> Пройди прямо 15 метрів або відкалібруй через Оптику по Сонцю чи Зірці.</li>
+                    <li style="margin-bottom: 5px;"><b>СТАРТ (БАЗА):</b> Одне натискання фіксує незмінну коричневу точку відліку. Далі цією ж кнопкою ставляться точки маршруту.</li>
+                    <li style="margin-bottom: 5px;"><b>ПОВЕРНЕННЯ:</b> Кнопка розвертає шлях назад до бази, видаляючи точки, які ви вже пройшли (при наближенні <15м).</li>
                 </ul>
 
                 <h3 style="color:#0cf;">👁 4. ОПТИКА ТА ШІ</h3>
                 <p style="margin-bottom: 10px;">Аналіз місцевості через камеру.</p>
-                <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>ШІ SCAN:</b> Інтелект обводить людей (зеленим) і техніку (червоним).</li>
-                    <li style="margin-bottom: 5px;"><b>ДЕТЕКТОР РУХУ:</b> Програма блимає і вібрує на найменший рух у кадрі.</li>
-                    <li style="margin-bottom: 5px;"><b>СКАЙНУВАТИ З ФОТО:</b> Дозволяє прочитати повідомлення чи маршрут, зроблені оптикою техніки або збережені в галереї.</li>
-                </ul>
             </div>
         </section>
     </div>
@@ -243,6 +231,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
     
-    <script src="app.js?v=10.16"></script>
+    <script src="app.js?v=10.18"></script>
 </body>
 </html>
