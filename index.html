@@ -75,6 +75,9 @@
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
+                <button id="btn-set-base" class="map-btn" style="color:#f1c40f;" onclick="setBasePoint()">🟤 ВСТАНОВИТИ БАЗУ</button>
+                <button id="btn-return-home" class="map-btn" style="color:#f33; display:none;" onclick="activateReturnMode()">🔄 ПОВЕРНЕННЯ</button>
+                
                 <button id="btn-transport" class="map-btn">🚙 ТРАНСПОРТ</button>
                 <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
@@ -115,11 +118,6 @@
             </div>
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
-            
-            <!-- ПУЛЬТ АВТОНОМНОГО ШТУРМАНА -->
-            <button id="btn-smart-pilot" class="tactical-btn" style="margin-top:20px; background:#4ade80; color:#000; font-size: 1.2rem; height: 80px;" onclick="handleSmartPilot()">СТАРТ (ВСТАНОВИТИ БАЗУ)</button>
-            <button id="btn-return-home" class="tactical-btn" style="margin-top:10px; background:#111; color:#f1c40f; display:none;" onclick="activateReturnMode()">🔄 ПОВЕРНЕННЯ (НАЗАД)</button>
-
         </section>
 
         <!-- ОПТИКА -->
@@ -210,7 +208,7 @@
                 <h3 style="color:#f1c40f;">🧭 3. СМАРТ-ШТУРМАН ТА ПОВОДИР</h3>
                 <p style="margin-bottom: 10px;">Веде до цілі навіть без GPS (використовує сонце/зірки та ручний відлік).</p>
                 <ul style="padding-left: 20px; margin-bottom: 20px;">
-                    <li style="margin-bottom: 5px;"><b>СТАРТ (БАЗА):</b> Одне натискання фіксує незмінну коричневу точку відліку. Далі цією ж кнопкою ставляться точки маршруту.</li>
+                    <li style="margin-bottom: 5px;"><b>ВСТАНОВИТИ БАЗУ:</b> В меню мапи фіксує незмінну коричневу точку відліку на ваших поточних координатах.</li>
                     <li style="margin-bottom: 5px;"><b>ПОВЕРНЕННЯ:</b> Кнопка розвертає шлях назад до бази, видаляючи точки, які ви вже пройшли (при наближенні <15м).</li>
                 </ul>
 
