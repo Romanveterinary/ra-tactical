@@ -41,7 +41,7 @@ if ('serviceWorker' in navigator) {
 // ==========================================
 // 1. ГЛОБАЛЬНІ ЗМІННІ ТА ШИФРУВАННЯ
 // ==========================================
-const CRYPTO_KEY = "RA_STORM_2026"; 
+const CRYPTO_KEY = "RA_STORM_2026"; // Наш секретний військовий ключ
 
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
@@ -51,13 +51,17 @@ let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
 let hasAbsoluteOrientation = false; 
 
-// Змінні для плавної та енергоефективної анімації компаса
+// === НОВІ ЗМІННІ ДЛЯ ПЛАВНОСТІ КОМПАСА ТА АУДІО-РАЦІЇ ===
 let targetDisplayAngle = 0;
 let isCompassAnimating = false;
 
-// Змінні для аудіо-рації
 let isListeningAudio = false;
 let audioListenTimer = null;
+let rxAudioCtx = null;
+let analyser = null;
+let microphone = null;
+let demodulationReqId = null;
+// ==========================================================
 
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
@@ -83,6 +87,7 @@ let wakeLock = null;
 let isTransportMode = false;
 let lastGpsCoordsForTransport = null;
 
+// Змінні Смарт-Штурмана (База та Реверс)
 let hasBase = false;
 let isReturnMode = false;
 let homeBasePoint = null;
@@ -245,6 +250,7 @@ function toggleMapMenu() {
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
+        // Повертаємо детальну супутникову мапу Google
         topoLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
         darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
@@ -434,6 +440,7 @@ function scanQRChatFrame() {
     }
     requestAnimationFrame(scanQRChatFrame);
 }
+
 
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
@@ -1067,15 +1074,10 @@ function activateReturnMode() {
         showModule('mod-compass'); 
     }
 }
+
 // ==========================================
 // 10. АУДІО-РАЦІЯ (ПЕРЕДАЧА ТА ПРИЙОМ)
 // ==========================================
-let isListeningAudio = false;
-let audioListenTimer = null;
-let rxAudioCtx = null;
-let analyser = null;
-let microphone = null;
-let demodulationReqId = null;
 
 async function sendAudioMessage() {
     let text = document.getElementById('chat-input').value.trim();
@@ -1267,6 +1269,4 @@ function finishDecoding(bitsVotes) {
 
     // Передаємо розшифрований рядок у твій стандартний обробник
     processDecodedQR(text);
-}
-    }
 }
