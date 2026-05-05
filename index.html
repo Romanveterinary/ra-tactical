@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.22 TACTICAL</title>
+    <title>RA_MOBILE v10.23 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.22">
+    <link rel="stylesheet" href="style.css?v=10.23">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -24,18 +24,25 @@
         #eco-dist { font-size: 3rem; color: #4ade80; font-family: monospace; font-weight: bold; text-shadow: 0 0 5px #000; }
         #eco-touch-area { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 80px; display: flex; align-items: center; justify-content: center; color: #222; font-size: 1.2rem; }
         
-        /* СТИЛІ ДЛЯ АСТРО-КАЛІБРУВАННЯ */
+        /* СТИЛІ ДЛЯ АСТРО-КАЛІБРУВАННЯ ТА ТРАФАРЕТУ */
         #v-astro-stream { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
         #astro-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
-        .astro-glow { position: absolute; top: 0; bottom: 0; width: 40px; opacity: 0; transition: opacity 0.3s; }
+        
+        .astro-glow-v { position: absolute; top: 0; bottom: 0; width: 50px; opacity: 0; transition: opacity 0.2s; }
         #astro-dir-left { left: 0; background: linear-gradient(to right, rgba(74,222,128,0.8), transparent); }
         #astro-dir-right { right: 0; background: linear-gradient(to left, rgba(74,222,128,0.8), transparent); }
+        
+        .astro-glow-h { position: absolute; left: 0; right: 0; height: 50px; opacity: 0; transition: opacity 0.2s; }
+        #astro-dir-top { top: 0; background: linear-gradient(to bottom, rgba(74,222,128,0.8), transparent); }
+        #astro-dir-bottom { bottom: 0; background: linear-gradient(to top, rgba(74,222,128,0.8), transparent); }
+        
         #astro-dist-text { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; color: #4ade80; font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 8px #000; }
         .astro-btn-container { position: absolute; bottom: 30px; width: 100%; z-index: 3; display: flex; justify-content: space-around; padding: 0 10px; pointer-events: auto; }
         #astro-hint { position: absolute; bottom: 85px; width: 100%; text-align: center; color: #fff; font-size: 1rem; text-shadow: 0 0 5px #000; z-index: 4; font-family: monospace; font-weight: bold; }
         
-        /* Підказки підводки */
-        #astro-guide-arrows { position:absolute; top:40%; left:0; width:100%; text-align:center; color:#4ade80; font-size:2rem; font-weight:bold; text-shadow: 0 0 10px #000; z-index:3; pointer-events:none; display:none; }
+        /* Світіння при захопленні цілі */
+        .astro-target-locked { stroke: #0cf !important; filter: drop-shadow(0 0 15px #0cf); }
+        #astro-target-msg { position:absolute; top:35%; left:0; width:100%; text-align:center; color:#0cf; font-size:2rem; font-weight:bold; text-shadow: 0 0 10px #000; z-index:3; display:none; }
     </style>
 </head>
 <body>
@@ -54,7 +61,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.22</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.23</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -124,50 +131,45 @@
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:10px; margin-bottom: 20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
             <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;">ЦІЛЬ: НЕМАЄ</div>
+            
             <div class="guide-panel">
                 <div class="flex-row">
-                    <button id="btn-guide-type" class="tactical-btn" style="flex:1; border-color:#555; color:#f1c40f;">РЕЖИМ: ПОШУК</button>
-                    <button id="btn-guide-audio" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;">ЗВУК: ВИМК</button>
+                    <button id="btn-guide-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;">ГОЛОС: ВИМК</button>
+                    <button id="btn-guide" class="tactical-btn" style="flex:1; color:#558; border-color:#224;">ПОВОДИР: ВИМК</button>
                 </div>
-                <button id="btn-guide" class="tactical-btn" style="color:#558; border-color:#224;">ПОВОДИР: ВИМК</button>
             </div>
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
         </section>
 
-        <!-- АСТРО-НАВІГАЦІЯ (БЕЗ GPS) ТА AR-ТРЕНАЖЕР -->
+        <!-- АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР -->
         <section id="mod-astro" class="module">
             <video id="v-astro-stream" autoplay playsinline muted></video>
             <div id="astro-overlay">
-                <!-- Підказки підводки (AR) -->
-                <div id="astro-guide-arrows">
-                    <span id="astro-arr-up" style="display:none;">⬈ ПІДНІМІТЬ ВИЩЕ<br></span>
-                    <span id="astro-arr-down" style="display:none;">⬊ ОПУСТІТЬ НИЖЧЕ<br></span>
-                    <span id="astro-arr-left" style="display:none;">⮜ ЛІВОРУЧ </span>
-                    <span id="astro-arr-right" style="display:none;"> ПРАВОРУЧ ⮞</span>
-                    <div id="astro-target-lock" style="display:none; color:#f1c40f; font-size:1.5rem; margin-top:20px;">ЦІЛЬ У ПРИЦІЛІ</div>
-                </div>
+                
+                <!-- Радарні підсвітки екрана -->
+                <div id="astro-dir-left" class="astro-glow-v"></div>
+                <div id="astro-dir-right" class="astro-glow-v"></div>
+                <div id="astro-dir-top" class="astro-glow-h"></div>
+                <div id="astro-dir-bottom" class="astro-glow-h"></div>
+                
+                <div id="astro-target-msg">ЦІЛЬ ЗАХОПЛЕНО</div>
 
+                <!-- Трафарет закріплений по центру -->
                 <svg width="100%" height="100%">
-                    <!-- Приціл статичний по центру -->
                     <circle cx="50%" cy="50%" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
                     <line x1="50%" y1="30%" x2="50%" y2="70%" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                     <line x1="30%" y1="50%" x2="70%" y2="50%" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                     
-                    <!-- Група зірок, що вільно рухається по екрану -->
-                    <g id="astro-stars" style="transition: transform 0.1s linear;">
-                        <!-- Полярна зірка -->
+                    <g id="astro-stencil" style="transition: all 0.2s linear;">
                         <circle cx="50%" cy="50%" r="4" fill="#fff" />
-                        <text x="52%" y="52%" fill="#fff" font-size="12px" font-weight="bold">ПОЛЯРНА ЗІРКА (N)</text>
+                        <text x="52%" y="52%" fill="#fff" font-size="12px" font-weight="bold">ПОЛЯРНА ЗІРКА</text>
                         <!-- Ковш -->
-                        <polyline points="50%,50% 40%,30% 30%,25% 15%,35% 10%,50% 25%,55% 30%,45% 15%,35%" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+                        <polyline points="50%,50% 40%,30% 30%,25% 15%,35% 10%,50% 25%,55% 30%,45% 15%,35%" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
                     </g>
                 </svg>
                 
-                <!-- Підсвітка країв для поводиря -->
-                <div id="astro-dir-left" class="astro-glow"></div>
-                <div id="astro-dir-right" class="astro-glow"></div>
-                
                 <div id="astro-dist-text">--- м</div>
+                <!-- Телеметрія для тренажера -->
                 <div id="astro-hint">ШУКАЙТЕ ПІВНІЧ</div>
             </div>
             
@@ -215,7 +217,7 @@
             </div>
         </section>
 
-        <!-- QR-РАЦІЯ (БЕЗ АУДІО) -->
+        <!-- QR-РАЦІЯ -->
         <section id="mod-chat" class="module">
             <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;">ОФЛАЙН РАЦІЯ</h2>
             <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;">
@@ -246,14 +248,14 @@
                 <h3 style="color:#f1c40f; margin-top: 10px;">⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ</h3>
                 <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку.</p>
 
-                <h3 style="color:#0cf; margin-top: 10px;">💬 1. ТЕКСТ / QR-РАЦІЯ</h3>
-                <p style="margin-bottom: 20px;">Пишіть текст. Скануйте QR-мітки. Код математично зашифровано!</p>
+                <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
+                <p style="margin-bottom: 10px;">Для встановлення своєї позиції вручну використайте "МОЯ ПОЗИЦІЯ (РУЧНА)" і зробіть довгий натиск. Подвійний тап ставить точку цілі.</p>
 
-                <h3 style="color:#4ade80; margin-top: 10px;">📍 2. МАРШРУТ ТА МАПА</h3>
-                <p style="margin-bottom: 10px;">Тут ти плануєш рух. Якщо GPS заглушено, використай "МОЯ ПОЗИЦІЯ (РУЧНА)".</p>
+                <h3 style="color:#0cf;">🧭 2. ГОЛОСОВИЙ ПОВОДИР</h3>
+                <p style="margin-bottom: 10px;">Увімкніть його в Компасі. Він промовлятиме напрямок і відстань прямо в навушник, щоб ви не дивилися на екран. Якщо ви йдете правильно коридором — він мовчить.</p>
 
                 <h3 style="color:#f1c40f;">🌌 3. АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР</h3>
-                <p style="margin-bottom: 10px;">Цей режим має вбудовану доповнену реальність. Працюйте з ним при увімкненому GPS, щоб тренуватися знаходити Полярну зірку. Стрілки підкажуть куди дивитися. Якщо GPS зник - накладіть малюнок на реальне небо і натисніть "Зірка".</p>
+                <p style="margin-bottom: 10px;">Трафарет зірок зафіксований по центру. Крутіть телефон туди, де края екрана світяться найсильніше. Коли знайдете правильний кут - екран спалахне синім "ЦІЛЬ ЗАХОПЛЕНО".</p>
             </div>
         </section>
     </div>
@@ -280,6 +282,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.22"></script>
+    <script src="app.js?v=10.23"></script>
 </body>
 </html>
