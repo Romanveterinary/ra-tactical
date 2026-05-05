@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.30 TACTICAL</title>
+    <title>RA_MOBILE v10.31 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.30">
+    <link rel="stylesheet" href="style.css?v=10.31">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -42,49 +42,60 @@
         
         .astro-target-locked { stroke: #0cf !important; filter: drop-shadow(0 0 15px #0cf); }
         #astro-target-msg { position:absolute; top:35%; left:0; width:100%; text-align:center; color:#0cf; font-size:2rem; font-weight:bold; text-shadow: 0 0 10px #000; z-index:3; display:none; }
+
+        .lang-btn { background: #111; color: #aaa; border: 1px solid #333; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin: 0 2px; }
+        .lang-btn.active { color: #4ade80; border-color: #4ade80; }
     </style>
 </head>
 <body>
     <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
         <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
-        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:20px;">ВХІД</button>
-        <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;">❌ ДОСТУП ЗАБОРОНЕНО</div>
+        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:20px;" data-i18n="btn_login">ВХІД</button>
+        <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;" data-i18n="err_access_denied">❌ ДОСТУП ЗАБОРОНЕНО</div>
     </div>
 
     <div id="qr-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:11000; flex-direction:column; align-items:center; justify-content:center;">
-        <h3 style="color:#4ade80; margin-bottom:20px;">ОПТИЧНИЙ ДАНИЙ КОД</h3>
+        <h3 style="color:#4ade80; margin-bottom:20px;" data-i18n="title_qr_scan">ОПТИЧНИЙ ДАНИЙ КОД</h3>
         <div id="qrcode-box" style="background:#fff; padding:15px; border-radius:10px;"></div>
-        <button onclick="closeQR()" class="tactical-btn" style="width:200px; margin-top:30px; background:#333;">ЗАКРИТИ</button>
+        <button onclick="closeQR()" class="tactical-btn" style="width:200px; margin-top:30px; background:#333;" data-i18n="btn_close">ЗАКРИТИ</button>
     </div>
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.30</h3>
+        
+        <!-- ПЕРЕМИКАЧ МОВ -->
+        <div style="text-align: center; margin-bottom: 10px; padding-left: 20px;">
+            <button class="lang-btn active" onclick="setLanguage('uk')" id="btn-lang-uk">UK</button>
+            <button class="lang-btn" onclick="setLanguage('en')" id="btn-lang-en">EN</button>
+            <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
+        </div>
+
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.31</h3>
         <hr style="border: 0.5px solid #222;">
-        <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
-        <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
-        <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;">🌌 АСТРО / БЕЗ GPS</a>
-        <a href="#" onclick="showModule('mod-eye'); closeNav()">👁 ОПТИКА / ШІ</a>
-        <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #0cf;">💬 ТЕКСТ / QR-РАЦІЯ</a>
-        <a href="#" onclick="showModule('mod-shield'); closeNav()">🛡 ОХОРОНА / ЩИТ</a>
-        <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #888;">📖 ІНСТРУКЦІЯ</a>
+        <a href="#" onclick="showModule('mod-map'); closeNav()" data-i18n="menu_map">📍 МАРШРУТ / МАПА</a>
+        <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
+        <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;" data-i18n="menu_astro">🌌 АСТРО / БЕЗ GPS</a>
+        <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics">👁 ОПТИКА / ШІ</a>
+        <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #0cf;" data-i18n="menu_radio">💬 ТЕКСТ / QR-РАЦІЯ</a>
+        <a href="#" onclick="showModule('mod-shield'); closeNav()" data-i18n="menu_shield">🛡 ОХОРОНА / ЩИТ</a>
+        <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #888;" data-i18n="menu_manual">📖 ІНСТРУКЦІЯ</a>
         <hr style="border: 0.5px solid #222; margin-top: 30px;">
-        <a href="#" onclick="killApp()" style="color: #f1c40f; font-weight: bold;">🛑 ВИМКНУТИ ДОДАТОК</a>
-        <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; margin-top: 10px;">💥 ЗНИЩИТИ ДАНІ</a>
+        <a href="#" onclick="killApp()" style="color: #f1c40f; font-weight: bold;" data-i18n="menu_power_off">🛑 ВИМКНУТИ ДОДАТОК</a>
+        <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; margin-top: 10px;" data-i18n="menu_destroy">💥 ЗНИЩИТИ ДАНІ</a>
     </div>
 
     <div id="menu-trigger" onclick="openNav()">&#9776;</div>
 
     <div id="tactical-hud">
         <div class="hud-row" style="display: flex; justify-content: space-between; align-items: center;">
-            <span id="gps-status">GPS: ПОШУК...</span>
-            <span id="alt-val" style="color: #aaa; font-size: 0.8rem; font-weight: bold;">ВИС: --- м</span>
-            <span id="pos-level" style="font-size: 0.75rem; font-weight: bold; border: 1px solid #555; padding: 2px 4px; border-radius: 3px; color: #aaa;">РІВЕНЬ: АНАЛІЗ</span>
+            <span id="gps-status" data-i18n="hud_gps_search">GPS: ПОШУК...</span>
+            <span id="alt-val" style="color: #aaa; font-size: 0.8rem; font-weight: bold;" data-i18n="hud_alt">ВИС: --- м</span>
+            <span id="pos-level" style="font-size: 0.75rem; font-weight: bold; border: 1px solid #555; padding: 2px 4px; border-radius: 3px; color: #aaa;" data-i18n="hud_level_analysis">РІВЕНЬ: АНАЛІЗ</span>
         </div>
         <div class="hud-row" style="margin-top: 5px; font-size: 0.8rem; display: flex; justify-content: space-between; width: 100%;">
-            <span id="speed-val" style="color: var(--glow);">ШВИД: 0.0 км/г</span>
-            <span id="hud-dist" style="color: #f1c40f; font-weight: bold;">ЦІЛЬ: --- м</span>
+            <span id="speed-val" style="color: var(--glow);" data-i18n="hud_speed">ШВИД: 0.0 км/г</span>
+            <span id="hud-dist" style="color: #f1c40f; font-weight: bold;" data-i18n="hud_target">ЦІЛЬ: --- м</span>
         </div>
     </div>
 
@@ -95,14 +106,14 @@
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
-                <button id="btn-manual-pos" class="map-btn" style="color:#f97316;">📍 Я ТУТ (БЕЗ GPS)</button>
-                <button id="btn-transport" class="map-btn">🚙 ТРАНСПОРТ</button>
-                <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
-                <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
-                <button id="btn-del-last" class="map-btn" style="color:#f33;">✖ ОСТАННЯ ТОЧКА</button>
-                <button id="btn-clear-map" class="map-btn" style="color:#f33;">🗑 ОЧИСТИТИ МАРШРУТ</button>
-                <button id="btn-layer-toggle" class="map-btn">🗺 ШАР</button>
-                <button id="btn-cache-map" class="map-btn">💾 КЕШ 2х2 км</button>
+                <button id="btn-manual-pos" class="map-btn" style="color:#f97316;" data-i18n="btn_map_manual">📍 Я ТУТ (БЕЗ GPS)</button>
+                <button id="btn-transport" class="map-btn" data-i18n="btn_map_transport">🚙 ТРАНСПОРТ</button>
+                <button id="btn-share-qr" class="map-btn" style="color:#0cf;" data-i18n="btn_map_share">📤 ПЕРЕДАТИ QR</button>
+                <button id="btn-follow" class="map-btn" style="color:#4ade80;" data-i18n="btn_map_follow">🎯 СЛІДКУВАТИ</button>
+                <button id="btn-del-last" class="map-btn" style="color:#f33;" data-i18n="btn_map_del_last">✖ ОСТАННЯ ТОЧКА</button>
+                <button id="btn-clear-map" class="map-btn" style="color:#f33;" data-i18n="btn_map_clear">🗑 ОЧИСТИТИ МАРШРУТ</button>
+                <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР</button>
+                <button id="btn-cache-map" class="map-btn" data-i18n="btn_map_cache">💾 КЕШ 2х2 км</button>
             </div>
         </section>
 
@@ -114,7 +125,7 @@
                     <div class="compass-mark" style="transform: translate(-50%, -50%) translateY(135px);">S</div>
                     <div class="compass-mark" style="transform: translate(-50%, -50%) translateX(135px);">E</div>
                     <div class="compass-mark" style="transform: translate(-50%, -50%) translateX(-135px);">W</div>
-                    <div id="sun-mark" class="compass-mark" style="display:none; text-shadow: 0 0 10px #f1c40f;">☀</div>
+                    <div id="sun-mark" class="compass-mark" style="display:block; text-shadow: 0 0 10px #f1c40f;">☀</div>
                 </div>
                 <div id="tc-arrow"></div>
                 <div id="clinometer-wrap"><div id="clino-bar"></div></div>
@@ -122,27 +133,27 @@
                     <div id="tc-deg">0°</div>
                     <div id="tc-dist">--- м</div>
                     <div id="tc-coords-small">LAT: -- <br> LON: --</div>
-                    <div id="tc-acc" style="font-size: 0.7rem; color: #555; margin-top: 5px;">ТОЧН: --</div>
-                    <div id="tc-alt" style="font-size: 0.7rem; color: #aaa; margin-top: 2px;">ВИСОТА: --- м</div>
+                    <div id="tc-acc" style="font-size: 0.7rem; color: #555; margin-top: 5px;" data-i18n="comp_acc">ТОЧН: --</div>
+                    <div id="tc-alt" style="font-size: 0.7rem; color: #aaa; margin-top: 2px;" data-i18n="comp_alt">ВИСОТА: --- м</div>
                 </div>
             </div>
             
-            <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
-            <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
+            <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
+            <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
-            <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;">ЦІЛЬ: НЕМАЄ</div>
+            <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;" data-i18n="comp_target_none">ЦІЛЬ: НЕМАЄ</div>
             
             <div class="guide-panel">
                 <div class="flex-row">
-                    <button id="btn-guide-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;">ГОЛОС: ВИМК</button>
-                    <button id="btn-guide" class="tactical-btn" style="flex:1; color:#558; border-color:#224;">ПОВОДИР (ВІБРО): ВИМК</button>
+                    <button id="btn-guide-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;" data-i18n="btn_voice_off">ГОЛОС: ВИМК</button>
+                    <button id="btn-guide" class="tactical-btn" style="flex:1; color:#558; border-color:#224;" data-i18n="btn_vibro_off">ПОВОДИР (ВІБРО): ВИМК</button>
                 </div>
                 <div id="voice-settings" style="display:none; margin-top:10px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px;">
-                    <label style="color:#aaa; font-size:0.8rem; display:block; text-align:left; margin-bottom:5px;">ІНТЕРВАЛ ПІДКАЗОК: <span id="voice-interval-val" style="color:#4ade80; font-weight:bold;">10</span> сек</label>
+                    <label style="color:#aaa; font-size:0.8rem; display:block; text-align:left; margin-bottom:5px;"><span data-i18n="lbl_voice_int">ІНТЕРВАЛ ПІДКАЗОК:</span> <span id="voice-interval-val" style="color:#4ade80; font-weight:bold;">10</span> <span data-i18n="lbl_sec">сек</span></label>
                     <input type="range" id="voice-interval" min="10" max="60" step="10" value="10" style="width:100%;">
                 </div>
             </div>
-            <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
+            <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;" data-i18n="btn_eco">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
         </section>
 
         <!-- АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР -->
@@ -155,33 +166,28 @@
                 <div id="astro-dir-top" class="astro-glow-h"></div>
                 <div id="astro-dir-bottom" class="astro-glow-h"></div>
                 
-                <div id="astro-target-msg">ЦІЛЬ ЗАХОПЛЕНО</div>
+                <div id="astro-target-msg" data-i18n="astro_locked">ЦІЛЬ ЗАХОПЛЕНО</div>
 
                 <div id="astro-pointer" style="position:absolute; top:50%; left:50%; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 30px solid #f33; display:none; z-index:3; filter: drop-shadow(0 0 5px #000); transform-origin: 50% 50%;"></div>
 
-                <!-- НОВИЙ ЦЕНТРОВАНИЙ БЛОК ДЛЯ МАЛЮВАННЯ КОВША ТА ЗІРОК -->
                 <div style="position:absolute; top:50%; left:50%; width:300px; height:300px; transform:translate(-50%, -50%); overflow:visible; pointer-events:none;">
                     <svg width="300" height="300" style="overflow:visible;">
-                        <!-- Жовтий приціл горизонту та курсу -->
                         <circle cx="150" cy="150" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
                         <line x1="150" y1="90" x2="150" y2="210" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                         <line x1="90" y1="150" x2="210" y2="150" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                         
-                        <!-- Плаваючий трафарет -->
-                        <g id="astro-stencil" style="transition: all 0.2s linear;">
-                            <!-- Невидимий квадрат для ідеального центрування осі обертання -->
-                            <rect x="0" y="0" width="300" height="300" fill="transparent" />
-                            
+                        <!-- Фіксована група: лише позиціонується (текст завжди рівний) -->
+                        <g id="astro-stencil-fixed" style="transition: all 0.2s linear;">
+                            <text x="160" y="155" fill="#fff" font-size="12px" font-weight="bold" data-i18n="astro_polar">ПОЛЯРНА ЗІРКА</text>
                             <circle cx="150" cy="150" r="4" fill="#fff" />
-                            <text x="160" y="155" fill="#fff" font-size="12px" font-weight="bold">ПОЛЯРНА ЗІРКА</text>
-                            
-                            <!-- Лінія-підказка від Ковша до Полярної -->
+                        </g>
+
+                        <!-- Обертова група: крутиться як реальний Ковш -->
+                        <g id="astro-stencil" style="transition: all 0.2s linear;">
+                            <rect x="0" y="0" width="300" height="300" fill="transparent" />
                             <line x1="150" y1="40" x2="150" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3"/>
-                            
-                            <!-- Велика Ведмедиця (Ковш) в точних пікселях -->
                             <polyline points="230,130 210,110 190,80 170,50 150,40 150,10 180,20 170,50" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
                             
-                            <!-- Самі зірочки Ковша -->
                             <circle cx="230" cy="130" r="2" fill="#fff"/>
                             <circle cx="210" cy="110" r="2" fill="#fff"/>
                             <circle cx="190" cy="80" r="2" fill="#fff"/>
@@ -194,14 +200,14 @@
                 </div>
                 
                 <div id="astro-dist-text">--- м</div>
-                <div id="astro-hint">ШУКАЙТЕ ПІВНІЧ</div>
+                <div id="astro-hint" data-i18n="astro_hint">ШУКАЙТЕ ПІВНІЧ</div>
             </div>
             
             <div class="astro-btn-container">
-                <button id="btn-astro-horizon" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#0cf; margin: 0 5px 10px 5px; border-color:#0cf;">⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)</button>
+                <button id="btn-astro-horizon" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#0cf; margin: 0 5px 10px 5px; border-color:#0cf;" data-i18n="btn_astro_cal">⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)</button>
                 <div style="display:flex; justify-content: space-around; width: 100%;">
-                    <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin:0 5px;">☀ СОНЦЕ</button>
-                    <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin:0 5px;">⭐ ЗІРКА (ФІКСАЦІЯ)</button>
+                    <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin:0 5px;" data-i18n="btn_astro_sun">☀ СОНЦЕ</button>
+                    <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin:0 5px;" data-i18n="btn_astro_star">⭐ ЗІРКА (ФІКСАЦІЯ)</button>
                 </div>
             </div>
         </section>
@@ -212,77 +218,77 @@
                 <video id="v-stream" autoplay playsinline muted></video>
                 <canvas id="proc-canvas" style="display:none;"></canvas>
                 <canvas id="ui-canvas"></canvas>
-                <div id="ai-stats">ШІ НЕ АКТИВНИЙ</div>
+                <div id="ai-stats" data-i18n="ai_off">ШІ НЕ АКТИВНИЙ</div>
             </div>
 
             <div class="sliders-panel" style="margin-bottom: 15px; padding: 10px; background: #111; border-radius: 8px; border: 1px solid #333;">
-                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЗУМ КАМЕРИ</label></div>
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;" data-i18n="lbl_cam_zoom">ЗУМ КАМЕРИ</label></div>
                 <input type="range" id="cam-zoom" min="1" max="5" step="0.1" value="1" style="width:100%; margin-bottom:10px;">
                 
-                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЧУТЛИВІСТЬ ШІ (%)</label></div>
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;" data-i18n="lbl_ai_sens">ЧУТЛИВІСТЬ ШІ (%)</label></div>
                 <input type="range" id="ai-sens" min="10" max="90" step="5" value="50" style="width:100%; margin-bottom:10px;">
                 
-                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ДАЛЬНІСТЬ ШІ (ФОКУС)</label></div>
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;" data-i18n="lbl_ai_focal">ДАЛЬНІСТЬ ШІ (ФОКУС)</label></div>
                 <input type="range" id="ai-focal" min="0.5" max="3" step="0.1" value="1.0" style="width:100%; margin-bottom:10px;">
                 
-                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;">ЧУТЛИВІСТЬ ІЧ / РУХУ</label></div>
+                <div style="display:flex; justify-content:space-between;"><label style="color:#aaa; font-size:0.7rem;" data-i18n="lbl_ir_sens">ЧУТЛИВІСТЬ ІЧ / РУХУ</label></div>
                 <input type="range" id="ir-sens" min="50" max="250" step="10" value="200" style="width:100%;">
             </div>
 
-            <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;">🔴 СКАНУВАТИ З КАМЕРИ</button>
+            <button id="btn-scan-qr" class="tactical-btn" style="background:#111; color:#0cf; border-color:#0cf; margin-bottom:10px;" data-i18n="btn_scan_cam">🔴 СКАНУВАТИ З КАМЕРИ</button>
             
             <input type="file" id="qr-file-input" accept="image/*" style="display:none;">
-            <button id="btn-scan-photo" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:10px;">🖼 ПРОЧИТАТИ З ФОТО</button>
+            <button id="btn-scan-photo" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:10px;" data-i18n="btn_scan_photo">🖼 ПРОЧИТАТИ З ФОТО</button>
             
             <div class="flex-row">
-                <button id="btn-cam" class="tactical-btn" style="margin-top:0;">🔴 КАМЕРА</button>
-                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;">🤖 ШІ SCAN</button>
+                <button id="btn-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_cam_off">🔴 КАМЕРА</button>
+                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_ai_scan">🤖 ШІ SCAN</button>
             </div>
             <div class="flex-row">
-                <button id="btn-ir" class="tactical-btn">🔭 ІЧ-ФІЛЬТР</button>
-                <button id="btn-scan" class="tactical-btn">📉 ДЕТЕКТОР РУХУ</button>
+                <button id="btn-ir" class="tactical-btn" data-i18n="btn_ir">🔭 ІЧ-ФІЛЬТР</button>
+                <button id="btn-scan" class="tactical-btn" data-i18n="btn_motion">📉 ДЕТЕКТОР РУХУ</button>
             </div>
         </section>
 
         <!-- QR-РАЦІЯ -->
         <section id="mod-chat" class="module">
-            <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;">ОФЛАЙН РАЦІЯ</h2>
-            <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;">
+            <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;" data-i18n="chat_title">ОФЛАЙН РАЦІЯ</h2>
+            <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;" data-i18n="chat_desc">
                 Введіть текст та створіть зашифрований QR-код для передачі напарнику.
             </p>
 
-            <button id="btn-chat-cam" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:15px;">📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ</button>
+            <button id="btn-chat-cam" class="tactical-btn" style="background:#111; color:#f1c40f; border-color:#f1c40f; margin-bottom:15px;" data-i18n="btn_chat_cam">📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ</button>
             <video id="v-chat-stream" autoplay playsinline muted style="width:90%; margin: 0 5% 10px 5%; border:2px solid #0cf; border-radius:8px; display:none; max-height: 250px; object-fit: cover;"></video>
             
             <textarea id="chat-input" maxlength="200" oninput="updateCharCount()" placeholder="Введіть коротке повідомлення..." style="width:90%; height:120px; margin: 0 5% 5px 5%; background:#111; color:#4ade80; border:1px solid #333; border-radius: 8px; padding:15px; font-family:monospace; font-size: 1rem; box-sizing: border-box; resize: none;"></textarea>
-            <div id="char-counter" style="color:#aaa; font-size:0.8rem; text-align:right; margin-bottom:15px; padding: 0 5%;">Залишилось: 200 символів</div>
+            <div id="char-counter" style="color:#aaa; font-size:0.8rem; text-align:right; margin-bottom:15px; padding: 0 5%;" data-i18n="chat_left">Залишилось: 200 символів</div>
             
-            <button onclick="generateChatQR()" class="tactical-btn" style="color: #0cf; border-color: #0cf;">СТВОРИТИ ЗАШИФРОВАНИЙ QR</button>
-            <button onclick="clearChat()" class="tactical-btn" style="background:#200; color:#f33; border-color:#500; margin-top: 15px;">ОЧИСТИТИ ТЕКСТ</button>
+            <button onclick="generateChatQR()" class="tactical-btn" style="color: #0cf; border-color: #0cf;" data-i18n="btn_chat_gen">СТВОРИТИ ЗАШИФРОВАНИЙ QR</button>
+            <button onclick="clearChat()" class="tactical-btn" style="background:#200; color:#f33; border-color:#500; margin-top: 15px;" data-i18n="btn_chat_clear">ОЧИСТИТИ ТЕКСТ</button>
         </section>
 
         <!-- ЩИТ -->
         <section id="mod-shield" class="module">
-            <h2>ОХОРОНА / ЩИТ</h2>
-            <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
-            <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
+            <h2 data-i18n="shield_title">ОХОРОНА / ЩИТ</h2>
+            <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;" data-i18n="btn_shield_off">АКТИВУВАТИ ЗАХИСТ</button>
+            <button id="btn-shield-sound" class="tactical-btn" data-i18n="btn_shield_snd_off">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
         <!-- ІНСТРУКЦІЯ -->
         <section id="mod-manual" class="module">
-            <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;">БОЙОВИЙ ПОСІБНИК</h2>
+            <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;" data-i18n="man_title">БОЙОВИЙ ПОСІБНИК</h2>
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
-                <h3 style="color:#f1c40f; margin-top: 10px;">⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ</h3>
-                <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку. Програма має 3 рівні позиціонування: <strong>Мережа (Макс)</strong>, <strong>Стелс (Тільки GPS)</strong>, та <strong>Автономний (Зорі/Кроки)</strong>.</p>
+                <h3 style="color:#f1c40f; margin-top: 10px;" data-i18n="man_h1">⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p1">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку. Програма має 3 рівні позиціонування: <strong>Мережа (Макс)</strong>, <strong>Стелс (Тільки GPS)</strong>, та <strong>Автономний (Зорі/Кроки)</strong>.</p>
 
-                <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
-                <p style="margin-bottom: 10px;">Для встановлення своєї позиції вручну використайте "Я ТУТ (БЕЗ GPS)" (працює лише в Автономному режимі) і клікніть по мапі. Трикутник стане помаранчевим. Подвійний тап ставить точку цілі.</p>
+                <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 1. МАРШРУТ ТА МАПА</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2">Для встановлення своєї позиції вручну використайте "Я ТУТ (БЕЗ GPS)" (працює лише в Автономному режимі) і клікніть по мапі. Трикутник стане помаранчевим. Подвійний тап ставить точку цілі.</p>
 
-                <h3 style="color:#0cf;">🧭 2. ПОВОДИР ТА КРОКОМІР</h3>
-                <p style="margin-bottom: 10px;">Увімкніть Голос або Вібро в Компасі. Якщо ви йдете (швидкість > 1.5 км/год) і збилися з курсу, він скаже куди повернути. Вібро працює як сонар: що точніше ви дивитесь на ціль, то частіше телефон вібрує.<br><strong>КРОКОМІР</strong> вмикається окремою кнопкою і рахує кроки без GPS.</p>
+                <h3 style="color:#0cf;" data-i18n="man_h3">🧭 2. ПОВОДИР ТА КРОКОМІР</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3">Увімкніть Голос або Вібро в Компасі. Якщо ви йдете і збилися з курсу, він скаже куди повернути. Вібро працює як сонар: що точніше ви дивитесь на ціль, то частіше телефон вібрує.<br><strong>КРОКОМІР</strong> вмикається окремою кнопкою і рахує кроки без GPS.</p>
 
-                <h3 style="color:#f1c40f;">🌌 3. АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР</h3>
-                <p style="margin-bottom: 10px;">1. Станьте рівно, тримаючи телефон вертикально, і натисніть "КАЛІБРУВАТИ ГОРИЗОНТ".<br>2. З'явиться червона стрілка. Ведіть телефон туди, куди вона вказує.<br>3. Коли знайдете правильний кут - екран спалахне синім "ЦІЛЬ ЗАХОПЛЕНО".</p>
+                <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 3. АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">1. Станьте рівно, тримаючи телефон вертикально, і натисніть "КАЛІБРУВАТИ ГОРИЗОНТ".<br>2. З'явиться червона стрілка. Ведіть телефон туди, куди вона вказує.<br>3. Коли знайдете правильний кут - екран спалахне синім "ЦІЛЬ ЗАХОПЛЕНО".</p>
             </div>
         </section>
     </div>
@@ -293,22 +299,22 @@
         <div id="eco-bottom" class="eco-edge"></div>
         <div id="eco-left" class="eco-edge"></div>
         <div id="eco-right" class="eco-edge"></div>
-        <div id="eco-touch-area" onclick="peekEco()">ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)</div>
+        <div id="eco-touch-area" onclick="peekEco()" data-i18n="eco_touch">ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)</div>
         <div id="eco-content"><div id="eco-dist">--- м</div></div>
-        <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
+        <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;" data-i18n="btn_eco_exit">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
 
     <!-- ПАНЕЛЬ МАЙСТРА НАЛАШТУВАНЬ (WIZARD) -->
     <div id="wizard-panel" style="display:none; position:fixed; bottom:20px; left:5%; width:90%; background:rgba(0, 20, 0, 0.9); border:2px solid #4ade80; border-radius:10px; padding:15px; z-index:12000; color:#fff; text-align:center; box-sizing:border-box;">
-        <h3 id="wizard-title" style="color:#f1c40f; margin-top:0; margin-bottom:10px; font-size:1.1rem;">ОФЛАЙН РЕЖИМ</h3>
-        <p id="wizard-text" style="font-size:0.95rem; margin-bottom:15px; color:#ddd;">Текст підказки</p>
+        <h3 id="wizard-title" style="color:#f1c40f; margin-top:0; margin-bottom:10px; font-size:1.1rem;" data-i18n="wiz_title">ОФЛАЙН РЕЖИМ</h3>
+        <p id="wizard-text" style="font-size:0.95rem; margin-bottom:15px; color:#ddd;" data-i18n="wiz_text">Текст підказки</p>
         
         <div style="display:flex; justify-content:space-between; gap:10px;">
-            <button onclick="OfflineWizard.cancel()" class="tactical-btn" style="flex:1; background:#300; color:#f33; border-color:#f33; margin:0;">СКАСУВАТИ</button>
-            <button id="wizard-btn-next" onclick="OfflineWizard.next()" class="tactical-btn" style="flex:1; display:none; margin:0;">ДАЛІ ➡</button>
+            <button onclick="OfflineWizard.cancel()" class="tactical-btn" style="flex:1; background:#300; color:#f33; border-color:#f33; margin:0;" data-i18n="btn_wiz_cancel">СКАСУВАТИ</button>
+            <button id="wizard-btn-next" onclick="OfflineWizard.next()" class="tactical-btn" style="flex:1; display:none; margin:0;" data-i18n="btn_wiz_next">ДАЛІ ➡</button>
         </div>
     </div>
     
-    <script src="app.js?v=10.30"></script>
+    <script src="app.js?v=10.31"></script>
 </body>
 </html>
