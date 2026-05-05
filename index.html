@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.26 TACTICAL</title>
+    <title>RA_MOBILE v10.27 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.26">
+    <link rel="stylesheet" href="style.css?v=10.27">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -61,7 +61,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.26</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.27</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -81,7 +81,8 @@
         <div class="hud-row" style="display: flex; justify-content: space-between; align-items: center;">
             <span id="gps-status">GPS: ПОШУК...</span>
             <span id="alt-val" style="color: #aaa; font-size: 0.8rem; font-weight: bold;">ВИС: --- м</span>
-            <span id="stealth-status" class="stealth-danger">⚠️ РАДІОСЛІД</span>
+            <!-- НОВИЙ ІНДИКАТОР ТРЬОХ РІВНІВ -->
+            <span id="pos-level" style="font-size: 0.75rem; font-weight: bold; border: 1px solid #555; padding: 2px 4px; border-radius: 3px; color: #aaa;">РІВЕНЬ: АНАЛІЗ</span>
         </div>
         <div class="hud-row" style="margin-top: 5px; font-size: 0.8rem; display: flex; justify-content: space-between; width: 100%;">
             <span id="speed-val" style="color: var(--glow);">ШВИД: 0.0 км/г</span>
@@ -90,6 +91,7 @@
     </div>
 
     <div id="main-content">
+        <!-- МАПА -->
         <section id="mod-map" class="module active">
             <div id="map-container"></div>
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
@@ -106,6 +108,7 @@
             </div>
         </section>
 
+        <!-- КОМПАС -->
         <section id="mod-compass" class="module">
             <div id="compass-container">
                 <div id="tc-ring">
@@ -143,10 +146,12 @@
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
         </section>
 
+        <!-- АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР -->
         <section id="mod-astro" class="module">
             <video id="v-astro-stream" autoplay playsinline muted></video>
             <div id="astro-overlay">
                 
+                <!-- Радарні підсвітки екрана -->
                 <div id="astro-dir-left" class="astro-glow-v"></div>
                 <div id="astro-dir-right" class="astro-glow-v"></div>
                 <div id="astro-dir-top" class="astro-glow-h"></div>
@@ -154,8 +159,10 @@
                 
                 <div id="astro-target-msg">ЦІЛЬ ЗАХОПЛЕНО</div>
 
+                <!-- Центральна стрілка-вказівник -->
                 <div id="astro-pointer" style="position:absolute; top:50%; left:50%; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 30px solid #f33; display:none; z-index:3; filter: drop-shadow(0 0 5px #000); transform-origin: 50% 50%;"></div>
 
+                <!-- Трафарет закріплений по центру -->
                 <svg width="100%" height="100%">
                     <circle cx="50%" cy="50%" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
                     <line x1="50%" y1="30%" x2="50%" y2="70%" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
@@ -164,11 +171,13 @@
                     <g id="astro-stencil" style="transition: all 0.2s linear;">
                         <circle cx="50%" cy="50%" r="4" fill="#fff" />
                         <text x="52%" y="52%" fill="#fff" font-size="12px" font-weight="bold">ПОЛЯРНА ЗІРКА</text>
+                        <!-- Ковш -->
                         <polyline points="50%,50% 40%,30% 30%,25% 15%,35% 10%,50% 25%,55% 30%,45% 15%,35%" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
                     </g>
                 </svg>
                 
                 <div id="astro-dist-text">--- м</div>
+                <!-- Телеметрія для тренажера -->
                 <div id="astro-hint">ШУКАЙТЕ ПІВНІЧ</div>
             </div>
             
@@ -181,6 +190,7 @@
             </div>
         </section>
 
+        <!-- ОПТИКА -->
         <section id="mod-eye" class="module">
             <div class="cam-box">
                 <video id="v-stream" autoplay playsinline muted></video>
@@ -218,6 +228,7 @@
             </div>
         </section>
 
+        <!-- QR-РАЦІЯ -->
         <section id="mod-chat" class="module">
             <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;">ОФЛАЙН РАЦІЯ</h2>
             <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;">
@@ -234,17 +245,19 @@
             <button onclick="clearChat()" class="tactical-btn" style="background:#200; color:#f33; border-color:#500; margin-top: 15px;">ОЧИСТИТИ ТЕКСТ</button>
         </section>
 
+        <!-- ЩИТ -->
         <section id="mod-shield" class="module">
             <h2>ОХОРОНА / ЩИТ</h2>
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;">АКТИВУВАТИ ЗАХИСТ</button>
             <button id="btn-shield-sound" class="tactical-btn">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
+        <!-- ІНСТРУКЦІЯ -->
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;">БОЙОВИЙ ПОСІБНИК</h2>
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
                 <h3 style="color:#f1c40f; margin-top: 10px;">⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ</h3>
-                <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку.</p>
+                <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку. Програма має 3 рівні позиціонування: <strong>Мережа (Макс)</strong>, <strong>Стелс (Тільки GPS)</strong>, та <strong>Автономний (Зорі/Кроки)</strong>.</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
                 <p style="margin-bottom: 10px;">Для встановлення своєї позиції вручну використайте "МОЯ ПОЗИЦІЯ (РУЧНА)" і зробіть довгий натиск. Подвійний тап ставить точку цілі.</p>
@@ -258,6 +271,7 @@
         </section>
     </div>
 
+    <!-- ЕКО ОВЕРЛЕЙ -->
     <div id="eco-overlay">
         <div id="eco-top" class="eco-edge"></div>
         <div id="eco-bottom" class="eco-edge"></div>
@@ -268,6 +282,7 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
 
+    <!-- ПАНЕЛЬ МАЙСТРА НАЛАШТУВАНЬ (WIZARD) -->
     <div id="wizard-panel" style="display:none; position:fixed; bottom:20px; left:5%; width:90%; background:rgba(0, 20, 0, 0.9); border:2px solid #4ade80; border-radius:10px; padding:15px; z-index:12000; color:#fff; text-align:center; box-sizing:border-box;">
         <h3 id="wizard-title" style="color:#f1c40f; margin-top:0; margin-bottom:10px; font-size:1.1rem;">ОФЛАЙН РЕЖИМ</h3>
         <p id="wizard-text" style="font-size:0.95rem; margin-bottom:15px; color:#ddd;">Текст підказки</p>
@@ -278,6 +293,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.26"></script>
+    <script src="app.js?v=10.27"></script>
 </body>
 </html>
