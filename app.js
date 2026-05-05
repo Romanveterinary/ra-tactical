@@ -90,7 +90,7 @@ const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'mot
 // 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
 // ==========================================
 function initSystem() {
-    updatePositioningLevel(); // Замість старого checkStealthMode
+    updatePositioningLevel();
     try{initMap();}catch(e){} 
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
@@ -122,12 +122,12 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// НОВА ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ
+// ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ
 function updatePositioningLevel() {
     const levelEl = document.getElementById('pos-level');
     if (!levelEl) return;
 
-    if (OfflineWizard.isActive || isSignalLost || isManualPosMode) {
+    if (isOfflineTracking || OfflineWizard.isActive || isSignalLost || isManualPosMode) {
         levelEl.innerText = "РІВЕНЬ 3: АВТОНОМНИЙ";
         levelEl.style.color = "#f1c40f";
         levelEl.style.borderColor = "#f1c40f";
@@ -645,6 +645,11 @@ document.getElementById('btn-cal-walk').onclick = () => {
     if(navigator.vibrate) navigator.vibrate([100, 100]); playSystemTone(500, 100);
 };
 
+// НОВА ШВИДКА КНОПКА КРОКОМІРА
+document.getElementById('btn-pedometer').onclick = () => {
+    toggleOfflineTracking(!isOfflineTracking);
+};
+
 function initGPS() {
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(pos => {
@@ -904,8 +909,8 @@ function updateCompassUI() {
             
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                // ЗМІНЕНО ЗНАК: тепер підняття телефону піднімає і графіку
-                let diffPitch = elevation - 48; 
+                // ПОВЕРНУТО ПРАВИЛЬНИЙ ЗНАК ДЛЯ ЕКРАНА (Щоб стрілка вказувала вгору)
+                let diffPitch = 48 - elevation; 
 
                 let opAz = Math.min(1, Math.abs(diffAz) / 30);
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
@@ -940,15 +945,19 @@ function updateCompassUI() {
             let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
             let absDiff = Math.abs(relativeAngle);
             
-            // Вібрація (тільки якщо включений ПОВОДИР)
+            // ВІДНОВЛЕНИЙ ВІБРО-СОНАР (Працює як міношукач: чим точніше на ціль - тим частіше)
             if (guideMode) {
-                if (absDiff <= 15) {
-                    if (timeNow - lastVibroTime > 10000) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
-                } else if (absDiff <= 45) {
-                    if (timeNow - lastVibroTime > 3000) { if (navigator.vibrate) navigator.vibrate([100, 50, 100]); lastVibroTime = timeNow; }
-                } else {
-                    if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(200); lastVibroTime = timeNow; }
+                if (absDiff <= 5) {
+                    // Ідеально на цілі - часта безперервна вібрація
+                    if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); lastVibroTime = timeNow; }
+                } else if (absDiff <= 15) {
+                    // Трохи відхилились - середній пульс
+                    if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
+                } else if (absDiff <= 30) {
+                    // Край коридору - рідкісні удари
+                    if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); lastVibroTime = timeNow; }
                 }
+                // Якщо більше 30 градусів - мовчить (Сонар втратив ціль)
             }
 
             // ГОЛОСОВИЙ ПОВОДИР (З динамічним інтервалом)
@@ -962,13 +971,11 @@ function updateCompassUI() {
                     if (isEcoMode) {
                         speakText(`Відстань ${d} метрів.`);
                         lastVoiceTime = timeNow;
-                    } else if (currentSpeedKmh > 1.5) {
-                        // Якщо відхилення більше 120 градусів - ціль позаду, ми йдемо назад!
+                    } else if (currentSpeedKmh > 1.5 || isManualPosMode) {
                         if (absDiff > 120) {
                             speakText(`Розверніться! Ви віддаляєтесь. Відстань ${d} метрів.`);
                             lastVoiceTime = timeNow;
                         } 
-                        // Якщо просто збилися з курсу більше ніж на 25 градусів
                         else if (absDiff > 25) {
                             let dirText = relativeAngle > 0 ? "Правіше." : "Лівіше.";
                             speakText(`${dirText} Відстань ${d} метрів.`);
@@ -1006,8 +1013,7 @@ function updateCompassUI() {
             
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                // ЗМІНЕНО ЗНАК: тепер підняття телефону піднімає і графіку
-                let diffPitch = elevation - 48; 
+                let diffPitch = 48 - elevation; 
 
                 let aLeft = document.getElementById('astro-dir-left');
                 let aRight = document.getElementById('astro-dir-right');
@@ -1018,7 +1024,7 @@ function updateCompassUI() {
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
                 aLeft.style.opacity = diffAz > 5 ? opAz : '0';
-                aRight.style.opacity = diffAz < -5 ? opAz : '0';
+                aRight.style.display = diffAz < -5 ? opAz : '0';
                 aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
                 aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
 
@@ -1043,7 +1049,7 @@ function updateCompassUI() {
     }
 }
 
-// Замінили кнопку режиму на Голосову підказку
+// Кнопка перемикання Голосу
 document.getElementById('btn-guide-voice').onclick = async () => { 
     isVoiceEnabled = !isVoiceEnabled; 
     let btn = document.getElementById('btn-guide-voice'); 
@@ -1067,7 +1073,13 @@ if (voiceSlider) {
     };
 }
 
-document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558"; };
+// Кнопка перемикання Вібро
+document.getElementById('btn-guide').onclick = async () => { 
+    await initSensors(); guideMode = !guideMode; 
+    let btn = document.getElementById('btn-guide'); 
+    btn.innerText = guideMode ? "ПОВОДИР (ВІБРО): УВІМК" : "ПОВОДИР (ВІБРО): ВИМК"; 
+    btn.style.color = guideMode ? "#4ade80" : "#558"; 
+};
 
 // --- КАЛІБРУВАННЯ ГОРИЗОНТУ ---
 document.getElementById('btn-astro-horizon').onclick = () => {
@@ -1341,14 +1353,26 @@ let isOfflineTracking = false;
 let stepLength = 0.75; 
 let lastAccel = 0;
 
+// НОВА ЛОГІКА ДЛЯ КНОПКИ КРОКОМІРА
+document.getElementById('btn-pedometer').onclick = () => {
+    toggleOfflineTracking(!isOfflineTracking);
+};
+
 function toggleOfflineTracking(forceStart = false) {
+    let btn = document.getElementById('btn-pedometer');
     if (forceStart) {
         isOfflineTracking = true;
-        alert("✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!\nТелефон рахуватиме кроки по вібрації і зміщуватиме вас на мапі.");
+        if(btn) { btn.innerText = "👣 РЕЖИМ КРОКОМІРА: УВІМК"; btn.style.color = "#4ade80"; btn.style.borderColor = "#4ade80"; }
+        if (!lastGoodGPS) alert("Увага: Немає початкової точки. Перейдіть на мапу і встановіть її довгим натиском (РУЧНА ПОЗИЦІЯ).");
+        else alert("✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!\nТелефон рахуватиме кроки по вібрації і зміщуватиме вас на мапі.");
+        playSystemTone(800, 200);
     } else {
         isOfflineTracking = false;
+        if(btn) { btn.innerText = "👣 РЕЖИМ КРОКОМІРА: ВИМК"; btn.style.color = "#f1c40f"; btn.style.borderColor = "#f1c40f"; }
         alert("Офлайн трекінг зупинено.");
+        playSystemTone(400, 200);
     }
+    updatePositioningLevel();
 }
 
 window.addEventListener('devicemotion', function(event) {
