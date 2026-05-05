@@ -90,7 +90,7 @@ const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'mot
 // 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
 // ==========================================
 function initSystem() {
-    checkStealthMode(); 
+    updatePositioningLevel(); // Замість старого checkStealthMode
     try{initMap();}catch(e){} 
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
@@ -122,13 +122,26 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-function checkStealthMode() {
-    const statusEl = document.getElementById('stealth-status');
-    if(!statusEl) return;
-    if (navigator.onLine) { statusEl.innerText = "⚠️ РАДІОСЛІД"; statusEl.className = "stealth-danger"; } 
-    else { statusEl.innerText = "[ СТЕЛС АКТИВНО ]"; statusEl.className = "stealth-safe"; }
+// НОВА ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ
+function updatePositioningLevel() {
+    const levelEl = document.getElementById('pos-level');
+    if (!levelEl) return;
+
+    if (OfflineWizard.isActive || isSignalLost || isManualPosMode) {
+        levelEl.innerText = "РІВЕНЬ 3: АВТОНОМНИЙ";
+        levelEl.style.color = "#f1c40f";
+        levelEl.style.borderColor = "#f1c40f";
+    } else if (!navigator.onLine) {
+        levelEl.innerText = "РІВЕНЬ 2: СТЕЛС (GPS)";
+        levelEl.style.color = "#4ade80";
+        levelEl.style.borderColor = "#4ade80";
+    } else {
+        levelEl.innerText = "РІВЕНЬ 1: МАКС (РАДІОСЛІД)";
+        levelEl.style.color = "#f33";
+        levelEl.style.borderColor = "#f33";
+    }
 }
-setInterval(checkStealthMode, 1000); 
+setInterval(updatePositioningLevel, 1000); 
 
 function vibrateError() { if (navigator.vibrate) navigator.vibrate([300, 100, 300]); }
 
@@ -1005,7 +1018,7 @@ function updateCompassUI() {
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
                 aLeft.style.opacity = diffAz > 5 ? opAz : '0';
-                aRight.style.display = diffAz < -5 ? opAz : '0';
+                aRight.style.opacity = diffAz < -5 ? opAz : '0';
                 aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
                 aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
 
