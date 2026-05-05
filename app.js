@@ -48,6 +48,7 @@ let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 let currentPitch = 0; 
 let horizonBeta = 90; // Стандартне положення горизонту
+let currentSpeedKmh = 0; // Змінна для фільтру голосу
 
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
@@ -638,6 +639,9 @@ function initGPS() {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
             
+            // Фільтр швидкості (м/с -> км/год)
+            currentSpeedKmh = spd ? (spd * 3.6) : 0;
+            
             if (firstFix && acc > 50) return; 
 
             if (tracePoints.length > 0 && map) {
@@ -702,8 +706,7 @@ function initGPS() {
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
             if (isTransportMode && lastGpsCoordsForTransport) {
-                let speedMs = spd || 0;
-                if (speedMs > 1.1) { 
+                if (currentSpeedKmh > 4) { 
                     let gpsH = pos.coords.heading;
                     if (gpsH === null || isNaN(gpsH)) {
                         gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon);
@@ -716,8 +719,7 @@ function initGPS() {
 
             lastGoodGPS = { lat, lon };
             
-            let speedKmH = spd ? (spd * 3.6).toFixed(1) : "0.0";
-            let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `ШВИД: ${speedKmH} км/г`;
+            let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `ШВИД: ${currentSpeedKmh.toFixed(1)} км/г`;
             
             let coordsEl = document.getElementById('tc-coords-small'); if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
             let accEl = document.getElementById('tc-acc'); if(accEl) accEl.innerText = `ТОЧН: ${Math.round(acc)}м`;
@@ -877,10 +879,11 @@ function updateCompassUI() {
                 document.getElementById('astro-dist-text').innerText = Math.round(d) + " м";
             }
             
+            // Вдосконалена математика висоти
+            let elevation = horizonBeta - currentPitch;
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                let relativeAlt = Math.round(horizonBeta - currentPitch); 
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${relativeAlt}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Потрібно: Азимут 0°, Висота ~48°)</span>`;
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${Math.round(elevation)}° / 48°<br><span style="color:#f1c40f; font-size:0.7rem;">(СИРИЙ ДАТЧИК: ${Math.round(currentPitch)}° | ГОРИЗОНТ: ${Math.round(horizonBeta)}°)</span>`;
             }
 
             let astroStencil = document.getElementById('astro-stencil');
@@ -892,16 +895,14 @@ function updateCompassUI() {
             let astroPointer = document.getElementById('astro-pointer');
             
             if (astroStencil) {
-                // Рахуємо відхилення
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                let targetPitch = horizonBeta - 48; // Україна ~48°
-                let diffPitch = currentPitch - targetPitch; 
+                let diffPitch = 48 - elevation; 
 
                 let opAz = Math.min(1, Math.abs(diffAz) / 30);
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
                 aLeft.style.opacity = diffAz > 5 ? opAz : '0';
-                aRight.style.display = diffAz < -5 ? opAz : '0';
+                aRight.style.opacity = diffAz < -5 ? opAz : '0';
                 aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
                 aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
 
@@ -925,7 +926,7 @@ function updateCompassUI() {
             }
         }
 
-        // ПОВОДИР (Вібро та Голос) працюють тільки якщо хоч один увімкнено
+        // ПОВОДИР (Вібро та Голос)
         if ((guideMode || isVoiceEnabled) && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
             let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
@@ -942,18 +943,23 @@ function updateCompassUI() {
                 }
             }
 
-            // Голосова підказка раз на 8 секунд
-            if (isVoiceEnabled && absDiff > 15 && (timeNow - lastVoiceTime > 8000)) {
+            // ГОЛОСОВИЙ ПОВОДИР (Фільтр швидкості та розширений коридор 25 градусів)
+            if (isVoiceEnabled && (timeNow - lastVoiceTime > 10000)) {
                 let d = 0;
                 if (lastGoodGPS && routePoints.length > 0 && map) {
                     d = Math.round(map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]));
+                    
+                    if (isEcoMode) {
+                        // В Екорежимі телефон працює як ехолот - кожні 10 сек каже дистанцію
+                        speakText(`Відстань ${d} метрів.`);
+                        lastVoiceTime = timeNow;
+                    } else if (currentSpeedKmh > 1.5 && absDiff > 25) {
+                        // Якщо екран увімкнено, ми йдемо (> 1.5 км/г) і серйозно відхилилися
+                        let dirText = relativeAngle > 0 ? "Правіше." : "Лівіше.";
+                        speakText(`${dirText} Відстань ${d} метрів.`);
+                        lastVoiceTime = timeNow;
+                    }
                 }
-                
-                let dirText = relativeAngle > 0 ? "Правіше." : "Лівіше.";
-                let textToSpeak = `${dirText} Відстань ${d} метрів.`;
-                
-                speakText(textToSpeak);
-                lastVoiceTime = timeNow;
             }
         }
     } else {
@@ -972,10 +978,10 @@ function updateCompassUI() {
             document.getElementById('astro-dir-top').style.opacity = '0';
             document.getElementById('astro-dir-bottom').style.opacity = '0';
             
+            let elevation = horizonBeta - currentPitch;
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                let relativeAlt = Math.round(horizonBeta - currentPitch); 
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${relativeAlt}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Потрібно: Азимут 0°, Висота ~48°)</span>`;
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${Math.round(elevation)}° / 48°<br><span style="color:#f1c40f; font-size:0.7rem;">(СИРИЙ ДАТЧИК: ${Math.round(currentPitch)}° | ГОРИЗОНТ: ${Math.round(horizonBeta)}°)</span>`;
             }
 
             let astroStencil = document.getElementById('astro-stencil');
@@ -984,8 +990,7 @@ function updateCompassUI() {
             
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                let targetPitch = horizonBeta - 48; 
-                let diffPitch = currentPitch - targetPitch; 
+                let diffPitch = 48 - elevation; 
 
                 let aLeft = document.getElementById('astro-dir-left');
                 let aRight = document.getElementById('astro-dir-right');
@@ -996,7 +1001,7 @@ function updateCompassUI() {
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
                 aLeft.style.opacity = diffAz > 5 ? opAz : '0';
-                aRight.style.display = diffAz < -5 ? opAz : '0';
+                aRight.style.opacity = diffAz < -5 ? opAz : '0';
                 aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
                 aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
 
