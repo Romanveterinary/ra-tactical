@@ -46,6 +46,7 @@ const CRYPTO_KEY = "RA_STORM_2026";
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
+let currentPitch = 0; // Нахил телефону (для Астро-тренажера)
 
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
@@ -72,6 +73,7 @@ let guideMode = false, guideType = 'search', navAudioEnabled = false;
 let lastVibroTime = 0, lastWarnTime = 0, lastGpsPing = 0;
 let isSignalLost = true, firstFix = true;
 let lastGpsProcessTime = Date.now(); 
+let gpsLostTimer = null; // Таймер втрати сигналу
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 let isManualPosMode = false;
@@ -258,38 +260,42 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
 
-        let pressTimer;
-        map.on('mousedown contextmenu', (e) => {
-            if (isManualPosMode) {
-                lastGoodGPS = { lat: e.latlng.lat, lon: e.latlng.lng };
-                if(!userMarker) {
-                    userMarker = L.marker([lastGoodGPS.lat, lastGoodGPS.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
-                } else {
-                    userMarker.setLatLng([lastGoodGPS.lat, lastGoodGPS.lon]);
-                }
-                isManualPosMode = false;
-                if(routePoints.length > 0) { currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, routePoints[0].lat, routePoints[0].lng); }
-                if(navigator.vibrate) navigator.vibrate(100); playSystemTone(800, 100);
-                document.getElementById('gps-status').innerText = "📍 РУЧНИЙ РЕЖИМ";
-                document.getElementById('gps-status').style.color = "#0cf";
-                return;
+        // ДОВГИЙ НАТИСК (contextmenu) -> Встановлює точку "Я ТУТ"
+        map.on('contextmenu', (e) => { 
+            if (navigator.vibrate) navigator.vibrate(100);
+            playSystemTone(800, 100);
+            
+            lastGoodGPS = { lat: e.latlng.lat, lon: e.latlng.lng };
+            if(!userMarker) {
+                userMarker = L.marker([lastGoodGPS.lat, lastGoodGPS.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
+            } else {
+                userMarker.setLatLng([lastGoodGPS.lat, lastGoodGPS.lon]);
             }
-
-            pressTimer = setTimeout(() => {
-                if(routePoints.length >= 10) return alert("Максимум 10 точок!");
-                if(navigator.vibrate) navigator.vibrate(50);
-                playNavTone(800, 100);
-                routePoints.push(e.latlng); updateRoute();
-            }, 700); 
+            
+            isManualPosMode = false;
+            if(routePoints.length > 0) { currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, routePoints[0].lat, routePoints[0].lng); }
+            
+            document.getElementById('gps-status').innerText = "📍 РУЧНИЙ РЕЖИМ";
+            document.getElementById('gps-status').style.color = "#0cf";
+            
+            // Якщо працює майстер - рухаємось далі
+            if (OfflineWizard.isActive && OfflineWizard.currentStep === 1) {
+                setTimeout(() => OfflineWizard.onStartPointSet(), 500);
+            }
         });
-        
-        map.on('mouseup mousemove dragstart', () => { clearTimeout(pressTimer); });
 
-        map.on('dblclick', (e) => {
-            if (isManualPosMode) return;
+        // ПОДВІЙНИЙ ТАП (dblclick) -> Встановлює точку маршруту "ЦІЛЬ"
+        map.on('dblclick', (e) => { 
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(navigator.vibrate) navigator.vibrate(50);
-            routePoints.push(e.latlng); updateRoute();
+            playNavTone(800, 100);
+            
+            routePoints.push(e.latlng); 
+            updateRoute();
+
+            if (OfflineWizard.isActive && OfflineWizard.currentStep === 2) {
+                setTimeout(() => OfflineWizard.onDestinationSet(), 500);
+            }
         });
         
         map.on('dragstart', () => { isMapFollowing = false; document.getElementById('btn-follow').style.color = '#fff'; });
@@ -301,7 +307,7 @@ function initMap() {
 
 document.getElementById('btn-manual-pos').onclick = () => {
     isManualPosMode = true;
-    alert("📍 РУЧНИЙ РЕЖИМ: Тапніть по мапі в тому місці, де ви зараз знаходитесь.");
+    alert("📍 РУЧНИЙ РЕЖИМ: Зробіть довгий натиск на мапі в тому місці, де ви зараз знаходитесь.");
     toggleMapMenu();
 };
 
@@ -626,11 +632,8 @@ function initGPS() {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
             
-            // 🚨 ВИПРАВЛЕННЯ ЗУБЦЯ (ХОЛОДНИЙ СТАРТ) 🚨
-            // Ігноруємо перші точки, якщо точність дуже погана (більше 50 метрів)
             if (firstFix && acc > 50) return; 
 
-            // Також ігноруємо "дикі стрибки" від вишок
             if (tracePoints.length > 0 && map) {
                 let lastP = tracePoints[tracePoints.length - 1];
                 let jumpDist = map.distance(lastP, [lat, lon]);
@@ -646,14 +649,21 @@ function initGPS() {
             if (hudAltEl) hudAltEl.innerText = `ВИС: ${altText}`;
 
             let stat = document.getElementById('gps-status');
+            
+            // ЛОГІКА ТАЙМЕРА ТА ВТРАТИ GPS
             if(acc > 200) {
-                if(stat) { stat.innerText = "❌ GPS ЗГЛУШЕНО (>200м)"; stat.style.color = "#f33"; }
-                if(!isSignalLost) { 
-                    if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                    playSystemTone(300, 500); 
-                    isSignalLost = true; 
+                if (!gpsLostTimer && !isSignalLost && !isManualPosMode) {
+                    gpsLostTimer = setTimeout(() => {
+                        if(stat) { stat.innerText = "❌ GPS ЗГЛУШЕНО (>200м)"; stat.style.color = "#f33"; }
+                        if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
+                        playSystemTone(300, 500); 
+                        isSignalLost = true; 
+                        OfflineWizard.start(); 
+                    }, 5000);
                 }
             } else {
+                if (gpsLostTimer) { clearTimeout(gpsLostTimer); gpsLostTimer = null; }
+                
                 if(stat && !isManualPosMode) { stat.innerText = "GPS: OK"; stat.style.color = "#4ade80"; }
                 if(isSignalLost) { 
                     if(navigator.vibrate) navigator.vibrate([100, 100, 100]); 
@@ -736,24 +746,29 @@ function initGPS() {
             }
         }, err => {
             let stat = document.getElementById('gps-status');
-            if(stat && !isManualPosMode) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
-            if(!isSignalLost && !isManualPosMode) { 
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                playSystemTone(300, 500); 
-                isSignalLost = true; 
-                
-                // Запускаємо Майстер автономного режиму
-                OfflineWizard.start(); 
+            
+            // ЛОГІКА ТАЙМЕРА ПРИ ПОВНІЙ ВТРАТІ (ERR)
+            if (!gpsLostTimer && !isSignalLost && !isManualPosMode) {
+                gpsLostTimer = setTimeout(() => {
+                    if(stat) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
+                    if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
+                    playSystemTone(300, 500); 
+                    isSignalLost = true; 
+                    OfflineWizard.start(); 
+                }, 5000);
             }
         }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }); 
     }
 }
 
-// === ОНОВЛЕНИЙ БЛОК КОМПАСА (ПЛАВНІСТЬ ТА ЕКО-РЕЖИМ) ===
+// === ОНОВЛЕНИЙ БЛОК КОМПАСА ТА НАХИЛУ ===
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
     let hw = null;
+    
+    // Зберігаємо поточний нахил телефону (pitch) для Астро-тренажера
+    currentPitch = e.beta || 0;
 
     if (e.webkitCompassHeading !== undefined) {
         hw = e.webkitCompassHeading;
@@ -821,7 +836,6 @@ function animateCompass() {
 function updateCompassUI() {
     let displayDeg = Math.round(((currentDisplayAngle % 360) + 360) % 360);
     
-    // Відображення на стандартному компасі
     if (!isEcoMode) {
         let ring = document.getElementById('tc-ring'); 
         let deg = document.getElementById('tc-deg');
@@ -832,7 +846,6 @@ function updateCompassUI() {
         if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
     }
 
-    // Робота з ціллю (якщо є)
     if (currentBearing !== null) {
         let relAngle = currentBearing - currentDisplayAngle;
         let relMod = (((currentBearing - displayDeg) % 360) + 360) % 360;
@@ -846,7 +859,6 @@ function updateCompassUI() {
             }
         }
 
-        // ЕКО-РЕЖИМ ПІДГЛЯДАННЯ
         if (isEcoMode && isEcoPeeking) {
             document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
             if (relMod >= 315 || relMod < 45) document.getElementById('eco-top').style.opacity = '1';
@@ -873,9 +885,14 @@ function updateCompassUI() {
                     aLeft.style.opacity = '1'; aRight.style.opacity = '1'; 
                 }
             }
+            
+            // Телеметрія для Астро-тренажера
+            let astroHint = document.getElementById('astro-hint');
+            if (astroHint) {
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна зірка: Азимут 0°, Нахил ~49°)</span>`;
+            }
         }
 
-        // Звуковий/Вібро поводир
         if (guideMode && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
             let absDiff = Math.abs((((currentBearing - displayDeg) % 360) + 360) % 360);
@@ -903,6 +920,12 @@ function updateCompassUI() {
             document.getElementById('astro-dist-text').innerText = "НЕМАЄ ЦІЛІ";
             document.getElementById('astro-dir-left').style.opacity = '0';
             document.getElementById('astro-dir-right').style.opacity = '0';
+            
+            // Телеметрія без цілі
+            let astroHint = document.getElementById('astro-hint');
+            if (astroHint) {
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна зірка: Азимут 0°, Нахил ~49°)</span>`;
+            }
         }
     }
 }
@@ -915,7 +938,7 @@ function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getE
 function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
 
 // ==========================================
-// 6. АСТРО-КАЛІБРУВАННЯ (НОВИЙ БЛОК)
+// 6. АСТРО-КАЛІБРУВАННЯ
 // ==========================================
 function getSunAzimuth(lat, lon, date) {
     let rad = Math.PI / 180; let start = new Date(date.getFullYear(), 0, 0);
@@ -945,7 +968,6 @@ document.getElementById('btn-astro-sun').onclick = () => {
 };
 
 document.getElementById('btn-astro-star').onclick = () => {
-    // Північ = 0 градусів
     compassOffset = (0 - hardwareHeading + 360) % 360; 
     if(navigator.vibrate) navigator.vibrate([200, 100, 200]); 
     playSystemTone(800, 100);
@@ -1115,7 +1137,7 @@ const OfflineWizard = {
         
         document.getElementById('wizard-panel').style.display = 'block';
         document.getElementById('wizard-title').innerText = "КРОК 1: ПОТОЧНА ПОЗИЦІЯ";
-        document.getElementById('wizard-text').innerText = "Тапніть по мапі, де ви зараз знаходитесь (з'явиться квадрат).";
+        document.getElementById('wizard-text').innerText = "Зробіть довгий натиск на мапі, де ви зараз знаходитесь (з'явиться квадрат).";
         document.getElementById('wizard-btn-next').style.display = 'none';
     },
 
@@ -1128,7 +1150,7 @@ const OfflineWizard = {
         document.getElementById('wizard-title').innerText = "КРОК 2: ЦІЛЬ МАРШРУТУ";
         
         if (routePoints.length === 0) {
-            document.getElementById('wizard-text').innerText = "Тапніть по мапі, щоб вказати точку, куди вам потрібно дістатися.";
+            document.getElementById('wizard-text').innerText = "Зробіть подвійний тап по мапі, щоб вказати точку, куди вам потрібно дістатися.";
             document.getElementById('wizard-btn-next').style.display = 'none';
         } else {
             document.getElementById('wizard-text').innerText = "Маршрут знайдено. Можемо переходити до калібрування компаса.";
@@ -1152,7 +1174,7 @@ const OfflineWizard = {
         showModule('mod-astro'); 
         
         document.getElementById('wizard-title').innerText = "КРОК 3: ПРИВ'ЯЗКА";
-        document.getElementById('wizard-text').innerText = "Наведіть приціл камери на Сонце або Зірку і натисніть кнопку внизу.";
+        document.getElementById('wizard-text').innerText = "Знайдіть Полярну зірку або Сонце та натисніть кнопку внизу.";
         document.getElementById('wizard-btn-next').style.display = 'none';
     },
 
