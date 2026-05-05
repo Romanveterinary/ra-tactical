@@ -122,23 +122,37 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ
+// ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ (З БЛОКУВАННЯМ КНОПОК)
 function updatePositioningLevel() {
     const levelEl = document.getElementById('pos-level');
+    let btnMan = document.getElementById('btn-manual-pos');
+    let btnPed = document.getElementById('btn-pedometer');
+
     if (!levelEl) return;
 
-    if (isOfflineTracking || OfflineWizard.isActive || isSignalLost || isManualPosMode) {
+    let isLevel3 = isOfflineTracking || OfflineWizard.isActive || isSignalLost || isManualPosMode;
+
+    if (isLevel3) {
         levelEl.innerText = "РІВЕНЬ 3: АВТОНОМНИЙ";
         levelEl.style.color = "#f1c40f";
         levelEl.style.borderColor = "#f1c40f";
+        // Розблоковуємо кнопки
+        if (btnMan) { btnMan.style.opacity = '1'; btnMan.style.pointerEvents = 'auto'; }
+        if (btnPed) { btnPed.style.opacity = '1'; btnPed.style.pointerEvents = 'auto'; }
     } else if (!navigator.onLine) {
         levelEl.innerText = "РІВЕНЬ 2: СТЕЛС (GPS)";
         levelEl.style.color = "#4ade80";
         levelEl.style.borderColor = "#4ade80";
+        // Блокуємо ручні кнопки
+        if (btnMan) { btnMan.style.opacity = '0.3'; btnMan.style.pointerEvents = 'none'; }
+        if (btnPed) { btnPed.style.opacity = '0.3'; btnPed.style.pointerEvents = 'none'; }
     } else {
         levelEl.innerText = "РІВЕНЬ 1: МАКС (РАДІОСЛІД)";
         levelEl.style.color = "#f33";
         levelEl.style.borderColor = "#f33";
+        // Блокуємо ручні кнопки
+        if (btnMan) { btnMan.style.opacity = '0.3'; btnMan.style.pointerEvents = 'none'; }
+        if (btnPed) { btnPed.style.opacity = '0.3'; btnPed.style.pointerEvents = 'none'; }
     }
 }
 setInterval(updatePositioningLevel, 1000); 
@@ -288,15 +302,19 @@ function initMap() {
             if (isManualPosMode) {
                 lastGoodGPS = { lat: e.latlng.lat, lon: e.latlng.lng };
                 if(!userMarker) {
-                    userMarker = L.marker([lastGoodGPS.lat, lastGoodGPS.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
+                    // Створюємо помаранчевий маркер
+                    userMarker = L.marker([lastGoodGPS.lat, lastGoodGPS.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri" style="border-bottom-color: #f97316 !important;"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
                 } else {
                     userMarker.setLatLng([lastGoodGPS.lat, lastGoodGPS.lon]);
+                    let tri = document.getElementById('user-tri');
+                    if (tri) tri.style.borderBottomColor = '#f97316'; // Робимо помаранчевим
                 }
                 isManualPosMode = false;
+                isSignalLost = true; // Примусово фіксуємо офлайн рівень
                 if(routePoints.length > 0) { currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, routePoints[0].lat, routePoints[0].lng); }
                 if(navigator.vibrate) navigator.vibrate(100); playSystemTone(800, 100);
                 document.getElementById('gps-status').innerText = "📍 РУЧНИЙ РЕЖИМ";
-                document.getElementById('gps-status').style.color = "#0cf";
+                document.getElementById('gps-status').style.color = "#f97316";
                 return;
             }
 
@@ -326,7 +344,7 @@ function initMap() {
 
 document.getElementById('btn-manual-pos').onclick = () => {
     isManualPosMode = true;
-    alert("📍 РУЧНИЙ РЕЖИМ: Тапніть по мапі в тому місці, де ви зараз знаходитесь.");
+    alert("📍 РУЧНИЙ РЕЖИМ (БЕЗ GPS):\nТапніть по мапі в тому місці, де ви зараз знаходитесь. Ваш маркер стане оранжевим.");
     toggleMapMenu();
 };
 
@@ -645,7 +663,7 @@ document.getElementById('btn-cal-walk').onclick = () => {
     if(navigator.vibrate) navigator.vibrate([100, 100]); playSystemTone(500, 100);
 };
 
-// НОВА ШВИДКА КНОПКА КРОКОМІРА
+// НОВА ЛОГІКА ДЛЯ КНОПКИ КРОКОМІРА
 document.getElementById('btn-pedometer').onclick = () => {
     toggleOfflineTracking(!isOfflineTracking);
 };
@@ -753,9 +771,16 @@ function initGPS() {
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
             if (isMapFollowing && !firstFix && map) map.panTo([lat, lon]);
 
+            // Відновлюємо нормальний колір, якщо з'явився хороший GPS
             if(!userMarker && map && typeof L !== 'undefined') {
                 userMarker = L.marker([lat, lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
-            } else if(userMarker) { userMarker.setLatLng([lat, lon]); }
+            } else if(userMarker) { 
+                userMarker.setLatLng([lat, lon]); 
+                if (!isOfflineTracking && !isManualPosMode) {
+                    let tri = document.getElementById('user-tri');
+                    if(tri) tri.style.borderBottomColor = ''; // Синій за замовчуванням
+                }
+            }
 
             if(isWalkCalibrating && walkStartPoint && map) {
                 let d = map.distance([walkStartPoint.lat, walkStartPoint.lon], [lat, lon]);
@@ -893,7 +918,10 @@ function updateCompassUI() {
                 document.getElementById('astro-dist-text').innerText = Math.round(d) + " м";
             }
             
-            let elevation = horizonBeta - currentPitch;
+            // ВИНАЙДЕНА ФОРМУЛА: Датчик збільшує кут при погляді в небо. 
+            // Отже висота = Поточний кут - Горизонт
+            let elevation = currentPitch - horizonBeta;
+            
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
                 astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${Math.round(elevation)}° / 48°<br><span style="color:#f1c40f; font-size:0.7rem;">(СИРИЙ ДАТЧИК: ${Math.round(currentPitch)}° | ГОРИЗОНТ: ${Math.round(horizonBeta)}°)</span>`;
@@ -909,7 +937,7 @@ function updateCompassUI() {
             
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                // ПОВЕРНУТО ПРАВИЛЬНИЙ ЗНАК ДЛЯ ЕКРАНА (Щоб стрілка вказувала вгору)
+                // Зберігаємо класичний розрахунок для вказівника: Треба пройти = Ціль - Поточна висота
                 let diffPitch = 48 - elevation; 
 
                 let opAz = Math.min(1, Math.abs(diffAz) / 30);
@@ -931,6 +959,7 @@ function updateCompassUI() {
                     aMsg.style.display = 'none';
                     if (astroPointer) {
                         astroPointer.style.display = 'block';
+                        // Формула стрілки. Завдяки правильному elevation вона покаже вгору!
                         let angleRad = Math.atan2(diffPitch, diffAz);
                         let arrowDeg = 90 - (angleRad * 180 / Math.PI);
                         astroPointer.style.transform = `translate(-50%, -50%) rotate(${arrowDeg}deg) translateY(-100px)`;
@@ -1001,7 +1030,7 @@ function updateCompassUI() {
             document.getElementById('astro-dir-top').style.opacity = '0';
             document.getElementById('astro-dir-bottom').style.opacity = '0';
             
-            let elevation = horizonBeta - currentPitch;
+            let elevation = currentPitch - horizonBeta;
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
                 astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${Math.round(elevation)}° / 48°<br><span style="color:#f1c40f; font-size:0.7rem;">(СИРИЙ ДАТЧИК: ${Math.round(currentPitch)}° | ГОРИЗОНТ: ${Math.round(horizonBeta)}°)</span>`;
@@ -1014,11 +1043,6 @@ function updateCompassUI() {
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
                 let diffPitch = 48 - elevation; 
-
-                let aLeft = document.getElementById('astro-dir-left');
-                let aRight = document.getElementById('astro-dir-right');
-                let aTop = document.getElementById('astro-dir-top');
-                let aBottom = document.getElementById('astro-dir-bottom');
 
                 let opAz = Math.min(1, Math.abs(diffAz) / 30);
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
@@ -1362,8 +1386,8 @@ function toggleOfflineTracking(forceStart = false) {
     let btn = document.getElementById('btn-pedometer');
     if (forceStart) {
         isOfflineTracking = true;
-        if(btn) { btn.innerText = "👣 РЕЖИМ КРОКОМІРА: УВІМК"; btn.style.color = "#4ade80"; btn.style.borderColor = "#4ade80"; }
-        if (!lastGoodGPS) alert("Увага: Немає початкової точки. Перейдіть на мапу і встановіть її довгим натиском (РУЧНА ПОЗИЦІЯ).");
+        if(btn) { btn.innerText = "👣 РЕЖИМ КРОКОМІРА: УВІМК"; btn.style.color = "#f97316"; btn.style.borderColor = "#f97316"; }
+        if (!lastGoodGPS) alert("Увага: Немає початкової точки. Перейдіть на мапу і встановіть її кнопкою Я ТУТ (БЕЗ GPS).");
         else alert("✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!\nТелефон рахуватиме кроки по вібрації і зміщуватиме вас на мапі.");
         playSystemTone(800, 200);
     } else {
@@ -1398,7 +1422,11 @@ window.addEventListener('devicemotion', function(event) {
         let newLon = lastGoodGPS.lon + (dLon * 180 / Math.PI);
         
         lastGoodGPS = { lat: newLat, lon: newLon };
-        if (userMarker) userMarker.setLatLng([newLat, newLon]);
+        if (userMarker) {
+            userMarker.setLatLng([newLat, newLon]);
+            let tri = document.getElementById('user-tri');
+            if (tri) tri.style.borderBottomColor = '#f97316'; // Завжди оранжевий в крокомірі
+        }
         updateRoute();
     }
     lastAccel = currentAccel;
