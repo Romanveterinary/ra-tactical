@@ -69,11 +69,11 @@ let isMapFollowing = true;
 let tracePoints = [];
 let traceLineLayer = null;
 
-let guideMode = false, guideType = 'search', navAudioEnabled = false;
-let lastVibroTime = 0, lastWarnTime = 0, lastGpsPing = 0;
+let guideMode = false, isVoiceEnabled = false;
+let lastVibroTime = 0, lastVoiceTime = 0, lastGpsPing = 0;
 let isSignalLost = true, firstFix = true;
 let lastGpsProcessTime = Date.now(); 
-let gpsLostTimer = null; // Таймер втрати сигналу
+let gpsLostTimer = null; 
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 let isManualPosMode = false;
@@ -142,7 +142,7 @@ async function initSensors() {
 }
 
 function playNavTone(freq, duration) {
-    if (!audioCtx || !navAudioEnabled) return; 
+    if (!audioCtx) return; 
     try {
         let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
         o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
@@ -156,6 +156,15 @@ function playSystemTone(freq, duration) {
         o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.5;
         o.start(); g.gain.setTargetAtTime(0, audioCtx.currentTime + duration/1000, 0.05); setTimeout(() => o.stop(), duration + 100);
     } catch(e) {}
+}
+
+function speakText(text) {
+    if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel(); // Очищаємо чергу
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'uk-UA';
+    utterance.rate = 1.1; // Трохи швидше для навігації
+    window.speechSynthesis.speak(utterance);
 }
 
 function triggerDestroyProtocol() {
@@ -199,7 +208,6 @@ async function showModule(id) {
     
     if (id !== 'mod-eye' && id !== 'mod-chat' && id !== 'mod-astro') turnOffCamera();
     
-    // Автозапуск камери для АСТРО-режиму
     if (id === 'mod-astro') {
         const video = document.getElementById('v-astro-stream');
         if (!video.srcObject) {
@@ -260,7 +268,6 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
 
-        // ДОВГИЙ НАТИСК (contextmenu) -> Встановлює точку "Я ТУТ"
         map.on('contextmenu', (e) => { 
             if (navigator.vibrate) navigator.vibrate(100);
             playSystemTone(800, 100);
@@ -278,13 +285,11 @@ function initMap() {
             document.getElementById('gps-status').innerText = "📍 РУЧНИЙ РЕЖИМ";
             document.getElementById('gps-status').style.color = "#0cf";
             
-            // Якщо працює майстер - рухаємось далі
             if (OfflineWizard.isActive && OfflineWizard.currentStep === 1) {
                 setTimeout(() => OfflineWizard.onStartPointSet(), 500);
             }
         });
 
-        // ПОДВІЙНИЙ ТАП (dblclick) -> Встановлює точку маршруту "ЦІЛЬ"
         map.on('dblclick', (e) => { 
             if(routePoints.length >= 10) return alert("Максимум 10 точок!");
             if(navigator.vibrate) navigator.vibrate(50);
@@ -650,7 +655,6 @@ function initGPS() {
 
             let stat = document.getElementById('gps-status');
             
-            // ЛОГІКА ТАЙМЕРА ТА ВТРАТИ GPS
             if(acc > 200) {
                 if (!gpsLostTimer && !isSignalLost && !isManualPosMode) {
                     gpsLostTimer = setTimeout(() => {
@@ -747,7 +751,6 @@ function initGPS() {
         }, err => {
             let stat = document.getElementById('gps-status');
             
-            // ЛОГІКА ТАЙМЕРА ПРИ ПОВНІЙ ВТРАТІ (ERR)
             if (!gpsLostTimer && !isSignalLost && !isManualPosMode) {
                 gpsLostTimer = setTimeout(() => {
                     if(stat) { stat.innerText = "❌ GPS ВТРАЧЕНО (OFFLINE)"; stat.style.color = "#f33"; }
@@ -766,8 +769,6 @@ function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
     let hw = null;
-    
-    // Зберігаємо поточний нахил телефону (pitch) для Астро-тренажера
     currentPitch = e.beta || 0;
 
     if (e.webkitCompassHeading !== undefined) {
@@ -867,92 +868,82 @@ function updateCompassUI() {
             else if (relMod >= 225 && relMod < 315) document.getElementById('eco-left').style.opacity = '1';
         }
 
-        // АСТРО-РЕЖИМ ПОВОДИР
+        // АСТРО-РЕЖИМ (Трафарет і Радар)
         let astroMod = document.getElementById('mod-astro');
         if (astroMod && astroMod.classList.contains('active')) {
             if (lastGoodGPS && routePoints.length > 0 && map) {
                 let d = map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]);
                 document.getElementById('astro-dist-text').innerText = Math.round(d) + " м";
-                
-                let aLeft = document.getElementById('astro-dir-left');
-                let aRight = document.getElementById('astro-dir-right');
-                
-                if (relMod > 5 && relMod <= 180) { 
-                    aRight.style.opacity = '1'; aLeft.style.opacity = '0'; 
-                } else if (relMod > 180 && relMod < 355) { 
-                    aLeft.style.opacity = '1'; aRight.style.opacity = '0'; 
-                } else { 
-                    aLeft.style.opacity = '1'; aRight.style.opacity = '1'; 
-                }
             }
             
-            // Телеметрія для Астро-тренажера
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
                 astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
             }
 
-            // АСТРО-ТРЕНАЖЕР (AR-магія підводки до зірок)
-            let astroStars = document.getElementById('astro-stars');
-            let astroGuide = document.getElementById('astro-guide-arrows');
-            let arrUp = document.getElementById('astro-arr-up');
-            let arrDown = document.getElementById('astro-arr-down');
-            let arrLeft = document.getElementById('astro-arr-left');
-            let arrRight = document.getElementById('astro-arr-right');
-            let arrLock = document.getElementById('astro-target-lock');
+            let astroStencil = document.getElementById('astro-stencil');
+            let aLeft = document.getElementById('astro-dir-left');
+            let aRight = document.getElementById('astro-dir-right');
+            let aTop = document.getElementById('astro-dir-top');
+            let aBottom = document.getElementById('astro-dir-bottom');
+            let aMsg = document.getElementById('astro-target-msg');
             
-            if (astroStars && astroGuide) {
-                astroGuide.style.display = 'block';
-                
-                // 1. Рахуємо відхилення від Півночі (Азимут 0°)
-                // Значення від -180 (ліворуч) до 180 (праворуч)
+            if (astroStencil) {
+                // Рахуємо відхилення
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                
-                // 2. Рахуємо відхилення по висоті
-                // Полярна зірка в Україні висить на висоті ~48°.
-                // Коли екран дивиться рівно в горизонт, currentPitch (beta) зазвичай дорівнює 90°.
-                // Коли піднімаємо на 48°, beta зменшується до ~42°.
                 let targetPitch = 42; 
                 let diffPitch = currentPitch - targetPitch; 
 
-                // 3. Зміщуємо малюнок зірок (15 пікселів на кожен градус відхилення)
-                let pxPerDeg = 15;
-                let tx = -diffAz * pxPerDeg;
-                let ty = -diffPitch * pxPerDeg;
-                
-                astroStars.style.transform = `translate(${tx}px, ${ty}px)`;
+                // Яскравість підсвітки залежить від того, наскільки ми відхилилися
+                // Максимальна яскравість (1) при відхиленні 30 градусів і більше
+                let opAz = Math.min(1, Math.abs(diffAz) / 30);
+                let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
-                // 4. Підказуємо стрілками куди вести камеру
-                arrLeft.style.display = diffAz > 10 ? 'inline' : 'none';
-                arrRight.style.display = diffAz < -10 ? 'inline' : 'none';
-                arrUp.style.display = diffPitch > 10 ? 'inline' : 'none';
-                arrDown.style.display = diffPitch < -10 ? 'inline' : 'none';
+                aLeft.style.opacity = diffAz > 5 ? opAz : '0';
+                aRight.style.display = diffAz < -5 ? opAz : '0';
+                aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
+                aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
 
-                // Якщо ми в межах 10 градусів - ЦІЛЬ У ПРИЦІЛІ
-                if (Math.abs(diffAz) <= 10 && Math.abs(diffPitch) <= 10) {
-                    arrLock.style.display = 'block';
-                    arrLeft.style.display = 'none';
-                    arrRight.style.display = 'none';
-                    arrUp.style.display = 'none';
-                    arrDown.style.display = 'none';
+                // Якщо ціль в межах 5 градусів - ЗАХОПЛЕННЯ!
+                if (Math.abs(diffAz) <= 5 && Math.abs(diffPitch) <= 5) {
+                    astroStencil.classList.add('astro-target-locked');
+                    aMsg.style.display = 'block';
+                    aLeft.style.opacity = '0'; aRight.style.opacity = '0';
+                    aTop.style.opacity = '0'; aBottom.style.opacity = '0';
                 } else {
-                    arrLock.style.display = 'none';
+                    astroStencil.classList.remove('astro-target-locked');
+                    aMsg.style.display = 'none';
                 }
             }
         }
 
+        // ГОЛОСОВИЙ ПОВОДИР
         if (guideMode && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
-            let absDiff = Math.abs((((currentBearing - displayDeg) % 360) + 360) % 360);
-            if (absDiff > 180) absDiff = 360 - absDiff;
-
-            if (guideType === 'corridor') {
-                if (absDiff <= 15) { if (timeNow - lastVibroTime > 30000) { if (navigator.vibrate) navigator.vibrate([40, 100, 40]); if(navAudioEnabled) playNavTone(800, 150); lastVibroTime = timeNow; } } 
-                else { if (timeNow - lastWarnTime > 5000) { if (navigator.vibrate) navigator.vibrate([150, 50, 150]); if(navAudioEnabled) playNavTone(300, 300); lastWarnTime = timeNow; } }
+            let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
+            
+            // Вібрація для страховки
+            let absDiff = Math.abs(relativeAngle);
+            if (absDiff <= 15) {
+                if (timeNow - lastVibroTime > 10000) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
+            } else if (absDiff <= 45) {
+                if (timeNow - lastVibroTime > 3000) { if (navigator.vibrate) navigator.vibrate([100, 50, 100]); lastVibroTime = timeNow; }
             } else {
-                if (absDiff <= 7) { if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); if(navAudioEnabled) playNavTone(1200, 50); lastVibroTime = timeNow; } } 
-                else if (absDiff <= 20) { if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); if(navAudioEnabled) playNavTone(800, 50); lastVibroTime = timeNow; } } 
-                else if (absDiff <= 45) { if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); if(navAudioEnabled) playNavTone(400, 50); lastVibroTime = timeNow; } }
+                if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(200); lastVibroTime = timeNow; }
+            }
+
+            // Голосова підказка раз на 8 секунд (тільки якщо збилися з курсу більше ніж на 15 градусів)
+            if (isVoiceEnabled && absDiff > 15 && (timeNow - lastVoiceTime > 8000)) {
+                let d = 0;
+                if (lastGoodGPS && routePoints.length > 0 && map) {
+                    d = Math.round(map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]));
+                }
+                
+                let dirText = relativeAngle > 0 ? "Правіше." : "Лівіше.";
+                let textToSpeak = `${dirText} Відстань ${d} метрів.`;
+                
+                speakText(textToSpeak);
+                lastVoiceTime = timeNow;
             }
         }
     } else {
@@ -968,54 +959,59 @@ function updateCompassUI() {
             document.getElementById('astro-dist-text').innerText = "НЕМАЄ ЦІЛІ";
             document.getElementById('astro-dir-left').style.opacity = '0';
             document.getElementById('astro-dir-right').style.opacity = '0';
+            document.getElementById('astro-dir-top').style.opacity = '0';
+            document.getElementById('astro-dir-bottom').style.opacity = '0';
             
-            // Телеметрія без цілі
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
                 astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
             }
 
-            // АСТРО-ТРЕНАЖЕР (AR-магія підводки до зірок, навіть якщо немає маршруту)
-            let astroStars = document.getElementById('astro-stars');
-            let astroGuide = document.getElementById('astro-guide-arrows');
-            let arrUp = document.getElementById('astro-arr-up');
-            let arrDown = document.getElementById('astro-arr-down');
-            let arrLeft = document.getElementById('astro-arr-left');
-            let arrRight = document.getElementById('astro-arr-right');
-            let arrLock = document.getElementById('astro-target-lock');
+            let astroStencil = document.getElementById('astro-stencil');
+            let aMsg = document.getElementById('astro-target-msg');
             
-            if (astroStars && astroGuide) {
-                astroGuide.style.display = 'block';
+            if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
                 let targetPitch = 42; 
                 let diffPitch = currentPitch - targetPitch; 
-                let pxPerDeg = 15;
-                let tx = -diffAz * pxPerDeg;
-                let ty = -diffPitch * pxPerDeg;
-                
-                astroStars.style.transform = `translate(${tx}px, ${ty}px)`;
 
-                arrLeft.style.display = diffAz > 10 ? 'inline' : 'none';
-                arrRight.style.display = diffAz < -10 ? 'inline' : 'none';
-                arrUp.style.display = diffPitch > 10 ? 'inline' : 'none';
-                arrDown.style.display = diffPitch < -10 ? 'inline' : 'none';
+                let aLeft = document.getElementById('astro-dir-left');
+                let aRight = document.getElementById('astro-dir-right');
+                let aTop = document.getElementById('astro-dir-top');
+                let aBottom = document.getElementById('astro-dir-bottom');
 
-                if (Math.abs(diffAz) <= 10 && Math.abs(diffPitch) <= 10) {
-                    arrLock.style.display = 'block';
-                    arrLeft.style.display = 'none';
-                    arrRight.style.display = 'none';
-                    arrUp.style.display = 'none';
-                    arrDown.style.display = 'none';
+                let opAz = Math.min(1, Math.abs(diffAz) / 30);
+                let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
+
+                aLeft.style.opacity = diffAz > 5 ? opAz : '0';
+                aRight.style.display = diffAz < -5 ? opAz : '0';
+                aTop.style.opacity = diffPitch > 5 ? opPitch : '0';
+                aBottom.style.opacity = diffPitch < -5 ? opPitch : '0';
+
+                if (Math.abs(diffAz) <= 5 && Math.abs(diffPitch) <= 5) {
+                    astroStencil.classList.add('astro-target-locked');
+                    aMsg.style.display = 'block';
+                    aLeft.style.opacity = '0'; aRight.style.opacity = '0';
+                    aTop.style.opacity = '0'; aBottom.style.opacity = '0';
                 } else {
-                    arrLock.style.display = 'none';
+                    astroStencil.classList.remove('astro-target-locked');
+                    aMsg.style.display = 'none';
                 }
             }
         }
     }
 }
 
-document.getElementById('btn-guide-type').onclick = () => { guideType = guideType === 'corridor' ? 'search' : 'corridor'; let btn = document.getElementById('btn-guide-type'); btn.innerText = guideType === 'corridor' ? "РЕЖИМ: КОРИДОР" : "РЕЖИМ: ПОШУК"; btn.style.color = guideType === 'search' ? "#f1c40f" : "#ccc"; };
-document.getElementById('btn-guide-audio').onclick = async () => { await initSensors(); navAudioEnabled = !navAudioEnabled; let btn = document.getElementById('btn-guide-audio'); btn.innerText = navAudioEnabled ? "ЗВУК: УВІМК" : "ЗВУК: ВИМК"; btn.style.color = navAudioEnabled ? "#4ade80" : "#ccc"; };
+// Замінили кнопку режиму на Голосову підказку
+document.getElementById('btn-guide-voice').onclick = async () => { 
+    isVoiceEnabled = !isVoiceEnabled; 
+    let btn = document.getElementById('btn-guide-voice'); 
+    btn.innerText = isVoiceEnabled ? "ГОЛОС: УВІМК" : "ГОЛОС: ВИМК"; 
+    btn.style.color = isVoiceEnabled ? "#4ade80" : "#ccc"; 
+    if (isVoiceEnabled) {
+        speakText("Голосовий поводир увімкнено");
+    }
+};
 document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558"; };
 
 function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
