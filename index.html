@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.28 TACTICAL</title>
+    <title>RA_MOBILE v10.29 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.28">
+    <link rel="stylesheet" href="style.css?v=10.29">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -60,7 +60,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.28</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.29</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -95,7 +95,7 @@
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
-                <button id="btn-manual-pos" class="map-btn" style="color:#0cf;">📍 МОЯ ПОЗИЦІЯ (РУЧНА)</button>
+                <button id="btn-manual-pos" class="map-btn" style="color:#f97316;">📍 Я ТУТ (БЕЗ GPS)</button>
                 <button id="btn-transport" class="map-btn">🚙 ТРАНСПОРТ</button>
                 <button id="btn-share-qr" class="map-btn" style="color:#0cf;">📤 ПЕРЕДАТИ QR</button>
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;">🎯 СЛІДКУВАТИ</button>
@@ -127,8 +127,7 @@
                 </div>
             </div>
             
-            <!-- НОВА КНОПКА КРОКОМІРА -->
-            <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f;">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
+            <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
             <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;">ЦІЛЬ: НЕМАЄ</div>
@@ -256,7 +255,7 @@
                 <p style="margin-bottom: 10px;">Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку. Програма має 3 рівні позиціонування: <strong>Мережа (Макс)</strong>, <strong>Стелс (Тільки GPS)</strong>, та <strong>Автономний (Зорі/Кроки)</strong>.</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;">📍 1. МАРШРУТ ТА МАПА</h3>
-                <p style="margin-bottom: 10px;">Для встановлення своєї позиції вручну використайте "МОЯ ПОЗИЦІЯ (РУЧНА)" і зробіть довгий натиск. Подвійний тап ставить точку цілі.</p>
+                <p style="margin-bottom: 10px;">Для встановлення своєї позиції вручну використайте "Я ТУТ (БЕЗ GPS)" (працює лише в Автономному режимі) і клікніть по мапі. Трикутник стане помаранчевим. Подвійний тап ставить точку цілі.</p>
 
                 <h3 style="color:#0cf;">🧭 2. ПОВОДИР ТА КРОКОМІР</h3>
                 <p style="margin-bottom: 10px;">Увімкніть Голос або Вібро в Компасі. Якщо ви йдете (швидкість > 1.5 км/год) і збилися з курсу, він скаже куди повернути. Вібро працює як сонар: що точніше ви дивитесь на ціль, то частіше телефон вібрує.<br><strong>КРОКОМІР</strong> вмикається окремою кнопкою і рахує кроки без GPS.</p>
@@ -289,6 +288,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.28"></script>
+    <script src="app.js?v=10.29"></script>
 </body>
 </html>
