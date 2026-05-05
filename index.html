@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.23 TACTICAL</title>
+    <title>RA_MOBILE v10.24 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.23">
+    <link rel="stylesheet" href="style.css?v=10.24">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -37,8 +37,8 @@
         #astro-dir-bottom { bottom: 0; background: linear-gradient(to top, rgba(74,222,128,0.8), transparent); }
         
         #astro-dist-text { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; color: #4ade80; font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 8px #000; }
-        .astro-btn-container { position: absolute; bottom: 30px; width: 100%; z-index: 3; display: flex; justify-content: space-around; padding: 0 10px; pointer-events: auto; }
-        #astro-hint { position: absolute; bottom: 85px; width: 100%; text-align: center; color: #fff; font-size: 1rem; text-shadow: 0 0 5px #000; z-index: 4; font-family: monospace; font-weight: bold; }
+        .astro-btn-container { position: absolute; bottom: 15px; width: 100%; z-index: 3; display: flex; flex-direction: column; padding: 0 10px; pointer-events: auto; }
+        #astro-hint { position: absolute; bottom: 120px; width: 100%; text-align: center; color: #fff; font-size: 1rem; text-shadow: 0 0 5px #000; z-index: 4; font-family: monospace; font-weight: bold; }
         
         /* Світіння при захопленні цілі */
         .astro-target-locked { stroke: #0cf !important; filter: drop-shadow(0 0 15px #0cf); }
@@ -61,7 +61,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.23</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.24</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -154,6 +154,9 @@
                 
                 <div id="astro-target-msg">ЦІЛЬ ЗАХОПЛЕНО</div>
 
+                <!-- Центральна стрілка-вказівник -->
+                <div id="astro-pointer" style="position:absolute; top:50%; left:50%; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 30px solid #f33; display:none; z-index:3; filter: drop-shadow(0 0 5px #000); transform-origin: 50% 50%;"></div>
+
                 <!-- Трафарет закріплений по центру -->
                 <svg width="100%" height="100%">
                     <circle cx="50%" cy="50%" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
@@ -174,8 +177,11 @@
             </div>
             
             <div class="astro-btn-container">
-                <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin-right:5px; margin-bottom:0;">☀ СОНЦЕ</button>
-                <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin-left:5px; margin-bottom:0;">⭐ ЗІРКА (ФІКСАЦІЯ)</button>
+                <button id="btn-astro-horizon" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#0cf; margin: 0 5px 10px 5px; border-color:#0cf;">⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)</button>
+                <div style="display:flex; justify-content: space-around; width: 100%;">
+                    <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin:0 5px;">☀ СОНЦЕ</button>
+                    <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin:0 5px;">⭐ ЗІРКА (ФІКСАЦІЯ)</button>
+                </div>
             </div>
         </section>
 
@@ -255,7 +261,7 @@
                 <p style="margin-bottom: 10px;">Увімкніть його в Компасі. Він промовлятиме напрямок і відстань прямо в навушник, щоб ви не дивилися на екран. Якщо ви йдете правильно коридором — він мовчить.</p>
 
                 <h3 style="color:#f1c40f;">🌌 3. АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР</h3>
-                <p style="margin-bottom: 10px;">Трафарет зірок зафіксований по центру. Крутіть телефон туди, де края екрана світяться найсильніше. Коли знайдете правильний кут - екран спалахне синім "ЦІЛЬ ЗАХОПЛЕНО".</p>
+                <p style="margin-bottom: 10px;">1. Станьте рівно, тримаючи телефон перед очима, натисніть "КАЛІБРУВАТИ ГОРИЗОНТ".<br>2. З'явиться червона стрілка. Ведіть телефон туди, куди вона вказує.<br>3. Коли знайдете правильний кут - екран спалахне синім "ЦІЛЬ ЗАХОПЛЕНО".</p>
             </div>
         </section>
     </div>
@@ -282,6 +288,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.23"></script>
+    <script src="app.js?v=10.24"></script>
 </body>
 </html>
