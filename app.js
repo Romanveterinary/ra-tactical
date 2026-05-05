@@ -46,7 +46,8 @@ const CRYPTO_KEY = "RA_STORM_2026";
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
-let currentPitch = 0; // Нахил телефону (для Астро-тренажера)
+let currentPitch = 0; 
+let horizonBeta = 90; // Стандартне положення горизонту
 
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
@@ -160,10 +161,10 @@ function playSystemTone(freq, duration) {
 
 function speakText(text) {
     if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel(); // Очищаємо чергу
+    window.speechSynthesis.cancel(); 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'uk-UA';
-    utterance.rate = 1.1; // Трохи швидше для навігації
+    utterance.rate = 1.1; 
     window.speechSynthesis.speak(utterance);
 }
 
@@ -868,7 +869,7 @@ function updateCompassUI() {
             else if (relMod >= 225 && relMod < 315) document.getElementById('eco-left').style.opacity = '1';
         }
 
-        // АСТРО-РЕЖИМ (Трафарет і Радар)
+        // АСТРО-РЕЖИМ (Трафарет, Радар та Вказівник)
         let astroMod = document.getElementById('mod-astro');
         if (astroMod && astroMod.classList.contains('active')) {
             if (lastGoodGPS && routePoints.length > 0 && map) {
@@ -878,7 +879,8 @@ function updateCompassUI() {
             
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
+                let relativeAlt = Math.round(horizonBeta - currentPitch); 
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${relativeAlt}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Потрібно: Азимут 0°, Висота ~48°)</span>`;
             }
 
             let astroStencil = document.getElementById('astro-stencil');
@@ -887,15 +889,14 @@ function updateCompassUI() {
             let aTop = document.getElementById('astro-dir-top');
             let aBottom = document.getElementById('astro-dir-bottom');
             let aMsg = document.getElementById('astro-target-msg');
+            let astroPointer = document.getElementById('astro-pointer');
             
             if (astroStencil) {
                 // Рахуємо відхилення
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                let targetPitch = 42; 
+                let targetPitch = horizonBeta - 48; // Україна ~48°
                 let diffPitch = currentPitch - targetPitch; 
 
-                // Яскравість підсвітки залежить від того, наскільки ми відхилилися
-                // Максимальна яскравість (1) при відхиленні 30 градусів і більше
                 let opAz = Math.min(1, Math.abs(diffAz) / 30);
                 let opPitch = Math.min(1, Math.abs(diffPitch) / 30);
 
@@ -910,29 +911,38 @@ function updateCompassUI() {
                     aMsg.style.display = 'block';
                     aLeft.style.opacity = '0'; aRight.style.opacity = '0';
                     aTop.style.opacity = '0'; aBottom.style.opacity = '0';
+                    if (astroPointer) astroPointer.style.display = 'none';
                 } else {
                     astroStencil.classList.remove('astro-target-locked');
                     aMsg.style.display = 'none';
+                    if (astroPointer) {
+                        astroPointer.style.display = 'block';
+                        let angleRad = Math.atan2(diffPitch, diffAz);
+                        let arrowDeg = 90 - (angleRad * 180 / Math.PI);
+                        astroPointer.style.transform = `translate(-50%, -50%) rotate(${arrowDeg}deg) translateY(-100px)`;
+                    }
                 }
             }
         }
 
-        // ГОЛОСОВИЙ ПОВОДИР
-        if (guideMode && (!isSignalLost || isManualPosMode)) {
+        // ПОВОДИР (Вібро та Голос) працюють тільки якщо хоч один увімкнено
+        if ((guideMode || isVoiceEnabled) && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
             let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
-            
-            // Вібрація для страховки
             let absDiff = Math.abs(relativeAngle);
-            if (absDiff <= 15) {
-                if (timeNow - lastVibroTime > 10000) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
-            } else if (absDiff <= 45) {
-                if (timeNow - lastVibroTime > 3000) { if (navigator.vibrate) navigator.vibrate([100, 50, 100]); lastVibroTime = timeNow; }
-            } else {
-                if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(200); lastVibroTime = timeNow; }
+            
+            // Вібрація (тільки якщо включений ПОВОДИР)
+            if (guideMode) {
+                if (absDiff <= 15) {
+                    if (timeNow - lastVibroTime > 10000) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
+                } else if (absDiff <= 45) {
+                    if (timeNow - lastVibroTime > 3000) { if (navigator.vibrate) navigator.vibrate([100, 50, 100]); lastVibroTime = timeNow; }
+                } else {
+                    if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(200); lastVibroTime = timeNow; }
+                }
             }
 
-            // Голосова підказка раз на 8 секунд (тільки якщо збилися з курсу більше ніж на 15 градусів)
+            // Голосова підказка раз на 8 секунд
             if (isVoiceEnabled && absDiff > 15 && (timeNow - lastVoiceTime > 8000)) {
                 let d = 0;
                 if (lastGoodGPS && routePoints.length > 0 && map) {
@@ -964,15 +974,17 @@ function updateCompassUI() {
             
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
+                let relativeAlt = Math.round(horizonBeta - currentPitch); 
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | ВИСОТА: ${relativeAlt}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Потрібно: Азимут 0°, Висота ~48°)</span>`;
             }
 
             let astroStencil = document.getElementById('astro-stencil');
             let aMsg = document.getElementById('astro-target-msg');
+            let astroPointer = document.getElementById('astro-pointer');
             
             if (astroStencil) {
                 let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
-                let targetPitch = 42; 
+                let targetPitch = horizonBeta - 48; 
                 let diffPitch = currentPitch - targetPitch; 
 
                 let aLeft = document.getElementById('astro-dir-left');
@@ -993,9 +1005,16 @@ function updateCompassUI() {
                     aMsg.style.display = 'block';
                     aLeft.style.opacity = '0'; aRight.style.opacity = '0';
                     aTop.style.opacity = '0'; aBottom.style.opacity = '0';
+                    if (astroPointer) astroPointer.style.display = 'none';
                 } else {
                     astroStencil.classList.remove('astro-target-locked');
                     aMsg.style.display = 'none';
+                    if (astroPointer) {
+                        astroPointer.style.display = 'block';
+                        let angleRad = Math.atan2(diffPitch, diffAz);
+                        let arrowDeg = 90 - (angleRad * 180 / Math.PI);
+                        astroPointer.style.transform = `translate(-50%, -50%) rotate(${arrowDeg}deg) translateY(-100px)`;
+                    }
                 }
             }
         }
@@ -1013,6 +1032,14 @@ document.getElementById('btn-guide-voice').onclick = async () => {
     }
 };
 document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? "ПОВОДИР: УВІМК" : "ПОВОДИР: ВИМК"; btn.style.color = guideMode ? "#4ade80" : "#558"; };
+
+// --- КАЛІБРУВАННЯ ГОРИЗОНТУ ---
+document.getElementById('btn-astro-horizon').onclick = () => {
+    horizonBeta = currentPitch;
+    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    playSystemTone(800, 100);
+    alert(`⚖️ Горизонт зафіксовано (${Math.round(horizonBeta)}°).\nТепер підніміть телефон вгору (на висоту ~48°) для пошуку зірок.`);
+};
 
 function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
 function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
