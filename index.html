@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.20 TACTICAL</title>
+    <title>RA_MOBILE v10.21 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.20">
+    <link rel="stylesheet" href="style.css?v=10.21">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -32,6 +32,7 @@
         #astro-dir-right { right: 0; background: linear-gradient(to left, rgba(74,222,128,0.8), transparent); }
         #astro-dist-text { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; color: #4ade80; font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 8px #000; }
         .astro-btn-container { position: absolute; bottom: 30px; width: 100%; z-index: 3; display: flex; justify-content: space-around; padding: 0 10px; }
+        #astro-hint { position: absolute; bottom: 85px; width: 100%; text-align: center; color: #fff; font-size: 1rem; text-shadow: 0 0 5px #000; z-index: 4; font-family: monospace; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -50,7 +51,7 @@
 
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.20</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.21</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()">🧭 КОМПАС / ПОВОДИР</a>
@@ -117,7 +118,6 @@
                 </div>
             </div>
             
-            <!-- КНОПКА КАЛІБРУВАННЯ ТЕПЕР ПІД КОМПАСОМ -->
             <button id="btn-cal-walk" class="tactical-btn" style="margin-top:10px; margin-bottom: 20px;">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
             <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;">ЦІЛЬ: НЕМАЄ</div>
@@ -131,20 +131,18 @@
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
         </section>
 
-        <!-- АСТРО-НАВІГАЦІЯ (НОВА ВКАЛДКА) -->
+        <!-- АСТРО-НАВІГАЦІЯ (БЕЗ GPS) -->
         <section id="mod-astro" class="module">
             <video id="v-astro-stream" autoplay playsinline muted></video>
             <div id="astro-overlay">
-                <!-- SVG Графіка (Приціл і Ковш) -->
                 <svg width="100%" height="100%">
                     <!-- Приціл Сонця -->
                     <circle cx="50%" cy="50%" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
                     <line x1="50%" y1="30%" x2="50%" y2="70%" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                     <line x1="30%" y1="50%" x2="70%" y2="50%" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                     
-                    <!-- Контур Ковша (Велика Ведмедиця) -->
+                    <!-- Контур Ковша (Велика Ведмедиця) - Placeholder -->
                     <polyline points="20%,20% 30%,30% 45%,35% 55%,50% 70%,55% 65%,70% 50%,60% 55%,50%" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-                    <!-- Полярна зірка (Умовно в кутку) -->
                     <circle cx="20%" cy="20%" r="4" fill="#fff" />
                     <text x="22%" y="22%" fill="#fff" font-size="12px">ПІВНІЧ</text>
                 </svg>
@@ -153,8 +151,9 @@
                 <div id="astro-dir-left" class="astro-glow"></div>
                 <div id="astro-dir-right" class="astro-glow"></div>
                 
-                <!-- Дистанція -->
                 <div id="astro-dist-text">--- м</div>
+                <!-- Телеметрія для тренажера -->
+                <div id="astro-hint">ШУКАЙТЕ ПІВНІЧ</div>
             </div>
             
             <div class="astro-btn-container">
@@ -254,7 +253,18 @@
         <div id="eco-content"><div id="eco-dist">--- м</div></div>
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
+
+    <!-- ПАНЕЛЬ МАЙСТРА НАЛАШТУВАНЬ (WIZARD) -->
+    <div id="wizard-panel" style="display:none; position:fixed; bottom:20px; left:5%; width:90%; background:rgba(0, 20, 0, 0.9); border:2px solid #4ade80; border-radius:10px; padding:15px; z-index:12000; color:#fff; text-align:center; box-sizing:border-box;">
+        <h3 id="wizard-title" style="color:#f1c40f; margin-top:0; margin-bottom:10px; font-size:1.1rem;">ОФЛАЙН РЕЖИМ</h3>
+        <p id="wizard-text" style="font-size:0.95rem; margin-bottom:15px; color:#ddd;">Текст підказки</p>
+        
+        <div style="display:flex; justify-content:space-between; gap:10px;">
+            <button onclick="OfflineWizard.cancel()" class="tactical-btn" style="flex:1; background:#300; color:#f33; border-color:#f33; margin:0;">СКАСУВАТИ</button>
+            <button id="wizard-btn-next" onclick="OfflineWizard.next()" class="tactical-btn" style="flex:1; display:none; margin:0;">ДАЛІ ➡</button>
+        </div>
+    </div>
     
-    <script src="app.js?v=10.20"></script>
+    <script src="app.js?v=10.21"></script>
 </body>
 </html>
