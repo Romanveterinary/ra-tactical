@@ -889,7 +889,55 @@ function updateCompassUI() {
             // Телеметрія для Астро-тренажера
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна зірка: Азимут 0°, Нахил ~49°)</span>`;
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
+            }
+
+            // АСТРО-ТРЕНАЖЕР (AR-магія підводки до зірок)
+            let astroStars = document.getElementById('astro-stars');
+            let astroGuide = document.getElementById('astro-guide-arrows');
+            let arrUp = document.getElementById('astro-arr-up');
+            let arrDown = document.getElementById('astro-arr-down');
+            let arrLeft = document.getElementById('astro-arr-left');
+            let arrRight = document.getElementById('astro-arr-right');
+            let arrLock = document.getElementById('astro-target-lock');
+            
+            if (astroStars && astroGuide) {
+                astroGuide.style.display = 'block';
+                
+                // 1. Рахуємо відхилення від Півночі (Азимут 0°)
+                // Значення від -180 (ліворуч) до 180 (праворуч)
+                let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
+                
+                // 2. Рахуємо відхилення по висоті
+                // Полярна зірка в Україні висить на висоті ~48°.
+                // Коли екран дивиться рівно в горизонт, currentPitch (beta) зазвичай дорівнює 90°.
+                // Коли піднімаємо на 48°, beta зменшується до ~42°.
+                let targetPitch = 42; 
+                let diffPitch = currentPitch - targetPitch; 
+
+                // 3. Зміщуємо малюнок зірок (15 пікселів на кожен градус відхилення)
+                let pxPerDeg = 15;
+                let tx = -diffAz * pxPerDeg;
+                let ty = -diffPitch * pxPerDeg;
+                
+                astroStars.style.transform = `translate(${tx}px, ${ty}px)`;
+
+                // 4. Підказуємо стрілками куди вести камеру
+                arrLeft.style.display = diffAz > 10 ? 'inline' : 'none';
+                arrRight.style.display = diffAz < -10 ? 'inline' : 'none';
+                arrUp.style.display = diffPitch > 10 ? 'inline' : 'none';
+                arrDown.style.display = diffPitch < -10 ? 'inline' : 'none';
+
+                // Якщо ми в межах 10 градусів - ЦІЛЬ У ПРИЦІЛІ
+                if (Math.abs(diffAz) <= 10 && Math.abs(diffPitch) <= 10) {
+                    arrLock.style.display = 'block';
+                    arrLeft.style.display = 'none';
+                    arrRight.style.display = 'none';
+                    arrUp.style.display = 'none';
+                    arrDown.style.display = 'none';
+                } else {
+                    arrLock.style.display = 'none';
+                }
             }
         }
 
@@ -924,7 +972,43 @@ function updateCompassUI() {
             // Телеметрія без цілі
             let astroHint = document.getElementById('astro-hint');
             if (astroHint) {
-                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна зірка: Азимут 0°, Нахил ~49°)</span>`;
+                astroHint.innerHTML = `АЗИМУТ: ${displayDeg}° | НАХИЛ: ${Math.round(currentPitch)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(Полярна: Азимут 0°, Нахил ~48°)</span>`;
+            }
+
+            // АСТРО-ТРЕНАЖЕР (AR-магія підводки до зірок, навіть якщо немає маршруту)
+            let astroStars = document.getElementById('astro-stars');
+            let astroGuide = document.getElementById('astro-guide-arrows');
+            let arrUp = document.getElementById('astro-arr-up');
+            let arrDown = document.getElementById('astro-arr-down');
+            let arrLeft = document.getElementById('astro-arr-left');
+            let arrRight = document.getElementById('astro-arr-right');
+            let arrLock = document.getElementById('astro-target-lock');
+            
+            if (astroStars && astroGuide) {
+                astroGuide.style.display = 'block';
+                let diffAz = (((displayDeg - 0) % 360) + 540) % 360 - 180;
+                let targetPitch = 42; 
+                let diffPitch = currentPitch - targetPitch; 
+                let pxPerDeg = 15;
+                let tx = -diffAz * pxPerDeg;
+                let ty = -diffPitch * pxPerDeg;
+                
+                astroStars.style.transform = `translate(${tx}px, ${ty}px)`;
+
+                arrLeft.style.display = diffAz > 10 ? 'inline' : 'none';
+                arrRight.style.display = diffAz < -10 ? 'inline' : 'none';
+                arrUp.style.display = diffPitch > 10 ? 'inline' : 'none';
+                arrDown.style.display = diffPitch < -10 ? 'inline' : 'none';
+
+                if (Math.abs(diffAz) <= 10 && Math.abs(diffPitch) <= 10) {
+                    arrLock.style.display = 'block';
+                    arrLeft.style.display = 'none';
+                    arrRight.style.display = 'none';
+                    arrUp.style.display = 'none';
+                    arrDown.style.display = 'none';
+                } else {
+                    arrLock.style.display = 'none';
+                }
             }
         }
     }
