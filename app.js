@@ -72,21 +72,27 @@ const translations = {
         btn_shield_on: "ОХОРОНА АКТИВНА",
         btn_shield_snd_off: "ЗВУК СИРЕНИ: ВИМК",
         btn_shield_snd_on: "ЗВУК СИРЕНИ: УВІМК",
+        
+        // Оновлена детальна інструкція
         man_title: "БОЙОВИЙ ПОСІБНИК",
-        man_h1: "⚠️ 0. ТАКТИЧНА БЕЗПЕКА ТА ДАТЧИКИ",
-        man_p1: "Верхня панель екрана — це ваш головний індикатор безпеки та зв'язку. Програма має 3 рівні позиціонування: <strong>Мережа (Макс)</strong>, <strong>Стелс (Тільки GPS)</strong>, та <strong>Автономний (Зорі/Кроки)</strong>.",
+        man_h1: "⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)",
+        man_p1: "Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.",
         man_h2: "📍 1. МАРШРУТ ТА МАПА",
-        man_p2: "Для встановлення своєї позиції вручну використайте 'Я ТУТ (БЕЗ GPS)' (працює лише в Автономному режимі) і клікніть по мапі. Трикутник стане помаранчевим. Подвійний тап ставить точку цілі.",
-        man_h3: "🧭 2. ПОВОДИР ТА КРОКОМІР",
-        man_p3: "Увімкніть Голос або Вібро в Компасі. Якщо ви йдете і збилися з курсу, він скаже куди повернути. Вібро працює як сонар: що точніше ви дивитесь на ціль, то частіше телефон вібрує.<br><strong>КРОКОМІР</strong> вмикається окремою кнопкою і рахує кроки без GPS.",
-        man_h4: "🌌 3. АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР",
-        man_p4: "1. Станьте рівно, тримаючи телефон вертикально, і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. З'явиться червона стрілка. Ведіть телефон туди, куди вона вказує.<br>3. Коли знайдете правильний кут - екран спалахне синім 'ЦІЛЬ ЗАХОПЛЕНО'.",
+        man_p2: "<strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.",
+        man_h3: "🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР",
+        man_p3: "<strong>Калібрування 15м:</strong> Натисніть круглу кнопку '15м' на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як 'сонар': чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.",
+        man_h4: "🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)",
+        man_p4: "Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне 'ЦІЛЬ ЗАХОПЛЕНО', натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.",
+        man_h5: "💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ",
+        man_p5: "<strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі викличуть тривогу або вібро-сигнал.",
+        
         eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)",
         btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ",
         wiz_title: "ОФЛАЙН РЕЖИМ",
         wiz_text: "Текст підказки",
         btn_wiz_cancel: "СКАСУВАТИ",
         btn_wiz_next: "ДАЛІ ➡",
+        
         // Змінні та динамічні тексти
         lvl3: "РІВЕНЬ 3: АВТОНОМНИЙ",
         lvl2: "РІВЕНЬ 2: СТЕЛС (GPS)",
@@ -108,7 +114,10 @@ const translations = {
         astro_sun_fix: "☀️ Сонце зафіксовано. Компас відкалібровано!",
         astro_star_fix: "⭐ Зірка зафіксована. Компас відкалібровано на Північ!",
         astro_hor_fix: "⚖️ Горизонт зафіксовано",
-        astro_hor_next: "Тепер підніміть телефон вгору (на висоту ~48°) для пошуку зірок."
+        astro_hor_next: "Тепер підніміть телефон вгору (на висоту ~48°) для пошуку зірок.",
+        lbl_meters_short: "м",
+        cal_done: "КАЛІБР: ГОТОВО",
+        alert_no_gps_cal: "Немає сигналу GPS!"
     },
     'en': {
         btn_login: "LOGIN",
@@ -121,7 +130,7 @@ const translations = {
         menu_optics: "👁 OPTICS / AI",
         menu_radio: "💬 TEXT / QR RADIO",
         menu_shield: "🛡 SECURITY / SHIELD",
-        menu_manual: "📖 MANUAL",
+        menu_manual: "📖 INSTRUCTIONS",
         menu_power_off: "🛑 SHUTDOWN APP",
         menu_destroy: "💥 DESTROY DATA",
         hud_gps_search: "GPS: SEARCHING...",
@@ -178,21 +187,27 @@ const translations = {
         btn_shield_on: "SHIELD ACTIVE",
         btn_shield_snd_off: "SIREN SOUND: OFF",
         btn_shield_snd_on: "SIREN SOUND: ON",
+        
+        // Detailed EN Manual
         man_title: "COMBAT MANUAL",
-        man_h1: "⚠️ 0. TACTICAL SECURITY & SENSORS",
-        man_p1: "The top panel is your main security indicator. The app has 3 positioning levels: <strong>Network (Max)</strong>, <strong>Stealth (GPS Only)</strong>, and <strong>Autonomous (Stars/Steps)</strong>.",
+        man_h1: "⚠️ 0. TACTICAL SECURITY (3 LEVELS)",
+        man_p1: "The app automatically monitors your security level:<br><strong>LEVEL 1 (MAX):</strong> Internet & GPS active. Danger of radio tracing.<br><strong>LEVEL 2 (STEALTH):</strong> Internet off, GPS receiving only. You are invisible.<br><strong>LEVEL 3 (AUTONOMOUS):</strong> EW or basement. Uses autonomous compass, pedometer & Astro-navigation.",
         man_h2: "📍 1. ROUTE & MAP",
-        man_p2: "To set your position manually, use 'I AM HERE (NO GPS)' (works only in Autonomous mode) and click on the map. The triangle turns orange. Double-tap to set a target.",
-        man_h3: "🧭 2. GUIDE & PEDOMETER",
-        man_p3: "Turn on Voice or Vibro in Compass. If walking (>1.5 km/h) and off course, it tells you where to turn. Vibro acts as a sonar.<br><strong>PEDOMETER</strong> is activated by a separate button to count steps without GPS.",
-        man_h4: "🌌 3. ASTRO-NAVIGATION & AR",
-        man_p4: "1. Stand straight, hold phone vertically, press 'CALIBRATE HORIZON'.<br>2. A red arrow appears. Move phone where it points.<br>3. At the correct angle, the screen flashes blue 'TARGET LOCKED'.",
+        man_p2: "<strong>Set Target:</strong> Double-tap map to create a waypoint (max 10).<br><strong>Manual Position:</strong> If no GPS (Level 3), tap 'I AM HERE (NO GPS)' and click the map. Your marker turns orange — this is your pedometer starting point.",
+        man_h3: "🧭 2. CALIBRATION & PEDOMETER",
+        man_p3: "<strong>15m Calibration:</strong> Tap the round '15m' button on the map and walk straight. This syncs the magnetic compass with GPS vector.<br><strong>Voice & Vibro:</strong> Voice warns of deviations. Vibro works as a sonar: the more precise you look at the target, the faster it vibrates.<br><strong>Pedometer:</strong> In EW conditions (no GPS), turn it on and the phone counts steps to move your orange marker.",
+        man_h4: "🌌 3. ASTRO-TRAINER (No GPS)",
+        man_p4: "Use this module to calibrate the compass by celestial bodies.<br>1. Hold phone vertically and press 'CALIBRATE HORIZON'.<br>2. Lift phone to the sky (~48 degrees). The red radar arrow shows Polaris and the Big Dipper.<br>3. When screen flashes 'TARGET LOCKED', press the Star or Sun fix button. Compass perfectly aligned to North.",
+        man_h5: "💬 4. OFFLINE RADIO & SHIELD",
+        man_p5: "<strong>Radio:</strong> Write text, create a QR code. Your partner scans it. Encrypted.<br><strong>Shield:</strong> Turn on security and put the phone down. Any movement or ground vibration triggers an alarm.",
+
         eco_touch: "TOUCH SCREEN<br>(3 sec)",
         btn_eco_exit: "EXIT BLACKOUT",
         wiz_title: "OFFLINE MODE",
         wiz_text: "Hint text",
         btn_wiz_cancel: "CANCEL",
         btn_wiz_next: "NEXT ➡",
+        
         // Dynamic
         lvl3: "LEVEL 3: AUTONOMOUS",
         lvl2: "LEVEL 2: STEALTH (GPS)",
@@ -214,7 +229,10 @@ const translations = {
         astro_sun_fix: "☀️ Sun locked. Compass calibrated!",
         astro_star_fix: "⭐ Star locked. Compass calibrated to North!",
         astro_hor_fix: "⚖️ Horizon locked",
-        astro_hor_next: "Now lift the phone up (to ~48° altitude) to search for stars."
+        astro_hor_next: "Now lift the phone up (to ~48° altitude) to search for stars.",
+        lbl_meters_short: "m",
+        cal_done: "CAL: DONE",
+        alert_no_gps_cal: "No GPS signal!"
     },
     'pt': {
         btn_login: "ENTRAR",
@@ -227,7 +245,7 @@ const translations = {
         menu_optics: "👁 ÓPTICA / IA",
         menu_radio: "💬 TEXTO / RÁDIO QR",
         menu_shield: "🛡 SEGURANÇA / ESCUDO",
-        menu_manual: "📖 MANUAL",
+        menu_manual: "📖 INSTRUÇÕES",
         menu_power_off: "🛑 DESLIGAR APLICATIVO",
         menu_destroy: "💥 DESTRUIR DADOS",
         hud_gps_search: "GPS: BUSCANDO...",
@@ -284,21 +302,27 @@ const translations = {
         btn_shield_on: "ESCUDO ATIVO",
         btn_shield_snd_off: "SOM SIRENE: DESL",
         btn_shield_snd_on: "SOM SIRENE: LIG",
+        
+        // Detailed PT Manual
         man_title: "MANUAL DE COMBATE",
-        man_h1: "⚠️ 0. SEGURANÇA TÁTICA E SENSORES",
-        man_p1: "O painel superior é seu principal indicador de segurança. O aplicativo tem 3 níveis de posicionamento: <strong>Rede (Máx)</strong>, <strong>Furtivo (Só GPS)</strong> e <strong>Autônomo (Estrelas/Passos)</strong>.",
+        man_h1: "⚠️ 0. SEGURANÇA TÁTICA (3 NÍVEIS)",
+        man_p1: "O app monitora automaticamente sua segurança:<br><strong>NÍVEL 1 (MÁX):</strong> Internet e GPS ativos. Perigo de rastreamento de rádio.<br><strong>NÍVEL 2 (FURTIVO):</strong> Internet desligada, apenas recebe GPS. Você está invisível.<br><strong>NÍVEL 3 (AUTÔNOMO):</strong> Guerra Eletrônica (EW). Usa bússola autônoma, pedômetro e Astro-navegação.",
         man_h2: "📍 1. ROTA E MAPA",
-        man_p2: "Para definir sua posição manualmente, use 'ESTOU AQUI (SEM GPS)' (só em modo Autônomo) e clique no mapa. O triângulo fica laranja. Toque duplo define um alvo.",
-        man_h3: "🧭 2. GUIA E PEDÔMETRO",
-        man_p3: "Ligue Voz ou Vibro na Bússola. Se andar (>1.5 km/h) e sair da rota, ele diz para onde virar. Vibro age como sonar.<br><strong>PEDÔMETRO</strong> é ativado por botão separado para contar passos sem GPS.",
-        man_h4: "🌌 3. ASTRO-NAVEGAÇÃO E AR",
-        man_p4: "1. Fique reto, segure o telefone verticalmente, pressione 'CALIBRAR HORIZONTE'.<br>2. Aparece uma seta vermelha. Mova o telefone para onde ela aponta.<br>3. No ângulo certo, a tela pisca azul 'ALVO BLOQUEADO'.",
+        man_p2: "<strong>Definir Alvo:</strong> Toque duplo no mapa para criar ponto (máx 10).<br><strong>Posição Manual:</strong> Sem GPS (Nível 3), toque em 'ESTOU AQUI (SEM GPS)' e clique no mapa. O marcador fica laranja — é o início do pedômetro.",
+        man_h3: "🧭 2. CALIBRAÇÃO E PEDÔMETRO",
+        man_p3: "<strong>Calibração 15m:</strong> Pressione o botão redondo '15m' no mapa e ande reto. Isso sincroniza a bússola com o GPS.<br><strong>Voz e Vibro:</strong> A voz avisa sobre desvios. O Vibro age como sonar: quanto mais preciso no alvo, mais rápido vibra.<br><strong>Pedômetro:</strong> Em condições EW, ligue-o e o telefone contará passos para mover seu marcador laranja.",
+        man_h4: "🌌 3. ASTRO-TREINADOR (Sem GPS)",
+        man_p4: "Calibre a bússola pelos astros.<br>1. Segure o telefone verticalmente e pressione 'CALIBRAR HORIZONTE'.<br>2. Levante o telefone para o céu (~48 graus). A seta vermelha mostra Polaris e a Ursa Maior.<br>3. Quando piscar 'ALVO BLOQUEADO', pressione Fixar Estrela ou Sol. Bússola perfeitamente alinhada ao Norte.",
+        man_h5: "💬 4. RÁDIO OFFLINE E ESCUDO",
+        man_p5: "<strong>Rádio:</strong> Escreva um texto, crie um QR. Seu parceiro escaneia. Criptografado.<br><strong>Escudo:</strong> Ligue a segurança e pouse o telefone. Qualquer movimento ou vibração no solo aciona um alarme.",
+
         eco_touch: "TOQUE NA TELA<br>(3 seg)",
         btn_eco_exit: "SAIR DO BLACKOUT",
         wiz_title: "MODO OFFLINE",
         wiz_text: "Texto de dica",
         btn_wiz_cancel: "CANCELAR",
         btn_wiz_next: "PRÓXIMO ➡",
+        
         // Dynamic
         lvl3: "NÍVEL 3: AUTÔNOMO",
         lvl2: "NÍVEL 2: FURTIVO (GPS)",
@@ -320,7 +344,10 @@ const translations = {
         astro_sun_fix: "☀️ Sol fixado. Bússola calibrada!",
         astro_star_fix: "⭐ Estrela fixada. Bússola calibrada para o Norte!",
         astro_hor_fix: "⚖️ Horizonte fixado",
-        astro_hor_next: "Agora levante o telefone (para ~48° de altitude) para procurar estrelas."
+        astro_hor_next: "Agora levante o telefone (para ~48° de altitude) para procurar estrelas.",
+        lbl_meters_short: "m",
+        cal_done: "CAL: PRONTO",
+        alert_no_gps_cal: "Sem sinal GPS!"
     }
 };
 
@@ -335,7 +362,7 @@ function setLanguage(lang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         let key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
-            el.innerHTML = translations[lang][key]; // innerHTML щоб зберегти теги <strong>
+            el.innerHTML = translations[lang][key]; 
         }
     });
 
@@ -543,7 +570,6 @@ function speakText(text) {
     window.speechSynthesis.cancel(); 
     const utterance = new SpeechSynthesisUtterance(text);
     
-    // Встановлюємо правильний акцент залежно від обраної мови
     if (currentLang === 'en') utterance.lang = 'en-US';
     else if (currentLang === 'pt') utterance.lang = 'pt-PT';
     else utterance.lang = 'uk-UA';
@@ -1003,19 +1029,24 @@ function updateSunPosition(lat, lon) {
     if(sunMark) { sunMark.style.display = 'block'; sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; }
 }
 
-document.getElementById('btn-cal-walk').onclick = () => {
-    if (!lastGoodGPS) return;
+// НОВА СПІЛЬНА ФУНКЦІЯ КАЛІБРУВАННЯ 15м
+function startWalkCalibration() {
+    if (!lastGoodGPS) {
+        alert(getT('alert_no_gps_cal'));
+        return;
+    }
     isWalkCalibrating = true;
     walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
-    let calBtn = document.getElementById('btn-cal-walk');
-    if(calBtn) { calBtn.style.color = "#f1c40f"; }
-    if(navigator.vibrate) navigator.vibrate([100, 100]); playSystemTone(500, 100);
-};
-
-// НОВА ЛОГІКА ДЛЯ КНОПКИ КРОКОМІРА
-document.getElementById('btn-pedometer').onclick = () => {
-    toggleOfflineTracking(!isOfflineTracking);
-};
+    
+    let calBtn1 = document.getElementById('btn-cal-walk');
+    let calBtn2 = document.getElementById('btn-map-cal'); // Кругла кнопка на мапі
+    
+    if(calBtn1) { calBtn1.innerText = "15 " + getT('lbl_meters_short'); calBtn1.style.color = "#f1c40f"; }
+    if(calBtn2) { calBtn2.innerText = "15"; calBtn2.style.color = "#f1c40f"; }
+    
+    if(navigator.vibrate) navigator.vibrate([100, 100]); 
+    playSystemTone(500, 100);
+}
 
 function initGPS() {
     if ('geolocation' in navigator) {
@@ -1035,7 +1066,7 @@ function initGPS() {
 
             lastGpsProcessTime = now; 
 
-            let altText = (alt !== null && alt !== undefined) ? Math.round(alt) + " м" : "--- м";
+            let altText = (alt !== null && alt !== undefined) ? Math.round(alt) + " m" : "--- m";
             let tcAltEl = document.getElementById('tc-alt');
             let hudAltEl = document.getElementById('alt-val');
             let prefixAlt1 = currentLang === 'uk' ? 'ВИСОТА:' : (currentLang === 'pt' ? 'ALT:' : 'ALT:');
@@ -1074,11 +1105,11 @@ function initGPS() {
             if(targetPoint && map) {
                 let d = map.distance([lat, lon], targetPoint);
                 
-                let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " м";
-                let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " м";
+                let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " m";
+                let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " m";
                 
                 let prefixTgt = currentLang === 'uk' ? 'ЦІЛЬ:' : (currentLang === 'pt' ? 'ALVO:' : 'TGT:');
-                let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `${prefixTgt} ${Math.round(d)} м`;
+                let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `${prefixTgt} ${Math.round(d)} m`;
                 
                 if(d <= 15) { 
                     if (routePoints.length > 0) {
@@ -1137,15 +1168,31 @@ function initGPS() {
                 }
             }
 
+            // НОВА ЛОГІКА: Зворотний відлік для 15 метрів
             if(isWalkCalibrating && walkStartPoint && map) {
                 let d = map.distance([walkStartPoint.lat, walkStartPoint.lon], [lat, lon]);
+                let remaining = Math.max(0, 15 - Math.round(d));
+                
+                let calBtn1 = document.getElementById('btn-cal-walk');
+                let calBtn2 = document.getElementById('btn-map-cal');
+
+                if(calBtn1) calBtn1.innerText = remaining + " " + getT('lbl_meters_short');
+                if(calBtn2) calBtn2.innerText = remaining;
+
                 if(d >= 15) {
                     compassOffset = (calcBearing(walkStartPoint.lat, walkStartPoint.lon, lat, lon) - hardwareHeading + 360) % 360;
                     isWalkCalibrating = false;
-                    let calBtn = document.getElementById('btn-cal-walk');
-                    if(calBtn) { calBtn.style.color = "#4ade80"; }
-                    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 200);
-                    setTimeout(() => { if(calBtn) { calBtn.style.color = "#fff"; } }, 5000);
+                    
+                    if(calBtn1) { calBtn1.innerText = getT('cal_done'); calBtn1.style.color = "#4ade80"; }
+                    if(calBtn2) { calBtn2.innerText = "OK"; calBtn2.style.color = "#4ade80"; }
+                    
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]); // Довге вібро підтвердження
+                    playSystemTone(800, 200);
+                    
+                    setTimeout(() => { 
+                        if(calBtn1) { calBtn1.innerText = getT('btn_cal_walk'); calBtn1.style.color = "#fff"; }
+                        if(calBtn2) { calBtn2.innerText = "15м"; calBtn2.style.color = "#f1c40f"; }
+                    }, 5000);
                 }
             }
         }, err => {
@@ -1270,7 +1317,7 @@ function updateCompassUI() {
         if (astroMod && astroMod.classList.contains('active')) {
             if (lastGoodGPS && routePoints.length > 0 && map) {
                 let d = map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]);
-                document.getElementById('astro-dist-text').innerText = Math.round(d) + " м";
+                document.getElementById('astro-dist-text').innerText = Math.round(d) + " m";
             }
             
             let elevation = currentPitch - horizonBeta;
@@ -1282,7 +1329,7 @@ function updateCompassUI() {
             }
 
             let astroStencil = document.getElementById('astro-stencil');
-            let astroStencilFixed = document.getElementById('astro-stencil-fixed'); // НОВА ФІКСОВАНА ГРУПА
+            let astroStencilFixed = document.getElementById('astro-stencil-fixed'); 
             let aLeft = document.getElementById('astro-dir-left');
             let aRight = document.getElementById('astro-dir-right');
             let aTop = document.getElementById('astro-dir-top');
@@ -1305,7 +1352,6 @@ function updateCompassUI() {
                 let hour = d.getHours() + (d.getMinutes() / 60);
                 let siderealAngle = (month * 30 + hour * 15) % 360;
 
-                // Рухаємо ОБИДВІ групи (і фіксовану, і обертову)
                 astroStencilFixed.style.transform = `translate(${tx}px, ${ty}px)`;
                 
                 astroStencil.style.transformOrigin = "50% 50%";
@@ -1651,7 +1697,7 @@ async function detectAI() {
                     uiCtx.strokeStyle = p.class === 'person' ? "#0f0" : "#f33"; uiCtx.lineWidth = 3;
                     uiCtx.strokeRect(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
                     uiCtx.fillStyle = p.class === 'person' ? "#0f0" : "#f33"; uiCtx.font = "bold 16px monospace";
-                    uiCtx.fillText(`${p.class} ~${Math.round(dist)}м`, x * scaleX, (y * scaleY) - 8);
+                    uiCtx.fillText(`${p.class} ~${Math.round(dist)}m`, x * scaleX, (y * scaleY) - 8);
                 }
             }
         });
@@ -1762,10 +1808,6 @@ const OfflineWizard = {
 let isOfflineTracking = false;
 let stepLength = 0.75; 
 let lastAccel = 0;
-
-document.getElementById('btn-pedometer').onclick = () => {
-    toggleOfflineTracking(!isOfflineTracking);
-};
 
 function toggleOfflineTracking(forceStart = false) {
     let btn = document.getElementById('btn-pedometer');
