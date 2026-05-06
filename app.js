@@ -121,7 +121,7 @@ const translations = {
         alert_pedo_off: "Офлайн трекінг зупинено.",
         alert_man_pos: "📍 РУЧНИЙ РЕЖИМ:\nТапніть по мапі в тому місці, де ви зараз знаходитесь.",
         astro_sun_fix: "☀️ Сонце зафіксовано. Компас відкалібровано!",
-        astro_star_fix: "⭐ Зірка зафірована. Компас відкалібровано на Північ!",
+        astro_star_fix: "⭐ Зірка зафіксована. Компас відкалібровано на Північ!",
         astro_hor_fix: "⚖️ Горизонт зафіксовано",
         astro_hor_next: "Тепер підніміть телефон вгору (на висоту ~48°) для пошуку зірок.",
         lbl_meters_short: "м",
@@ -771,7 +771,8 @@ function toggleMapMenu() {
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
-        topoLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
+        // ТУТ ЄДИНЕ ВАЖЛИВЕ ВИПРАВЛЕННЯ: http:// змінено на https://
+        topoLayer = L.tileLayer('https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
         darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         topoLayer.addTo(map);
@@ -979,6 +980,7 @@ function scanQRChatFrame() {
     }
     requestAnimationFrame(scanQRChatFrame);
 }
+
 
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
