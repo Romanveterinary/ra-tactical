@@ -11,8 +11,8 @@
     padding: 0;
     font-family: 'Courier New', Courier, monospace;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none; /* ЖОРСТКО ВИМИКАЄ ЛІНЗУ НА IOS */
-    -webkit-user-select: none;   /* ВИМИКАЄ ВИДІЛЕННЯ ТЕКСТУ НА IOS */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -98,7 +98,7 @@ body {
 #mod-map.active { padding: 0; }
 #map-container { height: 100%; width: 100%; background: #000; }
 
-/* КНОПКИ НА МАПІ (Приховані за замовчуванням) */
+/* КНОПКИ НА МАПІ */
 .map-overlay-controls {
     position: absolute;
     z-index: 1000;
@@ -205,25 +205,13 @@ body {
 }
 .tactical-btn:active { background: #333; }
 .flex-row { display: flex; gap: 10px; }
-.control-group { background: #111; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #222; }
-.control-group label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; }
 
 /* ПОВЗУНКИ */
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: #222; height: 8px; border-radius: 4px; margin-bottom: 15px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--glow); border-radius: 50%; cursor: pointer; }
 
-/* ІНСТРУКЦІЯ */
-.manual-content { color: #ccc; font-size: 0.9rem; line-height: 1.6; padding-bottom: 40px; }
-.manual-content h3 { color: var(--accent); margin: 25px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-.manual-content ul { padding-left: 20px; margin-bottom: 15px; }
-.manual-content li { margin-bottom: 10px; }
-.manual-highlight { color: var(--glow); font-weight: bold; }
-.manual-danger { color: var(--danger) !important; }
-
-/* СЛІД РУХУ */
+/* СЛІД РУХУ ТА МАРКЕР */
 .map-trace { stroke-opacity: 0.7; stroke-dasharray: 4, 6; }
-
-/* МАРКЕР КОРИСТУВАЧА */
 .u-icon { background: none !important; border: none !important; }
 #user-tri { 
     width: 0; height: 0;
@@ -235,3 +223,53 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
 }
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* =========================================
+   🟢 НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
+========================================== */
+body.tactical-night {
+    --glow: #f33 !important;
+    --accent: #f33 !important;
+    --danger: #a00 !important;
+    background: #050000 !important;
+    color: #f33 !important;
+}
+body.tactical-night #menu-trigger { color: #f33 !important; border-color: #500 !important; background: rgba(50,0,0,0.7) !important; }
+body.tactical-night .side-nav { background: #080000 !important; border-color: #300 !important; }
+body.tactical-night .side-nav a { color: #d33 !important; border-color: #300 !important; }
+body.tactical-night .side-nav a:hover { background: #300 !important; color: #f33 !important; }
+body.tactical-night .tactical-btn,
+body.tactical-night .map-btn,
+body.tactical-night .lang-btn {
+    background: #100 !important;
+    color: #f33 !important;
+    border-color: #500 !important;
+}
+body.tactical-night .lang-btn.active { color: #f33 !important; border-color: #f33 !important; font-weight: bold; background: #300 !important; }
+body.tactical-night #tactical-hud { background: rgba(20,0,0,0.85) !important; border-color: #500 !important; }
+body.tactical-night #compass-container { border-color: #500 !important; background: radial-gradient(circle, #200, #000) !important; }
+body.tactical-night #tc-ring { border-color: #500 !important; }
+body.tactical-night .compass-mark { color: #f33 !important; }
+body.tactical-night #tc-arrow { filter: drop-shadow(0 0 5px #f33) !important; border-bottom-color: #f33 !important; }
+body.tactical-night #user-tri { border-bottom-color: #f33 !important; filter: drop-shadow(0 0 5px #f33) !important; }
+body.tactical-night .map-trace { stroke: #f33 !important; }
+body.tactical-night .map-fab-eco, body.tactical-night .map-fab-cal { background: rgba(50,0,0,0.8) !important; color: #f33 !important; border-color:#f33 !important; }
+body.tactical-night #astro-horizon-line { background: rgba(255,51,51,0.8) !important; box-shadow: 0 0 5px #f33 !important; }
+body.tactical-night svg circle { fill: none !important; stroke: #f33 !important; }
+body.tactical-night svg line, body.tactical-night svg polyline { stroke: #f33 !important; }
+body.tactical-night svg text { fill: #f33 !important; }
+body.tactical-night .astro-target-locked { stroke: #f33 !important; filter: drop-shadow(0 0 15px #f33) !important; }
+body.tactical-night #astro-target-msg { color: #f33 !important; text-shadow: 0 0 10px #f33 !important; }
+body.tactical-night #eco-dist { color: #f33 !important; }
+body.tactical-night .eco-edge { background: #500 !important; }
+body.tactical-night input[type=range]::-webkit-slider-thumb { background: #f33 !important; }
+body.tactical-night input[type=range] { background: #300 !important; }
+body.tactical-night #clino-bar { background: #f33 !important; box-shadow: 0 0 8px #f33 !important; }
+body.tactical-night #clinometer-wrap { background: rgba(50,0,0,0.8) !important; border-color: #500 !important; }
+body.tactical-night #tc-alt, body.tactical-night #tc-acc, body.tactical-night #route-info { color: #d33 !important; }
+body.tactical-night #tc-dist { color: #f33 !important; }
+
+/* МАГІЯ: Фільтр мапи для нічного режиму (робить кольори червоно-чорними) */
+body.tactical-night .leaflet-layer {
+    filter: grayscale(100%) sepia(100%) hue-rotate(320deg) saturate(500%) brightness(0.6) contrast(1.5) !important;
+}
