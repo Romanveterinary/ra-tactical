@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.33 TACTICAL</title>
+    <title>RA_MOBILE v10.34 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.33">
+    <link rel="stylesheet" href="style.css?v=10.34">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -46,7 +46,6 @@
         .lang-btn.active { color: #4ade80; border-color: #4ade80; }
         
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
-        /* Кнопка ЕКО на мапі */
         .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
     </style>
 </head>
@@ -73,8 +72,12 @@
             <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.33</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.34</h3>
         <hr style="border: 0.5px solid #222;">
+        
+        <a href="#" onclick="toggleNightMode(); closeNav()" data-i18n="menu_day_night" style="font-weight:bold; color:#f33;">☀️ ДЕНЬ / 🔴 НІЧ</a>
+        <hr style="border: 0.5px solid #222;">
+
         <a href="#" onclick="showModule('mod-map'); closeNav()" data-i18n="menu_map">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;" data-i18n="menu_astro">🌌 АСТРО / БЕЗ GPS</a>
@@ -102,14 +105,12 @@
     </div>
 
     <div id="main-content">
-        <!-- МАПА -->
         <section id="mod-map" class="module active">
             <div id="map-container"></div>
             
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
             <button id="btn-map-cal" class="map-fab-cal" onclick="startWalkCalibration()">15м</button>
-            <!-- КНОПКА ЕКО НА МАПІ -->
             <button id="btn-map-eco" class="map-fab-eco" onclick="toggleEcoMode(true)">🌑</button>
 
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
@@ -124,7 +125,6 @@
             </div>
         </section>
 
-        <!-- КОМПАС -->
         <section id="mod-compass" class="module">
             <div id="compass-container">
                 <div id="tc-ring">
@@ -163,7 +163,6 @@
             <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;" data-i18n="btn_eco">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
         </section>
 
-        <!-- АСТРО-НАВІГАЦІЯ ТА AR-ТРЕНАЖЕР -->
         <section id="mod-astro" class="module">
             <video id="v-astro-stream" autoplay playsinline muted></video>
             <div id="astro-overlay">
@@ -172,6 +171,8 @@
                 <div id="astro-dir-right" class="astro-glow-v"></div>
                 <div id="astro-dir-top" class="astro-glow-h"></div>
                 <div id="astro-dir-bottom" class="astro-glow-h"></div>
+                
+                <div id="astro-horizon-line" style="position:absolute; top:50%; left:-50%; width:200%; height:2px; background:rgba(74,222,128,0.7); box-shadow:0 0 5px #4ade80; z-index:2; transform-origin:center;"></div>
                 
                 <div id="astro-target-msg" data-i18n="astro_locked">ЦІЛЬ ЗАХОПЛЕНО</div>
 
@@ -217,7 +218,6 @@
             </div>
         </section>
 
-        <!-- ОПТИКА -->
         <section id="mod-eye" class="module">
             <div class="cam-box">
                 <video id="v-stream" autoplay playsinline muted></video>
@@ -255,7 +255,6 @@
             </div>
         </section>
 
-        <!-- QR-РАЦІЯ -->
         <section id="mod-chat" class="module">
             <h2 style="color: #0cf; text-align: center; margin-bottom: 10px;" data-i18n="chat_title">ОФЛАЙН РАЦІЯ</h2>
             <p style="color:#aaa; font-size:0.85rem; text-align:center; padding:0 15px; margin-bottom: 15px;" data-i18n="chat_desc">
@@ -272,14 +271,12 @@
             <button onclick="clearChat()" class="tactical-btn" style="background:#200; color:#f33; border-color:#500; margin-top: 15px;" data-i18n="btn_chat_clear">ОЧИСТИТИ ТЕКСТ</button>
         </section>
 
-        <!-- ЩИТ -->
         <section id="mod-shield" class="module">
             <h2 data-i18n="shield_title">ОХОРОНА / ЩИТ</h2>
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;" data-i18n="btn_shield_off">АКТИВУВАТИ ЗАХИСТ</button>
             <button id="btn-shield-sound" class="tactical-btn" data-i18n="btn_shield_snd_off">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
-        <!-- ІНСТРУКЦІЯ (ДЕТАЛЬНА) -->
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;" data-i18n="man_title">БОЙОВИЙ ПОСІБНИК</h2>
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
@@ -301,7 +298,6 @@
         </section>
     </div>
 
-    <!-- ЕКО ОВЕРЛЕЙ -->
     <div id="eco-overlay">
         <div id="eco-top" class="eco-edge"></div>
         <div id="eco-bottom" class="eco-edge"></div>
@@ -312,7 +308,6 @@
         <button onclick="toggleEcoMode(false)" style="position:absolute; bottom: 20px; width: 80%; left: 10%; padding: 15px; background: transparent; color: #333; border: 1px solid #222; border-radius: 5px; font-size: 1rem;" data-i18n="btn_eco_exit">ВИЙТИ З БЛЕКАУТУ</button>
     </div>
 
-    <!-- ПАНЕЛЬ МАЙСТРА НАЛАШТУВАНЬ (WIZARD) -->
     <div id="wizard-panel" style="display:none; position:fixed; bottom:20px; left:5%; width:90%; background:rgba(0, 20, 0, 0.9); border:2px solid #4ade80; border-radius:10px; padding:15px; z-index:12000; color:#fff; text-align:center; box-sizing:border-box;">
         <h3 id="wizard-title" style="color:#f1c40f; margin-top:0; margin-bottom:10px; font-size:1.1rem;" data-i18n="wiz_title">ОФЛАЙН РЕЖИМ</h3>
         <p id="wizard-text" style="font-size:0.95rem; margin-bottom:15px; color:#ddd;" data-i18n="wiz_text">Текст підказки</p>
@@ -323,6 +318,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.33"></script>
+    <script src="app.js?v=10.34"></script>
 </body>
 </html>
