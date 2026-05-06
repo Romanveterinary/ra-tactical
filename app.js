@@ -9,6 +9,7 @@ const translations = {
         err_access_denied: "❌ ДОСТУП ЗАБОРОНЕНО",
         title_qr_scan: "ОПТИЧНИЙ ДАНИЙ КОД",
         btn_close: "ЗАКРИТИ",
+        menu_day_night: "☀️ ДЕНЬ / 🔴 НІЧ",
         menu_map: "📍 МАРШРУТ / МАПА",
         menu_compass: "🧭 КОМПАС / ПОВОДИР",
         menu_astro: "🌌 АСТРО / БЕЗ GPS",
@@ -77,13 +78,13 @@ const translations = {
         man_h1: "⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)",
         man_p1: "Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.",
         man_h2: "📍 1. МАРШРУТ ТА МАПА",
-        man_p2: "<strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.",
+        man_p2: "<strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту.<br><strong>Ручна позиція:</strong> Якщо немає GPS, натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі. Маркер стане помаранчевим.",
         man_h3: "🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР",
-        man_p3: "<strong>Калібрування 15м:</strong> Натисніть круглу кнопку '15м' на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як 'сонар': чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.",
+        man_p3: "<strong>Калібрування 15м:</strong> Натисніть '15м' на мапі і йдіть прямо.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення. Вібро-поводир працює як сонар.<br><strong>Крокомір:</strong> Рахує кроки і рухає вашу фішку по мапі.",
         man_h4: "🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)",
-        man_p4: "Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне 'ЦІЛЬ ЗАХОПЛЕНО', натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.",
+        man_p4: "Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів).<br>3. Натисніть кнопку фіксації Зірки або Сонця.",
         man_h5: "💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ",
-        man_p5: "<strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі викличуть тривогу або вібро-сигнал.",
+        man_p5: "<strong>Рація:</strong> Створіть зашифрований QR-код.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Рух або вібрація викличуть тривогу.",
         
         eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)",
         btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ",
@@ -105,10 +106,10 @@ const translations = {
         voice_turn: "Розверніться! Ви віддаляєтесь.",
         voice_right: "Правіше.",
         voice_left: "Лівіше.",
-        alert_no_start: "Увага: Немає початкової точки. Перейдіть на мапу і встановіть її кнопкою Я ТУТ (БЕЗ GPS).",
-        alert_pedo_on: "✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!\nТелефон рахуватиме кроки по вібрації і зміщуватиме вас на мапі.",
+        alert_no_start: "Увага: Немає початкової точки. Встановіть її кнопкою Я ТУТ (БЕЗ GPS).",
+        alert_pedo_on: "✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!",
         alert_pedo_off: "Офлайн трекінг зупинено.",
-        alert_man_pos: "📍 РУЧНИЙ РЕЖИМ (БЕЗ GPS):\nТапніть по мапі в тому місці, де ви зараз знаходитесь. Ваш маркер стане оранжевим.",
+        alert_man_pos: "📍 РУЧНИЙ РЕЖИМ:\nТапніть по мапі в тому місці, де ви зараз знаходитесь.",
         astro_sun_fix: "☀️ Сонце зафіксовано. Компас відкалібровано!",
         astro_star_fix: "⭐ Зірка зафіксована. Компас відкалібровано на Північ!",
         astro_hor_fix: "⚖️ Горизонт зафіксовано",
@@ -122,6 +123,7 @@ const translations = {
         err_access_denied: "❌ ACCESS DENIED",
         title_qr_scan: "OPTICAL DATA CODE",
         btn_close: "CLOSE",
+        menu_day_night: "☀️ DAY / 🔴 NIGHT",
         menu_map: "📍 ROUTE / MAP",
         menu_compass: "🧭 COMPASS / GUIDE",
         menu_astro: "🌌 ASTRO / NO GPS",
@@ -148,7 +150,7 @@ const translations = {
         comp_alt: "ALT: --- m",
         btn_pedo_off: "👣 PEDOMETER: OFF",
         btn_pedo_on: "👣 PEDOMETER: ON",
-        btn_cal_walk: "CALIBRATE BY WALKING (15m)",
+        btn_cal_walk: "CALIBRATE WALKING (15m)",
         comp_target_none: "TARGET: NONE",
         btn_voice_off: "VOICE: OFF",
         btn_voice_on: "VOICE: ON",
@@ -156,7 +158,7 @@ const translations = {
         btn_vibro_on: "GUIDE (VIBRO): ON",
         lbl_voice_int: "HINT INTERVAL:",
         lbl_sec: "sec",
-        btn_eco: "🌑 ECO BLACKOUT (SCREEN-COMPASS)",
+        btn_eco: "🌑 ECO BLACKOUT",
         astro_locked: "TARGET LOCKED",
         astro_polar: "POLARIS",
         astro_hint: "LOOK FOR NORTH",
@@ -175,7 +177,7 @@ const translations = {
         btn_ir: "🔭 IR FILTER",
         btn_motion: "📉 MOTION DETECTOR",
         chat_title: "OFFLINE RADIO",
-        chat_desc: "Enter text and generate an encrypted QR code to share with your partner.",
+        chat_desc: "Enter text and generate an encrypted QR code.",
         btn_chat_cam: "📷 TURN ON CAMERA TO READ",
         chat_left: "Remaining: 200 chars",
         btn_chat_gen: "GENERATE ENCRYPTED QR",
@@ -187,17 +189,17 @@ const translations = {
         btn_shield_snd_on: "SIREN SOUND: ON",
         
         man_title: "COMBAT MANUAL",
-        man_h1: "⚠️ 0. TACTICAL SECURITY (3 LEVELS)",
-        man_p1: "The app automatically monitors your security level:<br><strong>LEVEL 1 (MAX):</strong> Internet & GPS active. Danger of radio tracing.<br><strong>LEVEL 2 (STEALTH):</strong> Internet off, GPS receiving only. You are invisible.<br><strong>LEVEL 3 (AUTONOMOUS):</strong> EW or basement. Uses autonomous compass, pedometer & Astro-navigation.",
+        man_h1: "⚠️ 0. TACTICAL SECURITY",
+        man_p1: "LEVEL 1 (MAX): Internet & GPS. LEVEL 2: Stealth GPS only. LEVEL 3: Autonomous (No GPS).",
         man_h2: "📍 1. ROUTE & MAP",
-        man_p2: "<strong>Set Target:</strong> Double-tap map to create a waypoint (max 10).<br><strong>Manual Position:</strong> If no GPS (Level 3), tap 'I AM HERE (NO GPS)' and click the map. Your marker turns orange — this is your pedometer starting point.",
+        man_p2: "Double tap to set target. Use 'I AM HERE' for manual offline positioning.",
         man_h3: "🧭 2. CALIBRATION & PEDOMETER",
-        man_p3: "<strong>15m Calibration:</strong> Tap the round '15m' button on the map and walk straight. This syncs the magnetic compass with GPS vector.<br><strong>Voice & Vibro:</strong> Voice warns of deviations. Vibro works as a sonar: the more precise you look at the target, the faster it vibrates.<br><strong>Pedometer:</strong> In EW conditions (no GPS), turn it on and the phone counts steps to move your orange marker.",
-        man_h4: "🌌 3. ASTRO-TRAINER (No GPS)",
-        man_p4: "Use this module to calibrate the compass by celestial bodies.<br>1. Hold phone vertically and press 'CALIBRATE HORIZON'.<br>2. Lift phone to the sky (~48 degrees). The red radar arrow shows Polaris and the Big Dipper.<br>3. When screen flashes 'TARGET LOCKED', press the Star or Sun fix button. Compass perfectly aligned to North.",
+        man_p3: "Tap '15m' button to calibrate compass. Use Pedometer offline.",
+        man_h4: "🌌 3. ASTRO-TRAINER",
+        man_p4: "Calibrate horizon, lift to 48 degrees, lock Star or Sun.",
         man_h5: "💬 4. OFFLINE RADIO & SHIELD",
-        man_p5: "<strong>Radio:</strong> Write text, create a QR code. Your partner scans it. Encrypted.<br><strong>Shield:</strong> Turn on security and put the phone down. Any movement or ground vibration triggers an alarm.",
-
+        man_p5: "Secure QR radio and motion alarm shield.",
+        
         eco_touch: "TOUCH SCREEN<br>(3 sec)",
         btn_eco_exit: "EXIT BLACKOUT",
         wiz_title: "OFFLINE MODE",
@@ -215,17 +217,17 @@ const translations = {
         gps_offline: "❌ GPS LOST (OFFLINE)",
         voice_dist: "Distance",
         voice_meters: "meters",
-        voice_turn: "Turn around! You are moving away.",
+        voice_turn: "Turn around!",
         voice_right: "More to the right.",
         voice_left: "More to the left.",
-        alert_no_start: "Warning: No start point. Go to map and set it via I AM HERE (NO GPS).",
-        alert_pedo_on: "✅ AUTONOMOUS NAVIGATION ON!\nPhone will count steps by vibration and move you on the map.",
+        alert_no_start: "Warning: No start point set on map.",
+        alert_pedo_on: "✅ AUTONOMOUS NAVIGATION ON!",
         alert_pedo_off: "Offline tracking stopped.",
-        alert_man_pos: "📍 MANUAL MODE (NO GPS):\nTap the map where you are. Your marker will turn orange.",
-        astro_sun_fix: "☀️ Sun locked. Compass calibrated!",
-        astro_star_fix: "⭐ Star locked. Compass calibrated to North!",
+        alert_man_pos: "📍 MANUAL MODE:\nTap the map where you are.",
+        astro_sun_fix: "☀️ Sun locked!",
+        astro_star_fix: "⭐ Star locked!",
         astro_hor_fix: "⚖️ Horizon locked",
-        astro_hor_next: "Now lift the phone up (to ~48° altitude) to search for stars.",
+        astro_hor_next: "Now lift the phone up to search for stars.",
         lbl_meters_short: "m",
         cal_done: "CAL: DONE",
         alert_no_gps_cal: "No GPS signal!"
@@ -233,8 +235,9 @@ const translations = {
     'pt': {
         btn_login: "ENTRAR",
         err_access_denied: "❌ ACESSO NEGADO",
-        title_qr_scan: "CÓDIGO DE DADOS ÓPTICO",
+        title_qr_scan: "CÓDIGO DE DADOS",
         btn_close: "FECHAR",
+        menu_day_night: "☀️ DIA / 🔴 NOITE",
         menu_map: "📍 ROTA / MAPA",
         menu_compass: "🧭 BÚSSOLA / GUIA",
         menu_astro: "🌌 ASTRO / SEM GPS",
@@ -242,7 +245,7 @@ const translations = {
         menu_radio: "💬 TEXTO / RÁDIO QR",
         menu_shield: "🛡 SEGURANÇA / ESCUDO",
         menu_manual: "📖 INSTRUÇÕES",
-        menu_power_off: "🛑 DESLIGAR APLICATIVO",
+        menu_power_off: "🛑 DESLIGAR APP",
         menu_destroy: "💥 DESTRUIR DADOS",
         hud_gps_search: "GPS: BUSCANDO...",
         hud_alt: "ALT: --- m",
@@ -263,23 +266,23 @@ const translations = {
         btn_pedo_on: "👣 PEDÔMETRO: LIGADO",
         btn_cal_walk: "CALIBRAR ANDANDO (15m)",
         comp_target_none: "ALVO: NENHUM",
-        btn_voice_off: "VOZ: DESLIGADA",
+        btn_voice_off: "VOZ: DESL",
         btn_voice_on: "VOZ: LIGADA",
         btn_vibro_off: "GUIA (VIBRO): DESL",
         btn_vibro_on: "GUIA (VIBRO): LIG",
-        lbl_voice_int: "INTERVALO DE DICAS:",
+        lbl_voice_int: "DICAS:",
         lbl_sec: "seg",
-        btn_eco: "🌑 BLACKOUT ECO (TELA-BÚSSOLA)",
+        btn_eco: "🌑 BLACKOUT ECO",
         astro_locked: "ALVO BLOQUEADO",
         astro_polar: "POLARIS",
         astro_hint: "PROCURE O NORTE",
-        btn_astro_cal: "⚖ CALIBRAR HORIZONTE (0°)",
+        btn_astro_cal: "⚖ CALIBRAR HORIZONTE",
         btn_astro_sun: "☀ SOL",
         btn_astro_star: "⭐ ESTRELA (FIXAR)",
         ai_off: "IA INATIVA",
         lbl_cam_zoom: "ZOOM DA CÂMERA",
         lbl_ai_sens: "SENSIBILIDADE IA (%)",
-        lbl_ai_focal: "ALCANCE IA (FOCO)",
+        lbl_ai_focal: "ALCANCE IA",
         lbl_ir_sens: "IR / SENSIBILIDADE MOV",
         btn_scan_cam: "🔴 LER DA CÂMERA",
         btn_scan_photo: "🖼 LER DA FOTO",
@@ -288,8 +291,8 @@ const translations = {
         btn_ir: "🔭 FILTRO IR",
         btn_motion: "📉 DETECTOR MOVIMENTO",
         chat_title: "RÁDIO OFFLINE",
-        chat_desc: "Insira texto e gere um QR criptografado para compartilhar com seu parceiro.",
-        btn_chat_cam: "📷 LIGAR CÂMERA PARA LER",
+        chat_desc: "Insira texto e gere um QR criptografado.",
+        btn_chat_cam: "📷 LIGAR CÂMERA",
         chat_left: "Restante: 200 carac.",
         btn_chat_gen: "GERAR QR CRIPTOGRAFADO",
         btn_chat_clear: "LIMPAR TEXTO",
@@ -300,17 +303,17 @@ const translations = {
         btn_shield_snd_on: "SOM SIRENE: LIG",
         
         man_title: "MANUAL DE COMBATE",
-        man_h1: "⚠️ 0. SEGURANÇA TÁTICA (3 NÍVEIS)",
-        man_p1: "O app monitora automaticamente sua segurança:<br><strong>NÍVEL 1 (MÁX):</strong> Internet e GPS ativos. Perigo de rastreamento de rádio.<br><strong>NÍVEL 2 (FURTIVO):</strong> Internet desligada, apenas recebe GPS. Você está invisível.<br><strong>NÍVEL 3 (AUTÔNOMO):</strong> Guerra Eletrônica (EW). Usa bússola autônoma, pedômetro e Astro-navegação.",
+        man_h1: "⚠️ 0. SEGURANÇA TÁTICA",
+        man_p1: "NÍVEL 1: GPS+Net. NÍVEL 2: Furtivo. NÍVEL 3: Autônomo.",
         man_h2: "📍 1. ROTA E MAPA",
-        man_p2: "<strong>Definir Alvo:</strong> Toque duplo no mapa para criar ponto (máx 10).<br><strong>Posição Manual:</strong> Sem GPS (Nível 3), toque em 'ESTOU AQUI (SEM GPS)' e clique no mapa. O marcador fica laranja — é o início do pedômetro.",
+        man_p2: "Toque duplo define alvo. 'ESTOU AQUI' para manual.",
         man_h3: "🧭 2. CALIBRAÇÃO E PEDÔMETRO",
-        man_p3: "<strong>Calibração 15m:</strong> Pressione o botão redondo '15m' no mapa e ande reto. Isso sincroniza a bússola com o GPS.<br><strong>Voz e Vibro:</strong> A voz avisa sobre desvios. O Vibro age como sonar: quanto mais preciso no alvo, mais rápido vibra.<br><strong>Pedômetro:</strong> Em condições EW, ligue-o e o telefone contará passos para mover seu marcador laranja.",
-        man_h4: "🌌 3. ASTRO-TREINADOR (Sem GPS)",
-        man_p4: "Calibre a bússola pelos astros.<br>1. Segure o telefone verticalmente e pressione 'CALIBRAR HORIZONTE'.<br>2. Levante o telefone para o céu (~48 graus). A seta vermelha mostra Polaris e a Ursa Maior.<br>3. Quando piscar 'ALVO BLOQUEADO', pressione Fixar Estrela ou Sol. Bússola perfeitamente alinhada ao Norte.",
+        man_p3: "Use botão 15m para calibrar. Pedômetro move você offline.",
+        man_h4: "🌌 3. ASTRO-TREINADOR",
+        man_p4: "Calibre horizonte e mire no céu para Norte verdadeiro.",
         man_h5: "💬 4. RÁDIO OFFLINE E ESCUDO",
-        man_p5: "<strong>Rádio:</strong> Escreva um texto, crie um QR. Seu parceiro escaneia. Criptografado.<br><strong>Escudo:</strong> Ligue a segurança e pouse o telefone. Qualquer movimento ou vibração no solo aciona um alarme.",
-
+        man_p5: "QR Rádio seguro e alarme de movimento.",
+        
         eco_touch: "TOQUE NA TELA<br>(3 seg)",
         btn_eco_exit: "SAIR DO BLACKOUT",
         wiz_title: "MODO OFFLINE",
@@ -320,25 +323,25 @@ const translations = {
         
         lvl3: "NÍVEL 3: AUTÔNOMO",
         lvl2: "NÍVEL 2: FURTIVO (GPS)",
-        lvl1: "NÍVEL 1: MÁX (RASTRO RÁDIO)",
+        lvl1: "NÍVEL 1: MÁX",
         gps_delay: "⚠️ ATRASO GPS",
         gps_manual: "📍 MODO MANUAL",
         gps_lost: "❌ GPS BLOQUEADO (>200m)",
         gps_ok: "GPS: OK",
-        gps_offline: "❌ GPS PERDIDO (OFFLINE)",
+        gps_offline: "❌ GPS PERDIDO",
         voice_dist: "Distância",
         voice_meters: "metros",
-        voice_turn: "Vire-se! Você está se afastando.",
+        voice_turn: "Vire-se!",
         voice_right: "Mais para a direita.",
         voice_left: "Mais para a esquerda.",
-        alert_no_start: "Aviso: Sem ponto de partida. Vá ao mapa e defina em ESTOU AQUI (SEM GPS).",
-        alert_pedo_on: "✅ NAVEGAÇÃO AUTÔNOMA LIGADA!\nTelefone contará passos por vibração e moverá você no mapa.",
+        alert_no_start: "Aviso: Sem ponto de partida.",
+        alert_pedo_on: "✅ NAVEGAÇÃO AUTÔNOMA LIGADA!",
         alert_pedo_off: "Rastreamento offline parado.",
-        alert_man_pos: "📍 MODO MANUAL (SEM GPS):\nToque no mapa onde você está. Seu marcador ficará laranja.",
-        astro_sun_fix: "☀️ Sol fixado. Bússola calibrada!",
-        astro_star_fix: "⭐ Estrela fixada. Bússola calibrada para o Norte!",
+        alert_man_pos: "📍 MODO MANUAL:\nToque no mapa onde você está.",
+        astro_sun_fix: "☀️ Sol fixado!",
+        astro_star_fix: "⭐ Estrela fixada!",
         astro_hor_fix: "⚖️ Horizonte fixado",
-        astro_hor_next: "Agora levante o telefone (para ~48° de altitude) para procurar estrelas.",
+        astro_hor_next: "Levante o telefone para procurar estrelas.",
         lbl_meters_short: "m",
         cal_done: "CAL: PRONTO",
         alert_no_gps_cal: "Sem sinal GPS!"
@@ -369,6 +372,17 @@ function setLanguage(lang) {
     document.getElementById('btn-guide').innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off');
     document.getElementById('btn-shield').innerText = isShielded ? getT('btn_shield_on') : getT('btn_shield_off');
     document.getElementById('btn-shield-sound').innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off');
+}
+
+// НІЧНИЙ РЕЖИМ
+let isNightMode = false;
+function toggleNightMode() {
+    isNightMode = !isNightMode;
+    if (isNightMode) {
+        document.body.classList.add('tactical-night');
+    } else {
+        document.body.classList.remove('tactical-night');
+    }
 }
 
 // ==========================================
@@ -420,10 +434,10 @@ let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 let currentPitch = 0; 
+let currentRoll = 0; // ДОДАНО КУТ НАХИЛУ ROLL ДЛЯ АВІАГОРИЗОНТУ
 let horizonBeta = 90;
 let currentSpeedKmh = 0; 
 
-// НОВА ЗМІННА ДЛЯ СИНХРОНІЗАЦІЇ ДИСТАНЦІЇ
 let currentDistanceToTarget = null;
 
 let currentDisplayAngle = 0;
@@ -613,7 +627,9 @@ async function showModule(id) {
     
     if (id !== 'mod-eye' && id !== 'mod-chat' && id !== 'mod-astro') turnOffCamera();
     
+    let line = document.getElementById('astro-horizon-line');
     if (id === 'mod-astro') {
+        if(line) line.style.display = 'block';
         const video = document.getElementById('v-astro-stream');
         if (!video.srcObject) {
             try {
@@ -623,6 +639,7 @@ async function showModule(id) {
             } catch(e) {}
         }
     } else {
+        if(line) line.style.display = 'none';
         const videoAstro = document.getElementById('v-astro-stream');
         if (videoAstro && videoAstro.srcObject) { 
             videoAstro.srcObject.getTracks().forEach(t => t.stop()); 
@@ -1024,7 +1041,6 @@ function updateSunPosition(lat, lon) {
     if(sunMark) { sunMark.style.display = 'block'; sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; }
 }
 
-// НОВА СПІЛЬНА ФУНКЦІЯ КАЛІБРУВАННЯ 15м
 function startWalkCalibration() {
     if (!lastGoodGPS) {
         alert(getT('alert_no_gps_cal'));
@@ -1043,7 +1059,6 @@ function startWalkCalibration() {
     playSystemTone(500, 100);
 }
 
-// СИНХРОНІЗОВАНЕ ОНОВЛЕННЯ ДИСТАНЦІЇ (КРОКОМІР + GPS)
 function updateTargetDistance(lat, lon) {
     if (routePoints.length > 0 && map) {
         let d = map.distance([lat, lon], routePoints[0]);
@@ -1118,7 +1133,6 @@ function initGPS() {
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            // Оновлюємо дистанцію через нову спільну функцію
             updateTargetDistance(lat, lon);
 
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
@@ -1212,6 +1226,9 @@ function handleOrientation(e) {
 
     let hw = null;
     currentPitch = e.beta || 0;
+    
+    // Отримуємо кут нахилу телефону вліво/вправо для лінії горизонту
+    currentRoll = e.gamma || 0;
 
     if (e.webkitCompassHeading !== undefined) {
         hw = e.webkitCompassHeading;
@@ -1268,7 +1285,6 @@ function animateCompass() {
         return;
     }
 
-    // НОВА ЛОГІКА ІНТЕРПОЛЯЦІЇ ДЛЯ ТРАНСПОРТУ (згладжування ривків стрілки)
     let smoothing = isTransportMode ? 0.02 : 0.15;
     currentDisplayAngle += delta * smoothing; 
     
@@ -1329,6 +1345,8 @@ function updateCompassUI() {
 
             let astroStencil = document.getElementById('astro-stencil');
             let astroStencilFixed = document.getElementById('astro-stencil-fixed'); 
+            let horizonLine = document.getElementById('astro-horizon-line'); // НОВА ЛІНІЯ ГОРИЗОНТУ
+            
             let aLeft = document.getElementById('astro-dir-left');
             let aRight = document.getElementById('astro-dir-right');
             let aTop = document.getElementById('astro-dir-top');
@@ -1355,6 +1373,12 @@ function updateCompassUI() {
                 
                 astroStencil.style.transformOrigin = "50% 50%";
                 astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
+
+                // Рухаємо лінію горизонту відповідно до нахилу (Pitch) і крену (Roll)
+                if (horizonLine) {
+                    let tyHor = elevation * pDeg;
+                    horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-currentRoll}deg)`;
+                }
 
                 let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20));
                 let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
@@ -1450,6 +1474,7 @@ function updateCompassUI() {
 
             let astroStencil = document.getElementById('astro-stencil');
             let astroStencilFixed = document.getElementById('astro-stencil-fixed');
+            let horizonLine = document.getElementById('astro-horizon-line');
             let aMsg = document.getElementById('astro-target-msg');
             let astroPointer = document.getElementById('astro-pointer');
             
@@ -1472,6 +1497,11 @@ function updateCompassUI() {
                 
                 astroStencil.style.transformOrigin = "50% 50%";
                 astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
+
+                if (horizonLine) {
+                    let tyHor = elevation * pDeg;
+                    horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-currentRoll}deg)`;
+                }
 
                 let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20));
                 let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
