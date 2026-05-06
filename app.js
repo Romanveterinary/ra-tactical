@@ -73,7 +73,6 @@ const translations = {
         btn_shield_snd_off: "ЗВУК СИРЕНИ: ВИМК",
         btn_shield_snd_on: "ЗВУК СИРЕНИ: УВІМК",
         
-        // Оновлена детальна інструкція
         man_title: "БОЙОВИЙ ПОСІБНИК",
         man_h1: "⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)",
         man_p1: "Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.",
@@ -93,7 +92,6 @@ const translations = {
         btn_wiz_cancel: "СКАСУВАТИ",
         btn_wiz_next: "ДАЛІ ➡",
         
-        // Змінні та динамічні тексти
         lvl3: "РІВЕНЬ 3: АВТОНОМНИЙ",
         lvl2: "РІВЕНЬ 2: СТЕЛС (GPS)",
         lvl1: "РІВЕНЬ 1: МАКС (РАДІОСЛІД)",
@@ -188,7 +186,6 @@ const translations = {
         btn_shield_snd_off: "SIREN SOUND: OFF",
         btn_shield_snd_on: "SIREN SOUND: ON",
         
-        // Detailed EN Manual
         man_title: "COMBAT MANUAL",
         man_h1: "⚠️ 0. TACTICAL SECURITY (3 LEVELS)",
         man_p1: "The app automatically monitors your security level:<br><strong>LEVEL 1 (MAX):</strong> Internet & GPS active. Danger of radio tracing.<br><strong>LEVEL 2 (STEALTH):</strong> Internet off, GPS receiving only. You are invisible.<br><strong>LEVEL 3 (AUTONOMOUS):</strong> EW or basement. Uses autonomous compass, pedometer & Astro-navigation.",
@@ -208,7 +205,6 @@ const translations = {
         btn_wiz_cancel: "CANCEL",
         btn_wiz_next: "NEXT ➡",
         
-        // Dynamic
         lvl3: "LEVEL 3: AUTONOMOUS",
         lvl2: "LEVEL 2: STEALTH (GPS)",
         lvl1: "LEVEL 1: MAX (RADIO TRACE)",
@@ -303,7 +299,6 @@ const translations = {
         btn_shield_snd_off: "SOM SIRENE: DESL",
         btn_shield_snd_on: "SOM SIRENE: LIG",
         
-        // Detailed PT Manual
         man_title: "MANUAL DE COMBATE",
         man_h1: "⚠️ 0. SEGURANÇA TÁTICA (3 NÍVEIS)",
         man_p1: "O app monitora automaticamente sua segurança:<br><strong>NÍVEL 1 (MÁX):</strong> Internet e GPS ativos. Perigo de rastreamento de rádio.<br><strong>NÍVEL 2 (FURTIVO):</strong> Internet desligada, apenas recebe GPS. Você está invisível.<br><strong>NÍVEL 3 (AUTÔNOMO):</strong> Guerra Eletrônica (EW). Usa bússola autônoma, pedômetro e Astro-navegação.",
@@ -323,7 +318,6 @@ const translations = {
         btn_wiz_cancel: "CANCELAR",
         btn_wiz_next: "PRÓXIMO ➡",
         
-        // Dynamic
         lvl3: "NÍVEL 3: AUTÔNOMO",
         lvl2: "NÍVEL 2: FURTIVO (GPS)",
         lvl1: "NÍVEL 1: MÁX (RASTRO RÁDIO)",
@@ -358,7 +352,6 @@ function setLanguage(lang) {
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById('btn-lang-' + lang).classList.add('active');
 
-    // Переклад статичних елементів HTML
     document.querySelectorAll('[data-i18n]').forEach(el => {
         let key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
@@ -366,7 +359,6 @@ function setLanguage(lang) {
         }
     });
 
-    // Оновлення динамічних станів
     updatePositioningLevel();
     if(isOfflineTracking) {
         document.getElementById('btn-pedometer').innerText = getT('btn_pedo_on');
@@ -428,8 +420,11 @@ let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 let hardwareHeading = 0, compassOffset = 0, currentBearing = null; 
 let currentPitch = 0; 
-let horizonBeta = 90; // Стандартне положення горизонту
-let currentSpeedKmh = 0; // Змінна для фільтру голосу
+let horizonBeta = 90;
+let currentSpeedKmh = 0; 
+
+// НОВА ЗМІННА ДЛЯ СИНХРОНІЗАЦІЇ ДИСТАНЦІЇ
+let currentDistanceToTarget = null;
 
 let currentDisplayAngle = 0;
 let isFirstCompassUpdate = true;
@@ -471,7 +466,7 @@ const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'mot
 // 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
 // ==========================================
 function initSystem() {
-    setLanguage('uk'); // Ініціалізація мови за замовчуванням
+    setLanguage('uk'); 
     updatePositioningLevel();
     try{initMap();}catch(e){} 
     try{initGPS();}catch(e){} 
@@ -504,7 +499,6 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// ФУНКЦІЯ: 3 РІВНІ ПОЗИЦІОНУВАННЯ (З БЛОКУВАННЯМ КНОПОК)
 function updatePositioningLevel() {
     const levelEl = document.getElementById('pos-level');
     let btnMan = document.getElementById('btn-manual-pos');
@@ -585,6 +579,7 @@ function triggerDestroyProtocol() {
         if(traceLineLayer && map) map.removeLayer(traceLineLayer);
         localStorage.removeItem('savedRoute');
         currentBearing = null;
+        currentDistanceToTarget = null;
         document.getElementById('tc-dist').innerText = "--- м";
         document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
@@ -695,6 +690,7 @@ function initMap() {
                 if(navigator.vibrate) navigator.vibrate(100); playSystemTone(800, 100);
                 let stat = document.getElementById('gps-status');
                 if (stat) { stat.innerText = getT('gps_manual'); stat.style.color = "#f97316"; }
+                updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
                 return;
             }
 
@@ -739,6 +735,7 @@ function updateRoute() {
         document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
         currentBearing = null; 
+        currentDistanceToTarget = null;
         localStorage.removeItem('savedRoute'); return;
     }
 
@@ -755,7 +752,7 @@ function updateRoute() {
     document.getElementById('route-info').innerText = `${targetStr} ${routePoints.length}`;
     
     if(lastGoodGPS && routePoints.length > 0) {
-        currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, routePoints[0].lat, routePoints[0].lng);
+        updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
     }
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
@@ -826,7 +823,6 @@ function clearChat() {
 }
 
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
-
 
 // ==========================================
 // БЛОК СКАНУВАННЯ (ОПТИКА, ФОТО ТА НОВИЙ ЧАТ)
@@ -1025,7 +1021,6 @@ if(btnTransport) {
 function updateSunPosition(lat, lon) {
     let sunAz = getSunAzimuth(lat, lon, new Date());
     let sunMark = document.getElementById('sun-mark');
-    // Сонце тепер завжди видиме на компасі
     if(sunMark) { sunMark.style.display = 'block'; sunMark.style.transform = `translate(-50%, -50%) rotate(${sunAz}deg) translateY(-135px) rotate(-${sunAz}deg)`; }
 }
 
@@ -1039,13 +1034,37 @@ function startWalkCalibration() {
     walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
     
     let calBtn1 = document.getElementById('btn-cal-walk');
-    let calBtn2 = document.getElementById('btn-map-cal'); // Кругла кнопка на мапі
+    let calBtn2 = document.getElementById('btn-map-cal'); 
     
     if(calBtn1) { calBtn1.innerText = "15 " + getT('lbl_meters_short'); calBtn1.style.color = "#f1c40f"; }
     if(calBtn2) { calBtn2.innerText = "15"; calBtn2.style.color = "#f1c40f"; }
     
     if(navigator.vibrate) navigator.vibrate([100, 100]); 
     playSystemTone(500, 100);
+}
+
+// СИНХРОНІЗОВАНЕ ОНОВЛЕННЯ ДИСТАНЦІЇ (КРОКОМІР + GPS)
+function updateTargetDistance(lat, lon) {
+    if (routePoints.length > 0 && map) {
+        let d = map.distance([lat, lon], routePoints[0]);
+        currentDistanceToTarget = d;
+        
+        let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " m";
+        let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " m";
+        
+        let prefixTgt = currentLang === 'uk' ? 'ЦІЛЬ:' : (currentLang === 'pt' ? 'ALVO:' : 'TGT:');
+        let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `${prefixTgt} ${Math.round(d)} m`;
+        
+        if(d <= 15) { 
+            routePoints.shift(); updateRoute(); 
+            if(navigator.vibrate) navigator.vibrate([500,200,500]); playSystemTone(1200, 300); 
+        } else { 
+            currentBearing = calcBearing(lat, lon, routePoints[0].lat, routePoints[0].lng); 
+        }
+    } else {
+        currentDistanceToTarget = null;
+        currentBearing = null;
+    }
 }
 
 function initGPS() {
@@ -1099,28 +1118,8 @@ function initGPS() {
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
-            let targetPoint = null;
-            if (routePoints.length > 0) targetPoint = routePoints[0];
-
-            if(targetPoint && map) {
-                let d = map.distance([lat, lon], targetPoint);
-                
-                let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " m";
-                let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " m";
-                
-                let prefixTgt = currentLang === 'uk' ? 'ЦІЛЬ:' : (currentLang === 'pt' ? 'ALVO:' : 'TGT:');
-                let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `${prefixTgt} ${Math.round(d)} m`;
-                
-                if(d <= 15) { 
-                    if (routePoints.length > 0) {
-                        routePoints.shift(); updateRoute(); 
-                        if(navigator.vibrate) navigator.vibrate([500,200,500]); playSystemTone(1200, 300); 
-                    }
-                } 
-                else { currentBearing = calcBearing(lat, lon, targetPoint.lat, targetPoint.lng); }
-            } else if (routePoints.length === 0) {
-                 currentBearing = null;
-            }
+            // Оновлюємо дистанцію через нову спільну функцію
+            updateTargetDistance(lat, lon);
 
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
@@ -1168,7 +1167,6 @@ function initGPS() {
                 }
             }
 
-            // НОВА ЛОГІКА: Зворотний відлік для 15 метрів
             if(isWalkCalibrating && walkStartPoint && map) {
                 let d = map.distance([walkStartPoint.lat, walkStartPoint.lon], [lat, lon]);
                 let remaining = Math.max(0, 15 - Math.round(d));
@@ -1186,7 +1184,7 @@ function initGPS() {
                     if(calBtn1) { calBtn1.innerText = getT('cal_done'); calBtn1.style.color = "#4ade80"; }
                     if(calBtn2) { calBtn2.innerText = "OK"; calBtn2.style.color = "#4ade80"; }
                     
-                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]); // Довге вібро підтвердження
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]); 
                     playSystemTone(800, 200);
                     
                     setTimeout(() => { 
@@ -1270,7 +1268,10 @@ function animateCompass() {
         return;
     }
 
-    currentDisplayAngle += delta * 0.15; 
+    // НОВА ЛОГІКА ІНТЕРПОЛЯЦІЇ ДЛЯ ТРАНСПОРТУ (згладжування ривків стрілки)
+    let smoothing = isTransportMode ? 0.02 : 0.15;
+    currentDisplayAngle += delta * smoothing; 
+    
     updateCompassUI();
 
     if (isCompassAnimating) {
@@ -1312,12 +1313,10 @@ function updateCompassUI() {
             else if (relMod >= 225 && relMod < 315) document.getElementById('eco-left').style.opacity = '1';
         }
 
-        // АСТРО-РЕЖИМ
         let astroMod = document.getElementById('mod-astro');
         if (astroMod && astroMod.classList.contains('active')) {
-            if (lastGoodGPS && routePoints.length > 0 && map) {
-                let d = map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]);
-                document.getElementById('astro-dist-text').innerText = Math.round(d) + " m";
+            if (currentDistanceToTarget !== null) {
+                document.getElementById('astro-dist-text').innerText = Math.round(currentDistanceToTarget) + " m";
             }
             
             let elevation = currentPitch - horizonBeta;
@@ -1384,7 +1383,7 @@ function updateCompassUI() {
             }
         }
 
-        // ПОВОДИР (Вібро та Голос)
+        // ПОВОДИР (Вібро та Голос працює від єдиної змінної currentDistanceToTarget)
         if ((guideMode || isVoiceEnabled) && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
             let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
@@ -1403,10 +1402,8 @@ function updateCompassUI() {
             let voiceIntervalMs = parseInt(document.getElementById('voice-interval') ? document.getElementById('voice-interval').value : 10) * 1000;
             
             if (isVoiceEnabled && (timeNow - lastVoiceTime > voiceIntervalMs)) {
-                let d = 0;
-                if (lastGoodGPS && routePoints.length > 0 && map) {
-                    d = Math.round(map.distance([lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0]));
-                    
+                if (currentDistanceToTarget !== null) {
+                    let d = Math.round(currentDistanceToTarget);
                     let txtDist = getT('voice_dist');
                     let txtMeters = getT('voice_meters');
 
@@ -1549,8 +1546,40 @@ document.getElementById('btn-astro-horizon').onclick = () => {
     alert(`${getT('astro_hor_fix')} (${Math.round(horizonBeta)}°).\n${getT('astro_hor_next')}`);
 };
 
-function toggleEcoMode(state) { isEcoMode = state; const overlay = document.getElementById('eco-overlay'); if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } else { overlay.style.display = 'none'; isEcoPeeking = false; } }
-function peekEco() { if (!isEcoMode || isEcoPeeking) return; isEcoPeeking = true; document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); clearTimeout(ecoPeekTimer); ecoPeekTimer = setTimeout(() => { document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; }, 3000); }
+function toggleEcoMode(state) { 
+    isEcoMode = state; 
+    const overlay = document.getElementById('eco-overlay'); 
+    if (state) { 
+        overlay.style.display = 'block'; 
+        if(navigator.vibrate) navigator.vibrate(100); 
+        playSystemTone(500, 100); 
+    } else { 
+        overlay.style.display = 'none'; 
+        isEcoPeeking = false; 
+    } 
+}
+
+// НОВА ЛОГІКА ТАПУ В ЕКО-РЕЖИМІ (Озвучка відстані)
+function peekEco() { 
+    if (!isEcoMode || isEcoPeeking) return; 
+    isEcoPeeking = true; 
+    document.getElementById('eco-content').style.opacity = '1'; 
+    document.getElementById('eco-touch-area').style.color = '#000'; 
+    if(navigator.vibrate) navigator.vibrate(50); 
+    playSystemTone(800, 50); 
+    
+    if (isVoiceEnabled && currentDistanceToTarget !== null) {
+        speakText(`${getT('voice_dist')} ${Math.round(currentDistanceToTarget)} ${getT('voice_meters')}.`);
+    }
+    
+    clearTimeout(ecoPeekTimer); 
+    ecoPeekTimer = setTimeout(() => { 
+        document.getElementById('eco-content').style.opacity = '0'; 
+        document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); 
+        document.getElementById('eco-touch-area').style.color = '#222'; 
+        isEcoPeeking = false; 
+    }, 3000); 
+}
 
 // ==========================================
 // 6. АСТРО-КАЛІБРУВАННЯ
@@ -1854,6 +1883,9 @@ window.addEventListener('devicemotion', function(event) {
             let tri = document.getElementById('user-tri');
             if (tri) tri.style.borderBottomColor = '#f97316'; 
         }
+        
+        // Оновлюємо дистанцію при кожному кроці!
+        updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
         updateRoute();
     }
     lastAccel = currentAccel;
