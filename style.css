@@ -45,8 +45,6 @@ body {
     font-size: 0.85rem;
 }
 #gps-status { color: var(--glow); }
-.stealth-danger { color: var(--danger); animation: blink 1s infinite; text-shadow: 0 0 5px var(--danger); }
-.stealth-safe { color: var(--accent); text-shadow: 0 0 5px var(--accent); }
 
 /* БОКОВЕ МЕНЮ */
 .side-nav {
@@ -87,27 +85,16 @@ body {
     border: 1px solid #333;
 }
 
-/* МОДУЛІ */
+/* МОДУЛІ (ОРИГІНАЛЬНІ НАЛАШТУВАННЯ) */
 .module {
     display: none;
     height: 100vh;
-    width: 100%;
     padding: 95px 15px 20px;
     overflow-y: auto;
 }
 .module.active { display: block; }
-
-/* ФІКС МАПИ: Жорстке позиціонування для Leaflet */
-#mod-map { position: relative; padding: 0; overflow: hidden; }
-#map-container { 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    height: 100vh; 
-    width: 100vw; 
-    background: #000; 
-    z-index: 1; 
-}
+#mod-map.active { padding: 0; }
+#map-container { height: 100%; width: 100%; background: #000; }
 
 /* КНОПКИ НА МАПІ */
 .map-overlay-controls {
@@ -235,7 +222,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-/* SOS SHIELD UI */
+
+/* =========================================
+   НОВЕ: 🔘 SOS SHIELD UI ТА ЕКО/КАЛІБР КНОПКИ
+========================================== */
 .sos-btn {
     position: relative; width: 100%; height: 80px; background: #200; border: 2px solid #f33;
     color: #f33; font-size: 1.1rem; font-weight: bold; border-radius: 8px; overflow: hidden;
@@ -256,12 +246,12 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
     10%, 20%, 30% { opacity: 1; }
 }
 
-/* Кнопки на мапі */
 .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 
+
 /* =========================================
-   🟢 НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
+   НОВЕ: 🔴 НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
 ========================================== */
 body.tactical-night {
     --glow: #f33 !important;
@@ -276,29 +266,14 @@ body.tactical-night .side-nav a { color: #d33 !important; border-color: #300 !im
 body.tactical-night .side-nav a:hover { background: #300 !important; color: #f33 !important; }
 body.tactical-night .tactical-btn,
 body.tactical-night .map-btn,
-body.tactical-night .lang-btn {
-    background: #100 !important;
-    color: #f33 !important;
-    border-color: #500 !important;
-}
+body.tactical-night .lang-btn { background: #100 !important; color: #f33 !important; border-color: #500 !important; }
 body.tactical-night .lang-btn.active { color: #f33 !important; border-color: #f33 !important; font-weight: bold; background: #300 !important; }
 body.tactical-night #tactical-hud { background: rgba(20,0,0,0.85) !important; border-color: #500 !important; }
 body.tactical-night #compass-container { border-color: #500 !important; background: radial-gradient(circle, #200, #000) !important; }
 body.tactical-night #tc-ring { border-color: #500 !important; }
 body.tactical-night .compass-mark { color: #f33 !important; }
-
-/* КОНТРАСТНІСТЬ КОМПАСА ВНОЧІ */
-body.tactical-night #tc-deg, body.tactical-night #tc-dist { 
-    color: #f33 !important; 
-    text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 0 10px #000 !important; 
-    z-index: 30; position: relative; 
-}
-body.tactical-night #tc-arrow { 
-    border-bottom-color: #600 !important;
-    filter: drop-shadow(0 0 2px #f00) !important; 
-    z-index: 10; 
-}
-
+body.tactical-night #tc-deg, body.tactical-night #tc-dist { color: #f33 !important; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 0 10px #000 !important; z-index: 30; position: relative; }
+body.tactical-night #tc-arrow { border-bottom-color: #600 !important; filter: drop-shadow(0 0 2px #f00) !important; z-index: 10; }
 body.tactical-night #user-tri { border-bottom-color: #f33 !important; filter: drop-shadow(0 0 5px #f33) !important; }
 body.tactical-night .map-trace { stroke: #f33 !important; }
 body.tactical-night .map-fab-eco, body.tactical-night .map-fab-cal { background: rgba(50,0,0,0.8) !important; color: #f33 !important; border-color:#f33 !important; }
