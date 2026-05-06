@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.32 TACTICAL</title>
+    <title>RA_MOBILE v10.33 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.32">
+    <link rel="stylesheet" href="style.css?v=10.33">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -45,8 +45,9 @@
         .lang-btn { background: #111; color: #aaa; border: 1px solid #333; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin: 0 2px; }
         .lang-btn.active { color: #4ade80; border-color: #4ade80; }
         
-        /* Кнопка калібрування на мапі */
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
+        /* Кнопка ЕКО на мапі */
+        .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
     </style>
 </head>
 <body>
@@ -66,14 +67,13 @@
     <div id="side-menu" class="side-nav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         
-        <!-- ПЕРЕМИКАЧ МОВ -->
         <div style="text-align: center; margin-bottom: 10px; padding-left: 20px;">
             <button class="lang-btn active" onclick="setLanguage('uk')" id="btn-lang-uk">UK</button>
             <button class="lang-btn" onclick="setLanguage('en')" id="btn-lang-en">EN</button>
             <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.32</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.33</h3>
         <hr style="border: 0.5px solid #222;">
         <a href="#" onclick="showModule('mod-map'); closeNav()" data-i18n="menu_map">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
@@ -108,8 +108,9 @@
             
             <button id="btn-map-menu" class="tactical-btn" style="position:absolute; bottom:20px; left:10px; width:50px; height:50px; z-index:1100; margin:0; font-size:1.5rem; padding:0;" onclick="toggleMapMenu()">☰</button>
             
-            <!-- НОВА КНОПКА КАЛІБРУВАННЯ НА МАПІ -->
             <button id="btn-map-cal" class="map-fab-cal" onclick="startWalkCalibration()">15м</button>
+            <!-- КНОПКА ЕКО НА МАПІ -->
+            <button id="btn-map-eco" class="map-fab-eco" onclick="toggleEcoMode(true)">🌑</button>
 
             <div id="map-controls-panel" class="map-overlay-controls" style="display:none; bottom:80px; left:10px; right:auto;">
                 <button id="btn-manual-pos" class="map-btn" style="color:#f97316;" data-i18n="btn_map_manual">📍 Я ТУТ (БЕЗ GPS)</button>
@@ -145,7 +146,6 @@
             </div>
             
             <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
-            <!-- Переписав виклик на спільну функцію -->
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk" onclick="startWalkCalibration()">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
             <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;" data-i18n="comp_target_none">ЦІЛЬ: НЕМАЄ</div>
@@ -183,13 +183,11 @@
                         <line x1="150" y1="90" x2="150" y2="210" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                         <line x1="90" y1="150" x2="210" y2="150" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
                         
-                        <!-- Фіксована група: лише позиціонується (текст завжди рівний) -->
                         <g id="astro-stencil-fixed" style="transition: all 0.2s linear;">
                             <text x="160" y="155" fill="#fff" font-size="12px" font-weight="bold" data-i18n="astro_polar">ПОЛЯРНА ЗІРКА</text>
                             <circle cx="150" cy="150" r="4" fill="#fff" />
                         </g>
 
-                        <!-- Обертова група: крутиться як реальний Ковш -->
                         <g id="astro-stencil" style="transition: all 0.2s linear;">
                             <rect x="0" y="0" width="300" height="300" fill="transparent" />
                             <line x1="150" y1="40" x2="150" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3"/>
@@ -289,16 +287,16 @@
                 <p style="margin-bottom: 10px;" data-i18n="man_p1">Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 1. МАРШРУТ ТА МАПА</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть "Я ТУТ (БЕЗ GPS)" і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.</p>
 
                 <h3 style="color:#0cf;" data-i18n="man_h3">🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Калібрування 15м:</strong> Натисніть круглу кнопку "15м" на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як "сонар": чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Калібрування 15м:</strong> Натисніть круглу кнопку '15м' на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як 'сонар': чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.</p>
 
                 <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p4">Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть "КАЛІБРУВАТИ ГОРИЗОНТ".<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне "ЦІЛЬ ЗАХОПЛЕНО", натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне 'ЦІЛЬ ЗАХОПЛЕНО', натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.</p>
                 
                 <h3 style="color:#f33;" data-i18n="man_h5">💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі (кроки) викличуть тривогу або вібро-сигнал.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі викличуть тривогу або вібро-сигнал.</p>
             </div>
         </section>
     </div>
@@ -325,6 +323,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.32"></script>
+    <script src="app.js?v=10.33"></script>
 </body>
 </html>
