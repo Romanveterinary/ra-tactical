@@ -19,6 +19,7 @@ const translations = {
         menu_manual: "📖 ІНСТРУКЦІЯ",
         menu_power_off: "🛑 ВИМКНУТИ ДОДАТОК",
         menu_destroy: "💥 ЗНИЩИТИ ДАНІ",
+        menu_sos: "🆘 SOS / МАЯК",
         hud_gps_search: "GPS: ПОШУК...",
         hud_alt: "ВИС: --- м",
         hud_level_analysis: "РІВЕНЬ: АНАЛІЗ",
@@ -74,17 +75,30 @@ const translations = {
         btn_shield_snd_off: "ЗВУК СИРЕНИ: ВИМК",
         btn_shield_snd_on: "ЗВУК СИРЕНИ: УВІМК",
         
+        sos_title: "МАЯК ВИЖИВАННЯ",
+        sos_coords: "КООРДИНАТИ:",
+        sos_battery: "БАТАРЕЯ:",
+        btn_sos_on: "АЛАРМ (УВІМКНУТИ)",
+        btn_sos_off: "ВИМКНУТИ SOS",
+        sos_no_gps: "ОЧІКУВАННЯ GPS",
+
         man_title: "БОЙОВИЙ ПОСІБНИК",
-        man_h1: "⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)",
-        man_p1: "Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.",
-        man_h2: "📍 1. МАРШРУТ ТА МАПА",
-        man_p2: "<strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту.<br><strong>Ручна позиція:</strong> Якщо немає GPS, натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі. Маркер стане помаранчевим.",
-        man_h3: "🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР",
-        man_p3: "<strong>Калібрування 15м:</strong> Натисніть '15м' на мапі і йдіть прямо.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення. Вібро-поводир працює як сонар.<br><strong>Крокомір:</strong> Рахує кроки і рухає вашу фішку по мапі.",
-        man_h4: "🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)",
-        man_p4: "Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів).<br>3. Натисніть кнопку фіксації Зірки або Сонця.",
-        man_h5: "💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ",
-        man_p5: "<strong>Рація:</strong> Створіть зашифрований QR-код.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Рух або вібрація викличуть тривогу.",
+        man_h1: "🔐 1. ВХІД У СИСТЕМУ",
+        man_p1: "Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.",
+        man_h2: "📍 2. МАРШРУТ / МАПА",
+        man_p2: "<strong>Як поставити ціль:</strong> Двічі швидко тапни по карті. З'явиться лінія маршруту.<br><strong>Кнопка 'Я ТУТ (БЕЗ GPS)':</strong> Використовуй, коли працює РЕБ. Натисни її, а потім ткни пальцем у карту туди, де ти зараз знаходишся.<br><strong>Кнопка '15м':</strong> Натисни її і пройди прямо 15 метрів для точного калібрування компаса.",
+        man_h3: "🧭 3. КОМПАС / ПОВОДИР",
+        man_p3: "<strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.",
+        man_h4: "🌌 4. АСТРО / БЕЗ GPS",
+        man_p4: "Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце і натисни відповідну кнопку.",
+        man_h5: "👁 5. ОПТИКА / ШІ",
+        man_p5: "<strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.",
+        man_h6: "💬 6. ТЕКСТ / QR-РАЦІЯ",
+        man_p6: "Пишеш текст -> 'Створити зашифрований QR'. Твій напарник відкриває програму, тисне 'Увімкнути камеру' і сканує твій екран. Повідомлення розшифровано без зв'язку.",
+        man_h7: "🛡 7. ОХОРОНА / ЩИТ",
+        man_p7: "Лягаєш спати: Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон біля себе. Якщо хтось торкнеться телефону або земля завібрує — спрацює тривога.",
+        man_h8: "🆘 8. SOS / МАЯК ВИЖИВАННЯ",
+        man_p8: "Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран почне яскраво блимати, лунатиме пронизливий звук кожні 3 секунди, а на екрані з'являться твої координати та заряд батареї.",
         
         eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)",
         btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ",
@@ -133,6 +147,7 @@ const translations = {
         menu_manual: "📖 INSTRUCTIONS",
         menu_power_off: "🛑 SHUTDOWN APP",
         menu_destroy: "💥 DESTROY DATA",
+        menu_sos: "🆘 SOS / BEACON",
         hud_gps_search: "GPS: SEARCHING...",
         hud_alt: "ALT: --- m",
         hud_level_analysis: "LEVEL: ANALYSIS",
@@ -188,17 +203,30 @@ const translations = {
         btn_shield_snd_off: "SIREN SOUND: OFF",
         btn_shield_snd_on: "SIREN SOUND: ON",
         
+        sos_title: "SURVIVAL BEACON",
+        sos_coords: "COORDINATES:",
+        sos_battery: "BATTERY:",
+        btn_sos_on: "ALARM (TURN ON)",
+        btn_sos_off: "TURN OFF SOS",
+        sos_no_gps: "WAITING FOR GPS",
+
         man_title: "COMBAT MANUAL",
-        man_h1: "⚠️ 0. TACTICAL SECURITY",
-        man_p1: "LEVEL 1 (MAX): Internet & GPS. LEVEL 2: Stealth GPS only. LEVEL 3: Autonomous (No GPS).",
-        man_h2: "📍 1. ROUTE & MAP",
-        man_p2: "Double tap to set target. Use 'I AM HERE' for manual offline positioning.",
-        man_h3: "🧭 2. CALIBRATION & PEDOMETER",
-        man_p3: "Tap '15m' button to calibrate compass. Use Pedometer offline.",
-        man_h4: "🌌 3. ASTRO-TRAINER",
-        man_p4: "Calibrate horizon, lift to 48 degrees, lock Star or Sun.",
-        man_h5: "💬 4. OFFLINE RADIO & SHIELD",
-        man_p5: "Secure QR radio and motion alarm shield.",
+        man_h1: "🔐 1. SYSTEM LOGIN",
+        man_p1: "Enter your PIN code. This protects the device from enemy use.",
+        man_h2: "📍 2. ROUTE / MAP",
+        man_p2: "Double tap to set a target. Use 'I AM HERE' to manually set location if GPS is jammed.",
+        man_h3: "🧭 3. COMPASS / GUIDE",
+        man_p3: "Use pedometer for offline tracking. Vibro-guide will point you to the target.",
+        man_h4: "🌌 4. ASTRO / NO GPS",
+        man_p4: "Calibrate horizon, then look up to lock Polaris or the Sun to fix compass.",
+        man_h5: "👁 5. OPTICS / AI",
+        man_p5: "Use IR filter in low light. AI Scan detects vehicles and personnel.",
+        man_h6: "💬 6. TEXT / QR-RADIO",
+        man_p6: "Share encrypted messages via QR codes without internet.",
+        man_h7: "🛡 7. SECURITY / SHIELD",
+        man_p7: "Put phone on your bag while resting. Any vibration triggers the alarm.",
+        man_h8: "🆘 8. SOS / BEACON",
+        man_p8: "In critical conditions, activate SOS to flash screen and emit a 3-second beacon tone.",
         
         eco_touch: "TOUCH SCREEN<br>(3 sec)",
         btn_eco_exit: "EXIT BLACKOUT",
@@ -247,6 +275,7 @@ const translations = {
         menu_manual: "📖 INSTRUÇÕES",
         menu_power_off: "🛑 DESLIGAR APP",
         menu_destroy: "💥 DESTRUIR DADOS",
+        menu_sos: "🆘 SOS / SINALIZADOR",
         hud_gps_search: "GPS: BUSCANDO...",
         hud_alt: "ALT: --- m",
         hud_level_analysis: "NÍVEL: ANÁLISE",
@@ -302,17 +331,30 @@ const translations = {
         btn_shield_snd_off: "SOM SIRENE: DESL",
         btn_shield_snd_on: "SOM SIRENE: LIG",
         
+        sos_title: "SINALIZADOR",
+        sos_coords: "COORDENADAS:",
+        sos_battery: "BATERIA:",
+        btn_sos_on: "ALARME (LIGAR)",
+        btn_sos_off: "DESLIGAR SOS",
+        sos_no_gps: "AGUARDANDO GPS",
+
         man_title: "MANUAL DE COMBATE",
-        man_h1: "⚠️ 0. SEGURANÇA TÁTICA",
-        man_p1: "NÍVEL 1: GPS+Net. NÍVEL 2: Furtivo. NÍVEL 3: Autônomo.",
-        man_h2: "📍 1. ROTA E MAPA",
-        man_p2: "Toque duplo define alvo. 'ESTOU AQUI' para manual.",
-        man_h3: "🧭 2. CALIBRAÇÃO E PEDÔMETRO",
-        man_p3: "Use botão 15m para calibrar. Pedômetro move você offline.",
-        man_h4: "🌌 3. ASTRO-TREINADOR",
-        man_p4: "Calibre horizonte e mire no céu para Norte verdadeiro.",
-        man_h5: "💬 4. RÁDIO OFFLINE E ESCUDO",
-        man_p5: "QR Rádio seguro e alarme de movimento.",
+        man_h1: "🔐 1. SISTEMA DE LOGIN",
+        man_p1: "Insira o seu código PIN para proteção contra o inimigo.",
+        man_h2: "📍 2. ROTA / MAPA",
+        man_p2: "Toque duplo para definir alvo. Use ESTOU AQUI se o GPS falhar.",
+        man_h3: "🧭 3. BÚSSOLA / GUIA",
+        man_p3: "Use o pedômetro no modo offline.",
+        man_h4: "🌌 4. ASTRO / SEM GPS",
+        man_p4: "Calibre o horizonte e mire em Polaris ou Sol.",
+        man_h5: "👁 5. ÓPTICA / IA",
+        man_p5: "Use filtro IR ou IA para detecção.",
+        man_h6: "💬 6. TEXTO / RÁDIO QR",
+        man_p6: "Compartilhe ordens por QR encriptado.",
+        man_h7: "🛡 7. SEGURANÇA / ESCUDO",
+        man_p7: "O telefone vibrará se detectado movimento perto.",
+        man_h8: "🆘 8. SOS / SINALIZADOR",
+        man_p8: "Em emergência extrema, ative SOS para som e flash na tela.",
         
         eco_touch: "TOQUE NA TELA<br>(3 seg)",
         btn_eco_exit: "SAIR DO BLACKOUT",
@@ -372,6 +414,12 @@ function setLanguage(lang) {
     document.getElementById('btn-guide').innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off');
     document.getElementById('btn-shield').innerText = isShielded ? getT('btn_shield_on') : getT('btn_shield_off');
     document.getElementById('btn-shield-sound').innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off');
+    
+    if(isSosActive) {
+        document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_off');
+    } else {
+        document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_on');
+    }
 }
 
 // НІЧНИЙ РЕЖИМ
@@ -433,7 +481,6 @@ const CRYPTO_KEY = "RA_STORM_2026";
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 
-// ОНОВЛЕНІ ЗМІННІ ДЛЯ КОМПАСА ТА ЗГЛАДЖУВАННЯ
 let hardwareHeading = 0, compassOffset = 7, currentBearing = null; 
 let currentPitch = 0; 
 let currentRoll = 0; 
@@ -476,6 +523,9 @@ let isTransportMode = false;
 let lastGpsCoordsForTransport = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
+
+let isSosActive = false;
+let sosInterval = null;
 
 // ==========================================
 // 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
@@ -621,9 +671,9 @@ async function showModule(id) {
     document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 
-    if (id === 'mod-map') {
+    if (id === 'mod-map' || id === 'mod-sos') {
         requestWakeLock();
-        if (map) { setTimeout(() => { map.invalidateSize(); if (lastGoodGPS) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); }, 200); }
+        if (id === 'mod-map' && map) { setTimeout(() => { map.invalidateSize(); if (lastGoodGPS) map.setView([lastGoodGPS.lat, lastGoodGPS.lon], 18); }, 200); }
     } else { releaseWakeLock(); }
     
     if (id !== 'mod-eye' && id !== 'mod-chat' && id !== 'mod-astro') turnOffCamera();
@@ -1920,3 +1970,61 @@ window.addEventListener('devicemotion', function(event) {
     }
     lastAccel = currentAccel;
 });
+
+// ==========================================
+// 10. SOS МАЯК (ЗВУК + СТРОБОСКОП)
+// ==========================================
+async function toggleSOS() {
+    await initSensors();
+    isSosActive = !isSosActive;
+    let flasher = document.getElementById('sos-flasher');
+    let btn = document.getElementById('btn-sos-toggle');
+    
+    if (isSosActive) {
+        btn.innerText = getT('btn_sos_off');
+        btn.style.background = "#111";
+        btn.style.color = "#f33";
+        btn.style.boxShadow = "none";
+        btn.style.borderColor = "#f33";
+        flasher.style.display = "block";
+        requestWakeLock();
+        
+        if (navigator.getBattery) {
+            navigator.getBattery().then(batt => {
+                document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%";
+            });
+        }
+        
+        let isRed = true;
+        sosInterval = setInterval(() => {
+            if (lastGoodGPS) {
+                document.getElementById('sos-latlon').innerHTML = `${lastGoodGPS.lat.toFixed(5)}<br>${lastGoodGPS.lon.toFixed(5)}`;
+            } else {
+                document.getElementById('sos-latlon').innerText = getT('sos_no_gps');
+            }
+
+            if (navigator.getBattery) {
+                navigator.getBattery().then(batt => {
+                    document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%";
+                });
+            }
+
+            flasher.style.background = isRed ? "#f00" : "#fff";
+            isRed = !isRed;
+
+            playSystemTone(2500, 500); 
+            if(navigator.vibrate) navigator.vibrate([500]);
+            
+        }, 3000);
+
+    } else {
+        btn.innerText = getT('btn_sos_on');
+        btn.style.background = "#f33";
+        btn.style.color = "#fff";
+        btn.style.boxShadow = "0 0 20px #f33";
+        btn.style.borderColor = "#fff";
+        flasher.style.display = "none";
+        clearInterval(sosInterval);
+        releaseWakeLock();
+    }
+}
