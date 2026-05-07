@@ -85,7 +85,7 @@ body {
     border: 1px solid #333;
 }
 
-/* МОДУЛІ (ОРИГІНАЛЬНІ НАЛАШТУВАННЯ) */
+/* МОДУЛІ (ТВІЙ ОРИГІНАЛЬНИЙ РОБОЧИЙ КОД) */
 .module {
     display: none;
     height: 100vh;
@@ -220,11 +220,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
     filter: drop-shadow(0 0 5px var(--accent));
 }
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-
-
 /* =========================================
-   НОВЕ: 🔘 SOS SHIELD UI ТА ЕКО/КАЛІБР КНОПКИ
+   ДОДАТКОВИЙ UI (SOS ТА КНОПКИ КАЛІБРУВАННЯ)
 ========================================== */
 .sos-btn {
     position: relative; width: 100%; height: 80px; background: #200; border: 2px solid #f33;
@@ -245,13 +242,11 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
     0%, 40%, 100% { opacity: 0; }
     10%, 20%, 30% { opacity: 1; }
 }
-
 .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 
-
 /* =========================================
-   НОВЕ: 🔴 НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
+   🔴 НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
 ========================================== */
 body.tactical-night {
     --glow: #f33 !important;
@@ -289,8 +284,6 @@ body.tactical-night input[type=range]::-webkit-slider-thumb { background: #f33 !
 body.tactical-night input[type=range] { background: #300 !important; }
 body.tactical-night #clino-bar { background: #f33 !important; box-shadow: 0 0 8px #f33 !important; }
 body.tactical-night #clinometer-wrap { background: rgba(50,0,0,0.8) !important; border-color: #500 !important; }
-body.tactical-night #tc-alt, body.tactical-night #tc-acc, body.tactical-night #route-info { color: #d33 !important; }
-body.tactical-night #tc-dist { color: #f33 !important; }
 body.tactical-night .sos-btn { border-color: #f33 !important; color: #f33 !important; }
 
 /* Фільтр мапи для нічного режиму */
