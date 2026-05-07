@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.34 TACTICAL</title>
+    <title>RA_MOBILE v10.38 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.34">
+    <link rel="stylesheet" href="style.css?v=10.38">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -48,7 +48,7 @@
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
         .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 
-        /* --- НОВІ СТИЛІ КОМПАСА --- */
+        /* СТИЛІ КОМПАСА */
         #compass-container { width: 300px; height: 300px; margin: 10px auto; position: relative; border: 2px solid #222; border-radius: 50%; background: radial-gradient(circle, #111, #000); }
         #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; transition: transform 0.1s linear; }
         .compass-mark { position: absolute; top: 50%; left: 50%; transform-origin: center center; font-weight: bold; color: #888; font-size: 1rem; }
@@ -83,7 +83,7 @@
             <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.34</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.38</h3>
         <hr style="border: 0.5px solid #222;">
         
         <a href="#" onclick="toggleNightMode(); closeNav()" data-i18n="menu_day_night" style="font-weight:bold; color:#f33;">☀️ ДЕНЬ / 🔴 НІЧ</a>
@@ -95,7 +95,9 @@
         <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics">👁 ОПТИКА / ШІ</a>
         <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #0cf;" data-i18n="menu_radio">💬 ТЕКСТ / QR-РАЦІЯ</a>
         <a href="#" onclick="showModule('mod-shield'); closeNav()" data-i18n="menu_shield">🛡 ОХОРОНА / ЩИТ</a>
+        <a href="#" onclick="showModule('mod-sos'); closeNav()" style="color: #fff; font-weight: bold; background: rgba(255,0,0,0.3); border-radius: 5px; margin: 5px 10px; padding-left: 22px;" data-i18n="menu_sos">🆘 SOS / МАЯК</a>
         <a href="#" onclick="showModule('mod-manual'); closeNav()" style="color: #888;" data-i18n="menu_manual">📖 ІНСТРУКЦІЯ</a>
+        
         <hr style="border: 0.5px solid #222; margin-top: 30px;">
         <a href="#" onclick="killApp()" style="color: #f1c40f; font-weight: bold;" data-i18n="menu_power_off">🛑 ВИМКНУТИ ДОДАТОК</a>
         <a href="#" onclick="triggerDestroyProtocol()" style="color: #ff3333; font-weight: bold; margin-top: 10px;" data-i18n="menu_destroy">💥 ЗНИЩИТИ ДАНІ</a>
@@ -287,24 +289,50 @@
             <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;" data-i18n="btn_shield_off">АКТИВУВАТИ ЗАХИСТ</button>
             <button id="btn-shield-sound" class="tactical-btn" data-i18n="btn_shield_snd_off">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
+
+        <section id="mod-sos" class="module">
+            <div id="sos-flasher" style="position: absolute; top:0; left:0; width:100%; height:100%; display:none; z-index: 1;"></div>
+            <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
+                <h2 style="color: #f33; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px #f33;" data-i18n="sos_title">МАЯК ВИЖИВАННЯ</h2>
+                
+                <div id="sos-info" style="font-size: 1.2rem; color: #fff; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 30px; font-family: monospace; width: 100%; border: 2px solid #555;">
+                    <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТИ:</span><br>
+                    <span id="sos-latlon" style="color: #4ade80; font-weight: bold; font-size: 1.5rem;" data-i18n="sos_no_gps">ОЧІКУВАННЯ GPS</span><br><br>
+                    <span data-i18n="sos_battery" style="color: #ccc;">БАТАРЕЯ:</span> <span id="sos-batt" style="color: #f1c40f; font-weight: bold; font-size: 1.5rem;">--%</span>
+                </div>
+                
+                <button id="btn-sos-toggle" class="tactical-btn" style="background: #f33; color: #fff; height: 120px; font-size: 2rem; border-radius: 20px; box-shadow: 0 0 20px #f33; border: 2px solid #fff;" onclick="toggleSOS()" data-i18n="btn_sos_on">АЛАРМ (УВІМКНУТИ)</button>
+            </div>
+        </section>
         
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;" data-i18n="man_title">БОЙОВИЙ ПОСІБНИК</h2>
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
-                <h3 style="color:#f1c40f; margin-top: 10px;" data-i18n="man_h1">⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p1">Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.</p>
-
-                <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 1. МАРШРУТ ТА МАПА</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.</p>
-
-                <h3 style="color:#0cf;" data-i18n="man_h3">🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Калібрування 15м:</strong> Натисніть круглу кнопку '15м' на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як 'сонар': чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.</p>
-
-                <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p4">Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне 'ЦІЛЬ ЗАХОПЛЕНО', натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.</p>
                 
-                <h3 style="color:#f33;" data-i18n="man_h5">💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі викличуть тривогу або вібро-сигнал.</p>
+                <h3 style="color:#f1c40f; margin-top: 10px;" data-i18n="man_h1">🔐 1. ВХІД У СИСТЕМУ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p1">Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.</p>
+
+                <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 2. МАРШРУТ / МАПА</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Як поставити ціль:</strong> Двічі швидко тапни по карті. З'явиться лінія маршруту.<br><strong>Кнопка 'Я ТУТ (БЕЗ GPS)':</strong> Використовуй, коли працює РЕБ. Натисни її, а потім ткни пальцем у карту туди, де ти зараз знаходишся.<br><strong>Кнопка '15м':</strong> Натисни її і пройди прямо 15 метрів для точного калібрування компаса.</p>
+
+                <h3 style="color:#0cf;" data-i18n="man_h3">🧭 3. КОМПАС / ПОВОДИР</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.</p>
+
+                <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 4. АСТРО / БЕЗ GPS</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце і натисни відповідну кнопку.</p>
+                
+                <h3 style="color:#fff;" data-i18n="man_h5">👁 5. ОПТИКА / ШІ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
+
+                <h3 style="color:#0cf;" data-i18n="man_h6">💬 6. ТЕКСТ / QR-РАЦІЯ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p6">Пишеш текст -> 'Створити зашифрований QR'. Твій напарник відкриває програму, тисне 'Увімкнути камеру' і сканує твій екран. Повідомлення розшифровано без зв'язку.</p>
+
+                <h3 style="color:#888;" data-i18n="man_h7">🛡 7. ОХОРОНА / ЩИТ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p7">Лягаєш спати: Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон біля себе. Якщо хтось торкнеться телефону або земля завібрує — спрацює тривога.</p>
+
+                <h3 style="color:#f33;" data-i18n="man_h8">🆘 8. SOS / МАЯК ВИЖИВАННЯ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p8">Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран почне яскраво блимати, лунатиме пронизливий звук кожні 3 секунди, а на екрані з'являться твої координати та заряд батареї.</p>
+
             </div>
         </section>
     </div>
@@ -329,6 +357,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.34"></script>
+    <script src="app.js?v=10.38"></script>
 </body>
 </html>
