@@ -50,8 +50,8 @@ const translations = {
         astro_polar: "ПОЛЯРНА ЗІРКА",
         astro_hint: "ШУКАЙТЕ ПІВНІЧ",
         btn_astro_cal: "⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)",
-        btn_astro_sun: "☀ СОНЦЕ",
-        btn_astro_star: "⭐ ЗІРКА (ФІКСАЦІЯ)",
+        btn_astro_sun: "☀ СОНЦЕ (ЗАФІКСУВАТИ)",
+        btn_astro_star: "⭐ ЗІРКА (ЗАФІКСУВАТИ)",
         ai_off: "ШІ НЕ АКТИВНИЙ",
         lbl_cam_zoom: "ЗУМ КАМЕРИ",
         lbl_ai_sens: "ЧУТЛИВІСТЬ ШІ (%)",
@@ -74,39 +74,35 @@ const translations = {
         btn_shield_on: "ОХОРОНА АКТИВНА",
         btn_shield_snd_off: "ЗВУК СИРЕНИ: ВИМК",
         btn_shield_snd_on: "ЗВУК СИРЕНИ: УВІМК",
-        
         sos_title: "МАЯК ВИЖИВАННЯ",
         sos_coords: "КООРДИНАТИ:",
         sos_battery: "БАТАРЕЯ:",
         btn_sos_on: "АЛАРМ (УВІМКНУТИ)",
         btn_sos_off: "ВИМКНУТИ SOS",
         sos_no_gps: "ОЧІКУВАННЯ GPS",
-
         man_title: "БОЙОВИЙ ПОСІБНИК",
         man_h1: "🔐 1. ВХІД У СИСТЕМУ",
-        man_p1: "Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.",
+        man_p1: "Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором.",
         man_h2: "📍 2. МАРШРУТ / МАПА",
-        man_p2: "<strong>Як поставити ціль:</strong> Двічі швидко тапни по карті. З'явиться лінія маршруту.<br><strong>Кнопка 'Я ТУТ (БЕЗ GPS)':</strong> Використовуй, коли працює РЕБ. Натисни її, а потім ткни пальцем у карту туди, де ти зараз знаходишся.<br><strong>Кнопка '15м':</strong> Натисни її і пройди прямо 15 метрів для точного калібрування компаса.",
+        man_p2: "<strong>Як поставити ціль:</strong> Двічі швидко тапни по карті.<br><strong>Я ТУТ (БЕЗ GPS):</strong> Використовуй під РЕБом. Натисни і ткни пальцем у карту туди, де ти зараз.<br><strong>15м:</strong> Натисни і пройди 15 метрів для точного калібрування.",
         man_h3: "🧭 3. КОМПАС / ПОВОДИР",
-        man_p3: "<strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.",
+        man_p3: "<strong>Крокомір:</strong> Якщо немає GPS, увімкни його і він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Телефон вібрує, коли дивишся точно на ціль.<br><strong>ЕКО-Блекаут:</strong> Поклади палець на чорний екран на 3 сек, щоб дізнатися відстань.",
         man_h4: "🌌 4. АСТРО / БЕЗ GPS",
-        man_p4: "Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце і натисни відповідну кнопку.",
+        man_p4: "Коли компас збився: Тримаєш телефон рівно -> 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце в приціл і натисни кнопку.",
         man_h5: "👁 5. ОПТИКА / ШІ",
-        man_p5: "<strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.",
+        man_p5: "<strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.",
         man_h6: "💬 6. ТЕКСТ / QR-РАЦІЯ",
-        man_p6: "Пишеш текст -> 'Створити зашифрований QR'. Твій напарник відкриває програму, тисне 'Увімкнути камеру' і сканує твій екран. Повідомлення розшифровано без зв'язку.",
+        man_p6: "Пишеш текст -> 'Створити QR'. Напарник відкриває програму і сканує. Розшифровано без зв'язку.",
         man_h7: "🛡 7. ОХОРОНА / ЩИТ",
-        man_p7: "Лягаєш спати: Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон біля себе. Якщо хтось торкнеться телефону або земля завібрує — спрацює тривога.",
+        man_p7: "Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон. Якщо земля завібрує — спрацює тривога.",
         man_h8: "🆘 8. SOS / МАЯК ВИЖИВАННЯ",
-        man_p8: "Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран почне яскраво блимати, лунатиме пронизливий звук кожні 3 секунди, а на екрані з'являться твої координати та заряд батареї.",
-        
+        man_p8: "Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран яскраво блимає, лунає звук, показуються координати.",
         eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)",
         btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ",
         wiz_title: "ОФЛАЙН РЕЖИМ",
         wiz_text: "Текст підказки",
         btn_wiz_cancel: "СКАСУВАТИ",
         btn_wiz_next: "ДАЛІ ➡",
-        
         lvl3: "РІВЕНЬ 3: АВТОНОМНИЙ",
         lvl2: "РІВЕНЬ 2: СТЕЛС (GPS)",
         lvl1: "РІВЕНЬ 1: МАКС (РАДІОСЛІД)",
@@ -127,266 +123,44 @@ const translations = {
         astro_sun_fix: "☀️ Сонце зафіксовано. Компас відкалібровано!",
         astro_star_fix: "⭐ Зірка зафіксована. Компас відкалібровано на Північ!",
         astro_hor_fix: "⚖️ Горизонт зафіксовано",
-        astro_hor_next: "Тепер підніміть телефон вгору (на висоту ~48°) для пошуку зірок.",
+        astro_hor_next: "Тепер підніміть телефон вгору (на висоту вашої широти) для пошуку зірок.",
         lbl_meters_short: "м",
         cal_done: "КАЛІБР: ГОТОВО",
         alert_no_gps_cal: "Немає сигналу GPS!"
     },
     'en': {
-        btn_login: "LOGIN",
-        err_access_denied: "❌ ACCESS DENIED",
-        title_qr_scan: "OPTICAL DATA CODE",
-        btn_close: "CLOSE",
-        menu_day_night: "☀️ DAY / 🔴 NIGHT",
-        menu_map: "📍 ROUTE / MAP",
-        menu_compass: "🧭 COMPASS / GUIDE",
-        menu_astro: "🌌 ASTRO / NO GPS",
-        menu_optics: "👁 OPTICS / AI",
-        menu_radio: "💬 TEXT / QR RADIO",
-        menu_shield: "🛡 SECURITY / SHIELD",
-        menu_manual: "📖 INSTRUCTIONS",
-        menu_power_off: "🛑 SHUTDOWN APP",
-        menu_destroy: "💥 DESTROY DATA",
-        menu_sos: "🆘 SOS / BEACON",
-        hud_gps_search: "GPS: SEARCHING...",
-        hud_alt: "ALT: --- m",
-        hud_level_analysis: "LEVEL: ANALYSIS",
-        hud_speed: "SPD: 0.0 km/h",
-        hud_target: "TGT: --- m",
-        btn_map_manual: "📍 I AM HERE (NO GPS)",
-        btn_map_transport: "🚙 TRANSPORT",
-        btn_map_share: "📤 SHARE QR",
-        btn_map_follow: "🎯 FOLLOW",
-        btn_map_del_last: "✖ DELETE LAST",
-        btn_map_clear: "🗑 CLEAR ROUTE",
-        btn_map_layer: "🗺 LAYER",
-        btn_map_cache: "💾 CACHE 2x2 km",
-        comp_acc: "ACC: --",
-        comp_alt: "ALT: --- m",
-        btn_pedo_off: "👣 PEDOMETER: OFF",
-        btn_pedo_on: "👣 PEDOMETER: ON",
-        btn_cal_walk: "CALIBRATE WALKING (15m)",
-        comp_target_none: "TARGET: NONE",
-        btn_voice_off: "VOICE: OFF",
-        btn_voice_on: "VOICE: ON",
-        btn_vibro_off: "GUIDE (VIBRO): OFF",
-        btn_vibro_on: "GUIDE (VIBRO): ON",
-        lbl_voice_int: "HINT INTERVAL:",
-        lbl_sec: "sec",
-        btn_eco: "🌑 ECO BLACKOUT",
-        astro_locked: "TARGET LOCKED",
-        astro_polar: "POLARIS",
-        astro_hint: "LOOK FOR NORTH",
-        btn_astro_cal: "⚖ CALIBRATE HORIZON (0°)",
-        btn_astro_sun: "☀ SUN",
-        btn_astro_star: "⭐ STAR (LOCK)",
-        ai_off: "AI INACTIVE",
-        lbl_cam_zoom: "CAMERA ZOOM",
-        lbl_ai_sens: "AI SENSITIVITY (%)",
-        lbl_ai_focal: "AI RANGE (FOCUS)",
-        lbl_ir_sens: "IR / MOTION SENSITIVITY",
-        btn_scan_cam: "🔴 SCAN FROM CAMERA",
-        btn_scan_photo: "🖼 READ FROM PHOTO",
-        btn_cam_off: "🔴 CAMERA",
-        btn_ai_scan: "🤖 AI SCAN",
-        btn_ir: "🔭 IR FILTER",
-        btn_motion: "📉 MOTION DETECTOR",
-        chat_title: "OFFLINE RADIO",
-        chat_desc: "Enter text and generate an encrypted QR code.",
-        btn_chat_cam: "📷 TURN ON CAMERA TO READ",
-        chat_left: "Remaining: 200 chars",
-        btn_chat_gen: "GENERATE ENCRYPTED QR",
-        btn_chat_clear: "CLEAR TEXT",
-        shield_title: "SECURITY / SHIELD",
-        btn_shield_off: "ACTIVATE SHIELD",
-        btn_shield_on: "SHIELD ACTIVE",
-        btn_shield_snd_off: "SIREN SOUND: OFF",
-        btn_shield_snd_on: "SIREN SOUND: ON",
-        
-        sos_title: "SURVIVAL BEACON",
-        sos_coords: "COORDINATES:",
-        sos_battery: "BATTERY:",
-        btn_sos_on: "ALARM (TURN ON)",
-        btn_sos_off: "TURN OFF SOS",
-        sos_no_gps: "WAITING FOR GPS",
-
-        man_title: "COMBAT MANUAL",
-        man_h1: "🔐 1. SYSTEM LOGIN",
-        man_p1: "Enter your PIN code. This protects the device from enemy use.",
-        man_h2: "📍 2. ROUTE / MAP",
-        man_p2: "Double tap to set a target. Use 'I AM HERE' to manually set location if GPS is jammed.",
-        man_h3: "🧭 3. COMPASS / GUIDE",
-        man_p3: "Use pedometer for offline tracking. Vibro-guide will point you to the target.",
-        man_h4: "🌌 4. ASTRO / NO GPS",
-        man_p4: "Calibrate horizon, then look up to lock Polaris or the Sun to fix compass.",
-        man_h5: "👁 5. OPTICS / AI",
-        man_p5: "Use IR filter in low light. AI Scan detects vehicles and personnel.",
-        man_h6: "💬 6. TEXT / QR-RADIO",
-        man_p6: "Share encrypted messages via QR codes without internet.",
-        man_h7: "🛡 7. SECURITY / SHIELD",
-        man_p7: "Put phone on your bag while resting. Any vibration triggers the alarm.",
-        man_h8: "🆘 8. SOS / BEACON",
-        man_p8: "In critical conditions, activate SOS to flash screen and emit a 3-second beacon tone.",
-        
-        eco_touch: "TOUCH SCREEN<br>(3 sec)",
-        btn_eco_exit: "EXIT BLACKOUT",
-        wiz_title: "OFFLINE MODE",
-        wiz_text: "Hint text",
-        btn_wiz_cancel: "CANCEL",
-        btn_wiz_next: "NEXT ➡",
-        
-        lvl3: "LEVEL 3: AUTONOMOUS",
-        lvl2: "LEVEL 2: STEALTH (GPS)",
-        lvl1: "LEVEL 1: MAX (RADIO TRACE)",
-        gps_delay: "⚠️ GPS DELAY",
-        gps_manual: "📍 MANUAL MODE",
-        gps_lost: "❌ GPS JAMMED (>200m)",
-        gps_ok: "GPS: OK",
-        gps_offline: "❌ GPS LOST (OFFLINE)",
-        voice_dist: "Distance",
-        voice_meters: "meters",
-        voice_turn: "Turn around!",
-        voice_right: "More to the right.",
-        voice_left: "More to the left.",
-        alert_no_start: "Warning: No start point set on map.",
-        alert_pedo_on: "✅ AUTONOMOUS NAVIGATION ON!",
-        alert_pedo_off: "Offline tracking stopped.",
-        alert_man_pos: "📍 MANUAL MODE:\nTap the map where you are.",
-        astro_sun_fix: "☀️ Sun locked!",
-        astro_star_fix: "⭐ Star locked!",
-        astro_hor_fix: "⚖️ Horizon locked",
-        astro_hor_next: "Now lift the phone up to search for stars.",
-        lbl_meters_short: "m",
-        cal_done: "CAL: DONE",
-        alert_no_gps_cal: "No GPS signal!"
+        btn_login: "LOGIN", err_access_denied: "❌ ACCESS DENIED", title_qr_scan: "OPTICAL DATA CODE", btn_close: "CLOSE", menu_day_night: "☀️ DAY / 🔴 NIGHT", menu_map: "📍 ROUTE / MAP", menu_compass: "🧭 COMPASS / GUIDE", menu_astro: "🌌 ASTRO / NO GPS", menu_optics: "👁 OPTICS / AI", menu_radio: "💬 TEXT / QR RADIO", menu_shield: "🛡 SECURITY / SHIELD", menu_manual: "📖 INSTRUCTIONS", menu_power_off: "🛑 SHUTDOWN APP", menu_destroy: "💥 DESTROY DATA", menu_sos: "🆘 SOS / BEACON",
+        hud_gps_search: "GPS: SEARCHING...", hud_alt: "ALT: --- m", hud_level_analysis: "LEVEL: ANALYSIS", hud_speed: "SPD: 0.0 km/h", hud_target: "TGT: --- m",
+        btn_map_manual: "📍 I AM HERE (NO GPS)", btn_map_transport: "🚙 TRANSPORT", btn_map_share: "📤 SHARE QR", btn_map_follow: "🎯 FOLLOW", btn_map_del_last: "✖ DELETE LAST", btn_map_clear: "🗑 CLEAR ROUTE", btn_map_layer: "🗺 LAYER", btn_map_cache: "💾 CACHE 2x2 km",
+        comp_acc: "ACC: --", comp_alt: "ALT: --- m", btn_pedo_off: "👣 PEDOMETER: OFF", btn_pedo_on: "👣 PEDOMETER: ON", btn_cal_walk: "CALIBRATE WALKING (15m)", comp_target_none: "TARGET: NONE",
+        btn_voice_off: "VOICE: OFF", btn_voice_on: "VOICE: ON", btn_vibro_off: "GUIDE (VIBRO): OFF", btn_vibro_on: "GUIDE (VIBRO): ON", lbl_voice_int: "HINT INTERVAL:", lbl_sec: "sec", btn_eco: "🌑 ECO BLACKOUT",
+        astro_locked: "TARGET LOCKED", astro_polar: "POLARIS", astro_hint: "LOOK FOR NORTH", btn_astro_cal: "⚖ CALIBRATE HORIZON (0°)", btn_astro_sun: "☀ SUN (LOCK)", btn_astro_star: "⭐ STAR (LOCK)",
+        ai_off: "AI INACTIVE", lbl_cam_zoom: "CAMERA ZOOM", lbl_ai_sens: "AI SENSITIVITY (%)", lbl_ai_focal: "AI RANGE (FOCUS)", lbl_ir_sens: "IR / MOTION SENSITIVITY",
+        btn_scan_cam: "🔴 SCAN FROM CAMERA", btn_scan_photo: "🖼 READ FROM PHOTO", btn_cam_off: "🔴 CAMERA", btn_ai_scan: "🤖 AI SCAN", btn_ir: "🔭 IR FILTER", btn_motion: "📉 MOTION DETECTOR",
+        chat_title: "OFFLINE RADIO", chat_desc: "Enter text and generate an encrypted QR code.", btn_chat_cam: "📷 TURN ON CAMERA TO READ", chat_left: "Remaining: 200 chars", btn_chat_gen: "GENERATE ENCRYPTED QR", btn_chat_clear: "CLEAR TEXT",
+        shield_title: "SECURITY / SHIELD", btn_shield_off: "ACTIVATE SHIELD", btn_shield_on: "SHIELD ACTIVE", btn_shield_snd_off: "SIREN SOUND: OFF", btn_shield_snd_on: "SIREN SOUND: ON",
+        sos_title: "SURVIVAL BEACON", sos_coords: "COORDINATES:", sos_battery: "BATTERY:", btn_sos_on: "ALARM (TURN ON)", btn_sos_off: "TURN OFF SOS", sos_no_gps: "WAITING FOR GPS",
+        man_title: "COMBAT MANUAL", man_h1: "🔐 1. SYSTEM LOGIN", man_p1: "Enter your PIN code.", man_h2: "📍 2. ROUTE / MAP", man_p2: "Double tap to set target. Use 'I AM HERE' to manually set location.", man_h3: "🧭 3. COMPASS / GUIDE", man_p3: "Use pedometer for offline tracking. Vibro-guide will point you to the target.", man_h4: "🌌 4. ASTRO / NO GPS", man_p4: "Calibrate horizon, then look up to lock Polaris or the Sun in crosshair to fix compass.", man_h5: "👁 5. OPTICS / AI", man_p5: "Use IR filter in low light. AI Scan detects vehicles and personnel.", man_h6: "💬 6. TEXT / QR-RADIO", man_p6: "Share encrypted messages via QR codes.", man_h7: "🛡 7. SECURITY / SHIELD", man_p7: "Put phone on bag. Any vibration triggers the alarm.", man_h8: "🆘 8. SOS / BEACON", man_p8: "Activate SOS to flash screen and emit a 3-second beacon tone.",
+        eco_touch: "TOUCH SCREEN<br>(3 sec)", btn_eco_exit: "EXIT BLACKOUT", wiz_title: "OFFLINE MODE", wiz_text: "Hint text", btn_wiz_cancel: "CANCEL", btn_wiz_next: "NEXT ➡",
+        lvl3: "LEVEL 3: AUTONOMOUS", lvl2: "LEVEL 2: STEALTH (GPS)", lvl1: "LEVEL 1: MAX (RADIO TRACE)", gps_delay: "⚠️ GPS DELAY", gps_manual: "📍 MANUAL MODE", gps_lost: "❌ GPS JAMMED (>200m)", gps_ok: "GPS: OK", gps_offline: "❌ GPS LOST (OFFLINE)",
+        voice_dist: "Distance", voice_meters: "meters", voice_turn: "Turn around!", voice_right: "More to the right.", voice_left: "More to the left.", alert_no_start: "Warning: No start point set.", alert_pedo_on: "✅ AUTONOMOUS NAVIGATION ON!", alert_pedo_off: "Offline tracking stopped.", alert_man_pos: "📍 MANUAL MODE:\nTap the map where you are.", astro_sun_fix: "☀️ Sun locked!", astro_star_fix: "⭐ Star locked!", astro_hor_fix: "⚖️ Horizon locked", astro_hor_next: "Now lift the phone up to search for stars.", lbl_meters_short: "m", cal_done: "CAL: DONE", alert_no_gps_cal: "No GPS signal!"
     },
     'pt': {
-        btn_login: "ENTRAR",
-        err_access_denied: "❌ ACESSO NEGADO",
-        title_qr_scan: "CÓDIGO DE DADOS",
-        btn_close: "FECHAR",
-        menu_day_night: "☀️ DIA / 🔴 NOITE",
-        menu_map: "📍 ROTA / MAPA",
-        menu_compass: "🧭 BÚSSOLA / GUIA",
-        menu_astro: "🌌 ASTRO / SEM GPS",
-        menu_optics: "👁 ÓPTICA / IA",
-        menu_radio: "💬 TEXTO / RÁDIO QR",
-        menu_shield: "🛡 SEGURANÇA / ESCUDO",
-        menu_manual: "📖 INSTRUÇÕES",
-        menu_power_off: "🛑 DESLIGAR APP",
-        menu_destroy: "💥 DESTRUIR DADOS",
-        menu_sos: "🆘 SOS / SINALIZADOR",
-        hud_gps_search: "GPS: BUSCANDO...",
-        hud_alt: "ALT: --- m",
-        hud_level_analysis: "NÍVEL: ANÁLISE",
-        hud_speed: "VEL: 0.0 km/h",
-        hud_target: "ALVO: --- m",
-        btn_map_manual: "📍 ESTOU AQUI (SEM GPS)",
-        btn_map_transport: "🚙 TRANSPORTE",
-        btn_map_share: "📤 COMPARTILHAR QR",
-        btn_map_follow: "🎯 SEGUIR",
-        btn_map_del_last: "✖ EXCLUIR ÚLTIMO",
-        btn_map_clear: "🗑 LIMPAR ROTA",
-        btn_map_layer: "🗺 CAMADA",
-        btn_map_cache: "💾 CACHE 2x2 km",
-        comp_acc: "PRE: --",
-        comp_alt: "ALT: --- m",
-        btn_pedo_off: "👣 PEDÔMETRO: DESLIGADO",
-        btn_pedo_on: "👣 PEDÔMETRO: LIGADO",
-        btn_cal_walk: "CALIBRAR ANDANDO (15m)",
-        comp_target_none: "ALVO: NENHUM",
-        btn_voice_off: "VOZ: DESL",
-        btn_voice_on: "VOZ: LIGADA",
-        btn_vibro_off: "GUIA (VIBRO): DESL",
-        btn_vibro_on: "GUIA (VIBRO): LIG",
-        lbl_voice_int: "DICAS:",
-        lbl_sec: "seg",
-        btn_eco: "🌑 BLACKOUT ECO",
-        astro_locked: "ALVO BLOQUEADO",
-        astro_polar: "POLARIS",
-        astro_hint: "PROCURE O NORTE",
-        btn_astro_cal: "⚖ CALIBRAR HORIZONTE",
-        btn_astro_sun: "☀ SOL",
-        btn_astro_star: "⭐ ESTRELA (FIXAR)",
-        ai_off: "IA INATIVA",
-        lbl_cam_zoom: "ZOOM DA CÂMERA",
-        lbl_ai_sens: "SENSIBILIDADE IA (%)",
-        lbl_ai_focal: "ALCANCE IA",
-        lbl_ir_sens: "IR / SENSIBILIDADE MOV",
-        btn_scan_cam: "🔴 LER DA CÂMERA",
-        btn_scan_photo: "🖼 LER DA FOTO",
-        btn_cam_off: "🔴 CÂMERA",
-        btn_ai_scan: "🤖 IA SCAN",
-        btn_ir: "🔭 FILTRO IR",
-        btn_motion: "📉 DETECTOR MOVIMENTO",
-        chat_title: "RÁDIO OFFLINE",
-        chat_desc: "Insira texto e gere um QR criptografado.",
-        btn_chat_cam: "📷 LIGAR CÂMERA",
-        chat_left: "Restante: 200 carac.",
-        btn_chat_gen: "GERAR QR CRIPTOGRAFADO",
-        btn_chat_clear: "LIMPAR TEXTO",
-        shield_title: "SEGURANÇA / ESCUDO",
-        btn_shield_off: "ATIVAR ESCUDO",
-        btn_shield_on: "ESCUDO ATIVO",
-        btn_shield_snd_off: "SOM SIRENE: DESL",
-        btn_shield_snd_on: "SOM SIRENE: LIG",
-        
-        sos_title: "SINALIZADOR",
-        sos_coords: "COORDENADAS:",
-        sos_battery: "BATERIA:",
-        btn_sos_on: "ALARME (LIGAR)",
-        btn_sos_off: "DESLIGAR SOS",
-        sos_no_gps: "AGUARDANDO GPS",
-
-        man_title: "MANUAL DE COMBATE",
-        man_h1: "🔐 1. SISTEMA DE LOGIN",
-        man_p1: "Insira o seu código PIN para proteção contra o inimigo.",
-        man_h2: "📍 2. ROTA / MAPA",
-        man_p2: "Toque duplo para definir alvo. Use ESTOU AQUI se o GPS falhar.",
-        man_h3: "🧭 3. BÚSSOLA / GUIA",
-        man_p3: "Use o pedômetro no modo offline.",
-        man_h4: "🌌 4. ASTRO / SEM GPS",
-        man_p4: "Calibre o horizonte e mire em Polaris ou Sol.",
-        man_h5: "👁 5. ÓPTICA / IA",
-        man_p5: "Use filtro IR ou IA para detecção.",
-        man_h6: "💬 6. TEXTO / RÁDIO QR",
-        man_p6: "Compartilhe ordens por QR encriptado.",
-        man_h7: "🛡 7. SEGURANÇA / ESCUDO",
-        man_p7: "O telefone vibrará se detectado movimento perto.",
-        man_h8: "🆘 8. SOS / SINALIZADOR",
-        man_p8: "Em emergência extrema, ative SOS para som e flash na tela.",
-        
-        eco_touch: "TOQUE NA TELA<br>(3 seg)",
-        btn_eco_exit: "SAIR DO BLACKOUT",
-        wiz_title: "MODO OFFLINE",
-        wiz_text: "Texto de dica",
-        btn_wiz_cancel: "CANCELAR",
-        btn_wiz_next: "PRÓXIMO ➡",
-        
-        lvl3: "NÍVEL 3: AUTÔNOMO",
-        lvl2: "NÍVEL 2: FURTIVO (GPS)",
-        lvl1: "NÍVEL 1: MÁX",
-        gps_delay: "⚠️ ATRASO GPS",
-        gps_manual: "📍 MODO MANUAL",
-        gps_lost: "❌ GPS BLOQUEADO (>200m)",
-        gps_ok: "GPS: OK",
-        gps_offline: "❌ GPS PERDIDO",
-        voice_dist: "Distância",
-        voice_meters: "metros",
-        voice_turn: "Vire-se!",
-        voice_right: "Mais para a direita.",
-        voice_left: "Mais para a esquerda.",
-        alert_no_start: "Aviso: Sem ponto de partida.",
-        alert_pedo_on: "✅ NAVEGAÇÃO AUTÔNOMA LIGADA!",
-        alert_pedo_off: "Rastreamento offline parado.",
-        alert_man_pos: "📍 MODO MANUAL:\nToque no mapa onde você está.",
-        astro_sun_fix: "☀️ Sol fixado!",
-        astro_star_fix: "⭐ Estrela fixada!",
-        astro_hor_fix: "⚖️ Horizonte fixado",
-        astro_hor_next: "Levante o telefone para procurar estrelas.",
-        lbl_meters_short: "m",
-        cal_done: "CAL: PRONTO",
-        alert_no_gps_cal: "Sem sinal GPS!"
+        btn_login: "ENTRAR", err_access_denied: "❌ ACESSO NEGADO", title_qr_scan: "CÓDIGO DE DADOS", btn_close: "FECHAR", menu_day_night: "☀️ DIA / 🔴 NOITE", menu_map: "📍 ROTA / MAPA", menu_compass: "🧭 BÚSSOLA / GUIA", menu_astro: "🌌 ASTRO / SEM GPS", menu_optics: "👁 ÓPTICA / IA", menu_radio: "💬 TEXTO / RÁDIO QR", menu_shield: "🛡 SEGURANÇA / ESCUDO", menu_manual: "📖 INSTRUÇÕES", menu_power_off: "🛑 DESLIGAR APP", menu_destroy: "💥 DESTRUIR DADOS", menu_sos: "🆘 SOS / SINALIZADOR",
+        hud_gps_search: "GPS: BUSCANDO...", hud_alt: "ALT: --- m", hud_level_analysis: "NÍVEL: ANÁLISE", hud_speed: "VEL: 0.0 km/h", hud_target: "ALVO: --- m",
+        btn_map_manual: "📍 ESTOU AQUI (SEM GPS)", btn_map_transport: "🚙 TRANSPORTE", btn_map_share: "📤 COMPARTILHAR QR", btn_map_follow: "🎯 SEGUIR", btn_map_del_last: "✖ EXCLUIR ÚLTIMO", btn_map_clear: "🗑 LIMPAR ROTA", btn_map_layer: "🗺 CAMADA", btn_map_cache: "💾 CACHE 2x2 km",
+        comp_acc: "PRE: --", comp_alt: "ALT: --- m", btn_pedo_off: "👣 PEDÔMETRO: DESLIGADO", btn_pedo_on: "👣 PEDÔMETRO: LIGADO", btn_cal_walk: "CALIBRAR ANDANDO (15m)", comp_target_none: "ALVO: NENHUM",
+        btn_voice_off: "VOZ: DESL", btn_voice_on: "VOZ: LIGADA", btn_vibro_off: "GUIA (VIBRO): DESL", btn_vibro_on: "GUIA (VIBRO): LIG", lbl_voice_int: "DICAS:", lbl_sec: "seg", btn_eco: "🌑 BLACKOUT ECO",
+        astro_locked: "ALVO BLOQUEADO", astro_polar: "POLARIS", astro_hint: "PROCURE O NORTE", btn_astro_cal: "⚖ CALIBRAR HORIZONTE", btn_astro_sun: "☀ SOL (FIXAR)", btn_astro_star: "⭐ ESTRELA (FIXAR)",
+        ai_off: "IA INATIVA", lbl_cam_zoom: "ZOOM DA CÂMERA", lbl_ai_sens: "SENSIBILIDADE IA (%)", lbl_ai_focal: "ALCANCE IA", lbl_ir_sens: "IR / SENSIBILIDADE MOV",
+        btn_scan_cam: "🔴 LER DA CÂMERA", btn_scan_photo: "🖼 LER DA FOTO", btn_cam_off: "🔴 CÂMERA", btn_ai_scan: "🤖 IA SCAN", btn_ir: "🔭 FILTRO IR", btn_motion: "📉 DETECTOR MOVIMENTO",
+        chat_title: "RÁDIO OFFLINE", chat_desc: "Insira texto e gere um QR criptografado.", btn_chat_cam: "📷 LIGAR CÂMERA", chat_left: "Restante: 200 carac.", btn_chat_gen: "GERAR QR", btn_chat_clear: "LIMPAR TEXTO",
+        shield_title: "SEGURANÇA / ESCUDO", btn_shield_off: "ATIVAR ESCUDO", btn_shield_on: "ESCUDO ATIVO", btn_shield_snd_off: "SOM SIRENE: DESL", btn_shield_snd_on: "SOM SIRENE: LIG",
+        sos_title: "SINALIZADOR", sos_coords: "COORDENADAS:", sos_battery: "BATERIA:", btn_sos_on: "ALARME (LIGAR)", btn_sos_off: "DESLIGAR SOS", sos_no_gps: "AGUARDANDO GPS",
+        man_title: "MANUAL DE COMBATE", man_h1: "🔐 1. LOGIN", man_p1: "Insira PIN.", man_h2: "📍 2. ROTA / MAPA", man_p2: "Toque duplo define alvo.", man_h3: "🧭 3. BÚSSOLA", man_p3: "Pedômetro offline.", man_h4: "🌌 4. ASTRO", man_p4: "Calibre horizonte, mire na Estrela no centro.", man_h5: "👁 5. ÓPTICA", man_p5: "Filtro IR.", man_h6: "💬 6. RÁDIO QR", man_p6: "QR encriptado.", man_h7: "🛡 7. ESCUDO", man_p7: "Alarme de movimento.", man_h8: "🆘 8. SOS", man_p8: "Som e flash.",
+        eco_touch: "TOQUE NA TELA<br>(3 seg)", btn_eco_exit: "SAIR DO BLACKOUT", wiz_title: "MODO OFFLINE", wiz_text: "Texto", btn_wiz_cancel: "CANCELAR", btn_wiz_next: "PRÓXIMO ➡",
+        lvl3: "NÍVEL 3: AUTÔNOMO", lvl2: "NÍVEL 2: FURTIVO (GPS)", lvl1: "NÍVEL 1: MÁX", gps_delay: "⚠️ ATRASO GPS", gps_manual: "📍 MODO MANUAL", gps_lost: "❌ GPS BLOQUEADO", gps_ok: "GPS: OK", gps_offline: "❌ GPS PERDIDO",
+        voice_dist: "Distância", voice_meters: "metros", voice_turn: "Vire-se!", voice_right: "Para a direita.", voice_left: "Para a esquerda.", alert_no_start: "Aviso: Sem ponto.", alert_pedo_on: "✅ NAVEGAÇÃO LIGADA!", alert_pedo_off: "Parado.", alert_man_pos: "📍 MANUAL:\nToque no mapa.", astro_sun_fix: "☀️ Sol fixado!", astro_star_fix: "⭐ Estrela fixada!", astro_hor_fix: "⚖️ Horizonte fixado", astro_hor_next: "Levante o telefone.", lbl_meters_short: "m", cal_done: "CAL: PRONTO", alert_no_gps_cal: "Sem sinal GPS!"
     }
 };
 
@@ -405,37 +179,20 @@ function setLanguage(lang) {
     });
 
     updatePositioningLevel();
-    if(isOfflineTracking) {
-        document.getElementById('btn-pedometer').innerText = getT('btn_pedo_on');
-    } else {
-        document.getElementById('btn-pedometer').innerText = getT('btn_pedo_off');
-    }
+    if(isOfflineTracking) { document.getElementById('btn-pedometer').innerText = getT('btn_pedo_on'); } else { document.getElementById('btn-pedometer').innerText = getT('btn_pedo_off'); }
     document.getElementById('btn-guide-voice').innerText = isVoiceEnabled ? getT('btn_voice_on') : getT('btn_voice_off');
     document.getElementById('btn-guide').innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off');
     document.getElementById('btn-shield').innerText = isShielded ? getT('btn_shield_on') : getT('btn_shield_off');
     document.getElementById('btn-shield-sound').innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off');
-    
-    if(isSosActive) {
-        document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_off');
-    } else {
-        document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_on');
-    }
+    if(isSosActive) { document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_off'); } else { document.getElementById('btn-sos-toggle').innerText = getT('btn_sos_on'); }
 }
 
-// НІЧНИЙ РЕЖИМ
 let isNightMode = false;
 function toggleNightMode() {
     isNightMode = !isNightMode;
-    if (isNightMode) {
-        document.body.classList.add('tactical-night');
-    } else {
-        document.body.classList.remove('tactical-night');
-    }
+    if (isNightMode) { document.body.classList.add('tactical-night'); } else { document.body.classList.remove('tactical-night'); }
 }
 
-// ==========================================
-// 0. СИСТЕМА БЕЗПЕКИ ТА АВТОРИЗАЦІЯ
-// ==========================================
 const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 
@@ -459,7 +216,6 @@ async function checkPin() {
             window.addEventListener('deviceorientationabsolute', handleOrientation);
             window.addEventListener('deviceorientation', handleOrientation);
         }
-
         initSystem(); 
     } else {
         pinAttempts++;
@@ -473,17 +229,12 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); });
 }
 
-// ==========================================
-// 1. ГЛОБАЛЬНІ ЗМІННІ ТА ШИФРУВАННЯ
-// ==========================================
 const CRYPTO_KEY = "RA_STORM_2026"; 
-
 let audioCtx = null, osc = null, gain = null;
 let lastGoodGPS = null, watchId = null;
 
 let hardwareHeading = 0, compassOffset = 7, currentBearing = null; 
-let currentPitch = 0; 
-let currentRoll = 0; 
+let currentPitch = 0, currentRoll = 0; 
 let displayPitch = 0, displayRoll = 0; 
 let currentDisplayAngle = 0, targetDisplayAngle = 0;
 let isFirstCompassUpdate = true;
@@ -492,44 +243,31 @@ let hasAbsoluteOrientation = false;
 
 let horizonBeta = 90;
 let currentSpeedKmh = 0; 
-
 let currentDistanceToTarget = null;
-
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
-let currentVideoTrack = null; 
-let currentAstroTrack = null;
+let currentVideoTrack = null, currentAstroTrack = null;
 
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
 let isWalkCalibrating = false, walkStartPoint = null;
 let topoLayer = null, darkLayer = null, currentLayer = 'topo';
-
-let isMapFollowing = true;
-let tracePoints = [];
-let traceLineLayer = null;
+let isMapFollowing = true, tracePoints = [], traceLineLayer = null;
 
 let guideMode = false, isVoiceEnabled = false;
 let lastVibroTime = 0, lastVoiceTime = 0, lastGpsPing = 0;
 let isSignalLost = true, firstFix = true;
-let lastGpsProcessTime = Date.now(); 
-let gpsLostTimer = null; 
+let lastGpsProcessTime = Date.now(), gpsLostTimer = null; 
 
 let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
 let isManualPosMode = false;
-
 let wakeLock = null;
-let isTransportMode = false;
-let lastGpsCoordsForTransport = null;
+let isTransportMode = false, lastGpsCoordsForTransport = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
 
-let isSosActive = false;
-let sosInterval = null;
+let isSosActive = false, sosInterval = null;
 
-// ==========================================
-// 2. ІНІЦІАЛІЗАЦІЯ, ЗВУК ТА ЕКРАН
-// ==========================================
 function initSystem() {
     setLanguage('uk'); 
     updatePositioningLevel();
@@ -537,58 +275,37 @@ function initSystem() {
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
     setInterval(traceVanishing, 3000);
-    
     setInterval(() => {
         if (!isEcoMode && Date.now() - lastGpsProcessTime > 4000 && !isManualPosMode) {
             let stat = document.getElementById('gps-status');
-            if (stat && stat.innerText === getT('gps_ok')) {
-                stat.innerText = getT('gps_delay'); stat.style.color = "#f1c40f";
-            }
+            if (stat && stat.innerText === getT('gps_ok')) { stat.innerText = getT('gps_delay'); stat.style.color = "#f1c40f"; }
         }
     }, 1000);
 }
 
-async function requestWakeLock() {
-    if ('wakeLock' in navigator) {
-        try { wakeLock = await navigator.wakeLock.request('screen'); }
-        catch (err) { console.log(err); }
-    }
-}
-function releaseWakeLock() {
-    if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); }
-}
+async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} } }
+function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); } }
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) turnOffCamera();
-    if (!document.hidden && wakeLock !== null && document.getElementById('mod-map').classList.contains('active')) {
-        requestWakeLock();
-    }
+    if (!document.hidden && wakeLock !== null && document.getElementById('mod-map').classList.contains('active')) { requestWakeLock(); }
 });
 
 function updatePositioningLevel() {
     const levelEl = document.getElementById('pos-level');
-    let btnMan = document.getElementById('btn-manual-pos');
-    let btnPed = document.getElementById('btn-pedometer');
-
+    let btnMan = document.getElementById('btn-manual-pos'), btnPed = document.getElementById('btn-pedometer');
     if (!levelEl) return;
-
     let isLevel3 = isOfflineTracking || OfflineWizard.isActive || isSignalLost || isManualPosMode;
 
     if (isLevel3) {
-        levelEl.innerText = getT('lvl3');
-        levelEl.style.color = "#f1c40f";
-        levelEl.style.borderColor = "#f1c40f";
+        levelEl.innerText = getT('lvl3'); levelEl.style.color = "#f1c40f"; levelEl.style.borderColor = "#f1c40f";
         if (btnMan) { btnMan.style.opacity = '1'; btnMan.style.pointerEvents = 'auto'; }
         if (btnPed) { btnPed.style.opacity = '1'; btnPed.style.pointerEvents = 'auto'; }
     } else if (!navigator.onLine) {
-        levelEl.innerText = getT('lvl2');
-        levelEl.style.color = "#4ade80";
-        levelEl.style.borderColor = "#4ade80";
+        levelEl.innerText = getT('lvl2'); levelEl.style.color = "#4ade80"; levelEl.style.borderColor = "#4ade80";
         if (btnMan) { btnMan.style.opacity = '0.3'; btnMan.style.pointerEvents = 'none'; }
         if (btnPed) { btnPed.style.opacity = '0.3'; btnPed.style.pointerEvents = 'none'; }
     } else {
-        levelEl.innerText = getT('lvl1');
-        levelEl.style.color = "#f33";
-        levelEl.style.borderColor = "#f33";
+        levelEl.innerText = getT('lvl1'); levelEl.style.color = "#f33"; levelEl.style.borderColor = "#f33";
         if (btnMan) { btnMan.style.opacity = '0.3'; btnMan.style.pointerEvents = 'none'; }
         if (btnPed) { btnPed.style.opacity = '0.3'; btnPed.style.pointerEvents = 'none'; }
     }
@@ -601,8 +318,7 @@ async function initSensors() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             osc = audioCtx.createOscillator(); gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.value = 0; osc.start();
+            osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.value = 0; osc.start();
         } else if (audioCtx.state === 'suspended') { await audioCtx.resume(); }
     } catch (e) {}
 }
@@ -628,42 +344,29 @@ function speakText(text) {
     if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel(); 
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    if (currentLang === 'en') utterance.lang = 'en-US';
-    else if (currentLang === 'pt') utterance.lang = 'pt-PT';
-    else utterance.lang = 'uk-UA';
-    
+    if (currentLang === 'en') utterance.lang = 'en-US'; else if (currentLang === 'pt') utterance.lang = 'pt-PT'; else utterance.lang = 'uk-UA';
     utterance.rate = 1.1; 
     window.speechSynthesis.speak(utterance);
 }
 
 function triggerDestroyProtocol() {
     if (confirm("УВАГА! ЗНИЩИТИ ВЕСЬ МАРШРУТ ТА ДАНІ ПРОГРАМИ? / DESTROY ALL DATA?")) {
-        routePoints = []; tracePoints = []; 
-        updateRoute();
+        routePoints = []; tracePoints = []; updateRoute();
         if(traceLineLayer && map) map.removeLayer(traceLineLayer);
-        localStorage.removeItem('savedRoute');
-        currentBearing = null;
-        currentDistanceToTarget = null;
-        document.getElementById('tc-dist').innerText = "--- м";
-        document.getElementById('eco-dist').innerText = "--- м";
+        localStorage.removeItem('savedRoute'); currentBearing = null; currentDistanceToTarget = null;
+        document.getElementById('tc-dist').innerText = "--- м"; document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
-        closeNav();
-        if(navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]); 
+        closeNav(); if(navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 1000]); 
     }
 }
 
 function killApp() {
     if (confirm("ВИМКНУТИ ДОДАТОК? / SHUTDOWN?")) {
         if(watchId) navigator.geolocation.clearWatch(watchId);
-        turnOffCamera();
-        document.body.innerHTML = "<div style='color:#555; text-align:center; margin-top:40vh; font-family:monospace; font-size:1.5rem;'>СИСТЕМА ЗУПИНЕНА</div>";
+        turnOffCamera(); document.body.innerHTML = "<div style='color:#555; text-align:center; margin-top:40vh; font-family:monospace; font-size:1.5rem;'>СИСТЕМА ЗУПИНЕНА</div>";
     }
 }
 
-// ==========================================
-// 3. МЕНЮ ТА КЕРУВАННЯ МОДУЛЯМИ
-// ==========================================
 function openNav() { document.getElementById("side-menu").style.width = "280px"; }
 function closeNav() { document.getElementById("side-menu").style.width = "0"; }
 
@@ -693,9 +396,7 @@ async function showModule(id) {
         if(line) line.style.display = 'none';
         const videoAstro = document.getElementById('v-astro-stream');
         if (videoAstro && videoAstro.srcObject) { 
-            videoAstro.srcObject.getTracks().forEach(t => t.stop()); 
-            videoAstro.srcObject = null; 
-            currentAstroTrack = null; 
+            videoAstro.srcObject.getTracks().forEach(t => t.stop()); videoAstro.srcObject = null; currentAstroTrack = null; 
         }
     }
 }
@@ -704,14 +405,10 @@ function turnOffCamera() {
     try {
         const v = document.getElementById('v-stream');
         if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; currentVideoTrack = null; }
-        
         const vChat = document.getElementById('v-chat-stream');
         if (vChat && vChat.srcObject) { 
-            vChat.srcObject.getTracks().forEach(t => t.stop()); 
-            vChat.srcObject = null; 
-            vChat.style.display = 'none';
-            let btnChatCam = document.getElementById('btn-chat-cam');
-            if(btnChatCam) btnChatCam.innerText = getT('btn_chat_cam');
+            vChat.srcObject.getTracks().forEach(t => t.stop()); vChat.srcObject = null; vChat.style.display = 'none';
+            let btnChatCam = document.getElementById('btn-chat-cam'); if(btnChatCam) btnChatCam.innerText = getT('btn_chat_cam');
         }
     } catch(e) {}
     isAiLive = false; isScanning = false; isScanningQR = false;
@@ -720,13 +417,9 @@ function turnOffCamera() {
     let btnScanQR = document.getElementById('btn-scan-qr'); if(btnScanQR) btnScanQR.style.color = "#0cf";
     let btnScan = document.getElementById('btn-scan'); if(btnScan) { btnScan.innerText = getT('btn_motion'); btnScan.style.color = "#fff"; }
     let aiStats = document.getElementById('ai-stats'); if(aiStats) aiStats.innerText = getT('ai_off');
-    const canvas = document.getElementById('ui-canvas');
-    if(canvas) canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
+    const canvas = document.getElementById('ui-canvas'); if(canvas) canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
 }
 
-// ==========================================
-// 4. МАПА ТА QR-РАЦІЯ
-// ==========================================
 function toggleMapMenu() {
     const m = document.getElementById('map-controls-panel'); const btn = document.getElementById('btn-map-menu');
     if (m.style.display === 'none') { m.style.display = 'flex'; btn.style.color = '#0cf'; btn.style.borderColor = '#0cf'; } 
@@ -749,36 +442,30 @@ function initMap() {
                     userMarker = L.marker([lastGoodGPS.lat, lastGoodGPS.lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri" style="border-bottom-color: #f97316 !important;"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
                 } else {
                     userMarker.setLatLng([lastGoodGPS.lat, lastGoodGPS.lon]);
-                    let tri = document.getElementById('user-tri');
-                    if (tri) tri.style.borderBottomColor = '#f97316'; 
+                    let tri = document.getElementById('user-tri'); if (tri) tri.style.borderBottomColor = '#f97316'; 
                 }
-                isManualPosMode = false;
-                isSignalLost = true; 
+                isManualPosMode = false; isSignalLost = true; 
                 if(routePoints.length > 0) { currentBearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, routePoints[0].lat, routePoints[0].lng); }
                 if(navigator.vibrate) navigator.vibrate(100); playSystemTone(800, 100);
-                let stat = document.getElementById('gps-status');
-                if (stat) { stat.innerText = getT('gps_manual'); stat.style.color = "#f97316"; }
+                let stat = document.getElementById('gps-status'); if (stat) { stat.innerText = getT('gps_manual'); stat.style.color = "#f97316"; }
                 updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
                 return;
             }
 
             pressTimer = setTimeout(() => {
                 if(routePoints.length >= 10) return;
-                if(navigator.vibrate) navigator.vibrate(50);
-                playNavTone(800, 100);
+                if(navigator.vibrate) navigator.vibrate(50); playNavTone(800, 100);
                 routePoints.push(e.latlng); updateRoute();
             }, 700); 
         });
         
         map.on('mouseup mousemove dragstart', () => { clearTimeout(pressTimer); });
-
         map.on('dblclick', (e) => {
             if (isManualPosMode) return;
             if(routePoints.length >= 10) return;
             if(navigator.vibrate) navigator.vibrate(50);
             routePoints.push(e.latlng); updateRoute();
         });
-        
         map.on('dragstart', () => { isMapFollowing = false; document.getElementById('btn-follow').style.color = '#fff'; });
 
         const saved = localStorage.getItem('savedRoute');
@@ -786,11 +473,7 @@ function initMap() {
     } catch(e) {}
 }
 
-document.getElementById('btn-manual-pos').onclick = () => {
-    isManualPosMode = true;
-    alert(getT('alert_man_pos'));
-    toggleMapMenu();
-};
+document.getElementById('btn-manual-pos').onclick = () => { isManualPosMode = true; alert(getT('alert_man_pos')); toggleMapMenu(); };
 
 function updateRoute() {
     if(!map) return;
@@ -799,29 +482,19 @@ function updateRoute() {
 
     if (routePoints.length === 0) {
         document.getElementById('route-info').innerText = getT('comp_target_none');
-        document.getElementById('tc-dist').innerText = "--- м";
-        document.getElementById('eco-dist').innerText = "--- м";
+        document.getElementById('tc-dist').innerText = "--- м"; document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
-        currentBearing = null; 
-        currentDistanceToTarget = null;
+        currentBearing = null; currentDistanceToTarget = null;
         localStorage.removeItem('savedRoute'); return;
     }
 
-    routePoints.forEach((p, i) => { 
-        let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : '#f0f', radius: 8, fillOpacity: 1 }).addTo(map); 
-        routeMarkers.push(m); 
-    });
-    
-    if(routePoints.length > 1) { 
-        routeLine = L.polyline(routePoints, { color: '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); 
-    }
+    routePoints.forEach((p, i) => { let m = L.circleMarker(p, { color: i === 0 ? '#0f0' : '#f0f', radius: 8, fillOpacity: 1 }).addTo(map); routeMarkers.push(m); });
+    if(routePoints.length > 1) { routeLine = L.polyline(routePoints, { color: '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); }
     
     let targetStr = currentLang === 'uk' ? "ЦІЛЬ: ТОЧКА 1 З" : (currentLang === 'pt' ? "ALVO: PONTO 1 DE" : "TGT: POINT 1 OF");
     document.getElementById('route-info').innerText = `${targetStr} ${routePoints.length}`;
     
-    if(lastGoodGPS && routePoints.length > 0) {
-        updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
-    }
+    if(lastGoodGPS && routePoints.length > 0) { updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon); }
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
 
@@ -846,8 +519,7 @@ document.getElementById('btn-share-qr').onclick = () => {
 };
 
 function updateCharCount() {
-    let el = document.getElementById('chat-input');
-    let counter = document.getElementById('char-counter');
+    let el = document.getElementById('chat-input'), counter = document.getElementById('char-counter');
     if(el && counter) {
         let left = 200 - el.value.length;
         let prefix = currentLang === 'uk' ? 'Залишилось:' : (currentLang === 'pt' ? 'Restante:' : 'Remaining:');
@@ -856,27 +528,19 @@ function updateCharCount() {
 }
 
 function encryptData(text) {
-    let encrypted = "";
-    let safeText = encodeURIComponent(text); 
-    for (let i = 0; i < safeText.length; i++) {
-        encrypted += String.fromCharCode(safeText.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
-    }
+    let encrypted = ""; let safeText = encodeURIComponent(text); 
+    for (let i = 0; i < safeText.length; i++) { encrypted += String.fromCharCode(safeText.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length)); }
     return btoa(encrypted); 
 }
 
 function decryptData(encodedText) {
-    let decrypted = "";
-    let decodedStr = atob(encodedText); 
-    for (let i = 0; i < decodedStr.length; i++) {
-        decrypted += String.fromCharCode(decodedStr.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length));
-    }
+    let decrypted = ""; let decodedStr = atob(encodedText); 
+    for (let i = 0; i < decodedStr.length; i++) { decrypted += String.fromCharCode(decodedStr.charCodeAt(i) ^ CRYPTO_KEY.charCodeAt(i % CRYPTO_KEY.length)); }
     return decodeURIComponent(decrypted);
 }
 
 function generateChatQR() {
-    let text = document.getElementById('chat-input').value.trim();
-    if (!text) return;
-    
+    let text = document.getElementById('chat-input').value.trim(); if (!text) return;
     document.getElementById('qrcode-box').innerHTML = '';
     if(typeof QRCode !== 'undefined') {
         let safeText = "SEC:" + encryptData(text);
@@ -885,41 +549,21 @@ function generateChatQR() {
     }
 }
 
-function clearChat() { 
-    document.getElementById('chat-input').value = ''; 
-    updateCharCount();
-}
-
+function clearChat() { document.getElementById('chat-input').value = ''; updateCharCount(); }
 function closeQR() { document.getElementById('qr-modal').style.display = 'none'; }
 
-// ==========================================
-// БЛОК СКАНУВАННЯ (ОПТИКА, ФОТО ТА НОВИЙ ЧАТ)
-// ==========================================
-
 document.getElementById('btn-chat-cam').onclick = async () => {
-    const video = document.getElementById('v-chat-stream');
-    let btn = document.getElementById('btn-chat-cam');
-    
+    const video = document.getElementById('v-chat-stream'); let btn = document.getElementById('btn-chat-cam');
     if (video.srcObject) { 
-        video.srcObject.getTracks().forEach(t => t.stop()); 
-        video.srcObject = null;
-        video.style.display = 'none';
-        btn.innerText = getT('btn_chat_cam');
-        isScanningQR = false;
+        video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; video.style.display = 'none';
+        btn.innerText = getT('btn_chat_cam'); isScanningQR = false;
     } else {
         btn.innerText = "ЗАПУСК...";
         try {
             const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
-            video.srcObject = stream;
-            video.play();
-            video.style.display = 'block';
-            btn.innerText = "⏹ " + getT('btn_cam_off');
-            isScanningQR = true;
-            scanQRChatFrame(); 
-        } catch(e) { 
-            btn.innerText = "❌"; 
-            setTimeout(() => { btn.innerText = getT('btn_chat_cam'); }, 3000); 
-        }
+            video.srcObject = stream; video.play(); video.style.display = 'block';
+            btn.innerText = "⏹ " + getT('btn_cam_off'); isScanningQR = true; scanQRChatFrame(); 
+        } catch(e) { btn.innerText = "❌"; setTimeout(() => { btn.innerText = getT('btn_chat_cam'); }, 3000); }
     }
 };
 
@@ -931,26 +575,18 @@ function scanQRChatFrame() {
         const ctx = canvas.getContext("2d"); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-        
         if (code) {
-            isScanningQR = false; 
-            document.getElementById('btn-chat-cam').innerText = getT('btn_chat_cam');
-            video.srcObject.getTracks().forEach(t => t.stop()); 
-            video.srcObject = null;
-            video.style.display = 'none';
-            processDecodedQR(code.data);
-            return;
+            isScanningQR = false; document.getElementById('btn-chat-cam').innerText = getT('btn_chat_cam');
+            video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; video.style.display = 'none';
+            processDecodedQR(code.data); return;
         }
     }
     requestAnimationFrame(scanQRChatFrame);
 }
 
-
 document.getElementById('btn-scan-qr').onclick = () => {
     const video = document.getElementById('v-stream');
-    if (!video.srcObject) return;
-    if (typeof jsQR === 'undefined') return;
-    
+    if (!video.srcObject || typeof jsQR === 'undefined') return;
     isScanningQR = !isScanningQR;
     document.getElementById('btn-scan-qr').style.color = isScanningQR ? "#4ade80" : "#0cf";
     if (isScanningQR) scanQROpticsFrame();
@@ -964,43 +600,27 @@ function scanQROpticsFrame() {
         const ctx = canvas.getContext("2d"); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-        
         if (code) {
-            isScanningQR = false; 
-            document.getElementById('btn-scan-qr').style.color = "#0cf";
-            processDecodedQR(code.data);
-            return;
+            isScanningQR = false; document.getElementById('btn-scan-qr').style.color = "#0cf";
+            processDecodedQR(code.data); return;
         }
     }
     requestAnimationFrame(scanQROpticsFrame);
 }
 
-document.getElementById('btn-scan-photo').onclick = () => {
-    document.getElementById('qr-file-input').click();
-};
+document.getElementById('btn-scan-photo').onclick = () => { document.getElementById('qr-file-input').click(); };
 
 document.getElementById('qr-file-input').addEventListener('change', function(e) {
-    let file = e.target.files[0];
-    if (!file) return;
-
-    e.target.value = '';
-
+    let file = e.target.files[0]; if (!file) return; e.target.value = '';
     let reader = new FileReader();
     reader.onload = function(event) {
         let img = new Image();
         img.onload = function() {
-            let canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, img.width, img.height);
+            let canvas = document.createElement("canvas"); canvas.width = img.width; canvas.height = img.height;
+            let ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0, img.width, img.height);
             let imageData = ctx.getImageData(0, 0, img.width, img.height);
-            
             const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-
-            if (code) {
-                processDecodedQR(code.data);
-            }
+            if (code) processDecodedQR(code.data);
         };
         img.src = event.target.result;
     };
@@ -1009,32 +629,16 @@ document.getElementById('qr-file-input').addEventListener('change', function(e) 
 
 function processDecodedQR(data) {
     if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
-
-    if (data.startsWith("SEC:")) {
-        try {
-            let msg = decryptData(data.substring(4)); 
-            alert("📥:\n\n" + msg);
-        } catch (err) {}
-        return;
-    }
-    if (data.startsWith("CHAT:")) {
-        try { let msg = decodeURIComponent(data.substring(5)); alert("📥:\n\n" + msg); } catch (err) {} return;
-    }
-    if (data.startsWith("MSG:")) {
-        alert("📥:\n\n" + data.substring(4)); return;
-    }
-    
+    if (data.startsWith("SEC:")) { try { let msg = decryptData(data.substring(4)); alert("📥:\n\n" + msg); } catch (err) {} return; }
+    if (data.startsWith("CHAT:")) { try { let msg = decodeURIComponent(data.substring(5)); alert("📥:\n\n" + msg); } catch (err) {} return; }
+    if (data.startsWith("MSG:")) { alert("📥:\n\n" + data.substring(4)); return; }
     try {
         let pts = JSON.parse(data);
         if (Array.isArray(pts)) {
-            routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute();
-            showModule('mod-map'); 
-            return;
+            routePoints = pts.map(p => L.latLng(p[0], p[1])); updateRoute(); showModule('mod-map'); return;
         }
     } catch(e) {}
 }
-
-// ==========================================
 
 document.getElementById('btn-follow').onclick = () => {
     isMapFollowing = true; document.getElementById('btn-follow').style.color = '#4ade80';
@@ -1049,11 +653,7 @@ document.getElementById('btn-layer-toggle').onclick = () => {
 };
 
 document.getElementById('btn-del-last').onclick = () => { if (routePoints.length > 0) { routePoints.pop(); updateRoute(); } toggleMapMenu(); };
-document.getElementById('btn-clear-map').onclick = () => { 
-    routePoints = []; 
-    updateRoute(); 
-    toggleMapMenu(); 
-};
+document.getElementById('btn-clear-map').onclick = () => { routePoints = []; updateRoute(); toggleMapMenu(); };
 
 document.getElementById('btn-cache-map').onclick = async () => {
     if (!map || !lastGoodGPS) return;
@@ -1073,19 +673,12 @@ let btnTransport = document.getElementById('btn-transport');
 if(btnTransport) {
     btnTransport.onclick = () => {
         isTransportMode = !isTransportMode;
-        if (isTransportMode) {
-            btnTransport.style.color = '#4ade80'; btnTransport.style.borderColor = '#4ade80';
-            compassOffset = 0; 
-        } else {
-            btnTransport.style.color = '#fff'; btnTransport.style.borderColor = '#333';
-        }
+        if (isTransportMode) { btnTransport.style.color = '#4ade80'; btnTransport.style.borderColor = '#4ade80'; compassOffset = 0; } 
+        else { btnTransport.style.color = '#fff'; btnTransport.style.borderColor = '#333'; }
         toggleMapMenu();
     };
 }
 
-// ==========================================
-// 5. РОЗУМНИЙ GPS, АЛЬТИМЕТР ТА ПОВОДИР
-// ==========================================
 function updateSunPosition(lat, lon) {
     let sunAz = getSunAzimuth(lat, lon, new Date());
     let sunMark = document.getElementById('sun-mark');
@@ -1093,44 +686,27 @@ function updateSunPosition(lat, lon) {
 }
 
 function startWalkCalibration() {
-    if (!lastGoodGPS) {
-        alert(getT('alert_no_gps_cal'));
-        return;
-    }
-    isWalkCalibrating = true;
-    walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
-    
-    let calBtn1 = document.getElementById('btn-cal-walk');
-    let calBtn2 = document.getElementById('btn-map-cal'); 
-    
+    if (!lastGoodGPS) { alert(getT('alert_no_gps_cal')); return; }
+    isWalkCalibrating = true; walkStartPoint = { lat: lastGoodGPS.lat, lon: lastGoodGPS.lon };
+    let calBtn1 = document.getElementById('btn-cal-walk'), calBtn2 = document.getElementById('btn-map-cal'); 
     if(calBtn1) { calBtn1.innerText = "15 " + getT('lbl_meters_short'); calBtn1.style.color = "#f1c40f"; }
     if(calBtn2) { calBtn2.innerText = "15"; calBtn2.style.color = "#f1c40f"; }
-    
-    if(navigator.vibrate) navigator.vibrate([100, 100]); 
-    playSystemTone(500, 100);
+    if(navigator.vibrate) navigator.vibrate([100, 100]); playSystemTone(500, 100);
 }
 
 function updateTargetDistance(lat, lon) {
     if (routePoints.length > 0 && map) {
-        let d = map.distance([lat, lon], routePoints[0]);
-        currentDistanceToTarget = d;
-        
+        let d = map.distance([lat, lon], routePoints[0]); currentDistanceToTarget = d;
         let distEl = document.getElementById('tc-dist'); if(distEl) distEl.innerText = Math.round(d) + " m";
         let ecoDistEl = document.getElementById('eco-dist'); if(ecoDistEl) ecoDistEl.innerText = Math.round(d) + " m";
-        
         let prefixTgt = currentLang === 'uk' ? 'ЦІЛЬ:' : (currentLang === 'pt' ? 'ALVO:' : 'TGT:');
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = `${prefixTgt} ${Math.round(d)} m`;
         
         if(d <= 15) { 
             routePoints.shift(); updateRoute(); 
             if(navigator.vibrate) navigator.vibrate([500,200,500]); playSystemTone(1200, 300); 
-        } else { 
-            currentBearing = calcBearing(lat, lon, routePoints[0].lat, routePoints[0].lng); 
-        }
-    } else {
-        currentDistanceToTarget = null;
-        currentBearing = null;
-    }
+        } else { currentBearing = calcBearing(lat, lon, routePoints[0].lat, routePoints[0].lng); }
+    } else { currentDistanceToTarget = null; currentBearing = null; }
 }
 
 function initGPS() {
@@ -1138,85 +714,55 @@ function initGPS() {
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
-            
             currentSpeedKmh = spd ? (spd * 3.6) : 0;
-            
             if (firstFix && acc > 50) return; 
 
             if (tracePoints.length > 0 && map) {
-                let lastP = tracePoints[tracePoints.length - 1];
-                let jumpDist = map.distance(lastP, [lat, lon]);
+                let lastP = tracePoints[tracePoints.length - 1]; let jumpDist = map.distance(lastP, [lat, lon]);
                 if (jumpDist > 100 && acc > 25) return; 
             }
-
             lastGpsProcessTime = now; 
 
             let altText = (alt !== null && alt !== undefined) ? Math.round(alt) + " m" : "--- m";
-            let tcAltEl = document.getElementById('tc-alt');
-            let hudAltEl = document.getElementById('alt-val');
-            let prefixAlt1 = currentLang === 'uk' ? 'ВИСОТА:' : (currentLang === 'pt' ? 'ALT:' : 'ALT:');
-            let prefixAlt2 = currentLang === 'uk' ? 'ВИС:' : (currentLang === 'pt' ? 'ALT:' : 'ALT:');
-
-            if (tcAltEl) tcAltEl.innerText = `${prefixAlt1} ${altText}`;
-            if (hudAltEl) hudAltEl.innerText = `${prefixAlt2} ${altText}`;
+            let tcAltEl = document.getElementById('tc-alt'), hudAltEl = document.getElementById('alt-val');
+            let prefixAlt1 = currentLang === 'uk' ? 'ВИСОТА:' : 'ALT:'; let prefixAlt2 = currentLang === 'uk' ? 'ВИС:' : 'ALT:';
+            if (tcAltEl) tcAltEl.innerText = `${prefixAlt1} ${altText}`; if (hudAltEl) hudAltEl.innerText = `${prefixAlt2} ${altText}`;
 
             let stat = document.getElementById('gps-status');
-            
             if(acc > 200) {
                 if (!gpsLostTimer && !isSignalLost && !isManualPosMode) {
                     gpsLostTimer = setTimeout(() => {
                         if(stat) { stat.innerText = getT('gps_lost'); stat.style.color = "#f33"; }
-                        if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                        playSystemTone(300, 500); 
-                        isSignalLost = true; 
-                        OfflineWizard.start(); 
+                        if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); playSystemTone(300, 500); 
+                        isSignalLost = true; OfflineWizard.start(); 
                     }, 5000);
                 }
             } else {
                 if (gpsLostTimer) { clearTimeout(gpsLostTimer); gpsLostTimer = null; }
-                
                 if(stat && !isManualPosMode) { stat.innerText = getT('gps_ok'); stat.style.color = "#4ade80"; }
-                if(isSignalLost) { 
-                    if(navigator.vibrate) navigator.vibrate([100, 100, 100]); 
-                    playSystemTone(1200, 200); 
-                    isSignalLost = false; 
-                } 
+                if(isSignalLost) { if(navigator.vibrate) navigator.vibrate([100, 100, 100]); playSystemTone(1200, 200); isSignalLost = false; } 
                 if (guideMode && !isEcoMode && now - lastGpsPing > 3000) { if(navigator.vibrate) navigator.vibrate(30); lastGpsPing = now; }
             }
 
             updateTargetDistance(lat, lon);
-
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
             if (isTransportMode && lastGpsCoordsForTransport) {
                 if (currentSpeedKmh > 4) { 
-                    let gpsH = pos.coords.heading;
-                    if (gpsH === null || isNaN(gpsH)) {
-                        gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon);
-                    }
-                    let fakeAlpha = (360 - gpsH) % 360;
-                    handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
+                    let gpsH = pos.coords.heading; if (gpsH === null || isNaN(gpsH)) { gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon); }
+                    let fakeAlpha = (360 - gpsH) % 360; handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
                 }
             }
-            lastGpsCoordsForTransport = { lat, lon };
-
-            lastGoodGPS = { lat, lon };
+            lastGpsCoordsForTransport = { lat, lon }; lastGoodGPS = { lat, lon };
             
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : (currentLang === 'pt' ? 'VEL:' : 'SPD:');
             let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `${prefixSpd} ${currentSpeedKmh.toFixed(1)} km/h`;
-            
             let coordsEl = document.getElementById('tc-coords-small'); if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
-            
             let prefixAcc = currentLang === 'uk' ? 'ТОЧН:' : (currentLang === 'pt' ? 'PRE:' : 'ACC:');
             let accEl = document.getElementById('tc-acc'); if(accEl) accEl.innerText = `${prefixAcc} ${Math.round(acc)}m`;
 
-            tracePoints.push([lat, lon]);
-            if(tracePoints.length > 200) tracePoints.shift(); 
-            if(map) {
-                if(traceLineLayer) map.removeLayer(traceLineLayer);
-                traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map);
-            }
-            
+            tracePoints.push([lat, lon]); if(tracePoints.length > 200) tracePoints.shift(); 
+            if(map) { if(traceLineLayer) map.removeLayer(traceLineLayer); traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map); }
             updateSunPosition(lat, lon);
 
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
@@ -1226,52 +772,31 @@ function initGPS() {
                 userMarker = L.marker([lat, lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
             } else if(userMarker) { 
                 userMarker.setLatLng([lat, lon]); 
-                if (!isOfflineTracking && !isManualPosMode) {
-                    let tri = document.getElementById('user-tri');
-                    if(tri) tri.style.borderBottomColor = ''; 
-                }
+                if (!isOfflineTracking && !isManualPosMode) { let tri = document.getElementById('user-tri'); if(tri) tri.style.borderBottomColor = ''; }
             }
 
             if(isWalkCalibrating && walkStartPoint && map) {
                 let d = map.distance([walkStartPoint.lat, walkStartPoint.lon], [lat, lon]);
                 let remaining = Math.max(0, 15 - Math.round(d));
-                
-                let calBtn1 = document.getElementById('btn-cal-walk');
-                let calBtn2 = document.getElementById('btn-map-cal');
-
-                if(calBtn1) calBtn1.innerText = remaining + " " + getT('lbl_meters_short');
-                if(calBtn2) calBtn2.innerText = remaining;
+                let calBtn1 = document.getElementById('btn-cal-walk'), calBtn2 = document.getElementById('btn-map-cal');
+                if(calBtn1) calBtn1.innerText = remaining + " " + getT('lbl_meters_short'); if(calBtn2) calBtn2.innerText = remaining;
 
                 if(d >= 15) {
                     compassOffset = (calcBearing(walkStartPoint.lat, walkStartPoint.lon, lat, lon) - hardwareHeading + 360) % 360;
                     isWalkCalibrating = false;
-                    
                     if(calBtn1) { calBtn1.innerText = getT('cal_done'); calBtn1.style.color = "#4ade80"; }
                     if(calBtn2) { calBtn2.innerText = "OK"; calBtn2.style.color = "#4ade80"; }
-                    
-                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]); 
-                    playSystemTone(800, 200);
-                    
-                    setTimeout(() => { 
-                        if(calBtn1) { calBtn1.innerText = getT('btn_cal_walk'); calBtn1.style.color = "#fff"; }
-                        if(calBtn2) { calBtn2.innerText = "15м"; calBtn2.style.color = "#f1c40f"; }
-                    }, 5000);
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]); playSystemTone(800, 200);
+                    setTimeout(() => { if(calBtn1) { calBtn1.innerText = getT('btn_cal_walk'); calBtn1.style.color = "#fff"; } if(calBtn2) { calBtn2.innerText = "15м"; calBtn2.style.color = "#f1c40f"; } }, 5000);
                 }
             }
         }, err => {
-            let stat = document.getElementById('gps-status');
-            if(stat && !isManualPosMode) { stat.innerText = getT('gps_offline'); stat.style.color = "#f33"; }
-            if(!isSignalLost && !isManualPosMode) { 
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); 
-                playSystemTone(300, 500); 
-                isSignalLost = true; 
-                OfflineWizard.start(); 
-            }
+            let stat = document.getElementById('gps-status'); if(stat && !isManualPosMode) { stat.innerText = getT('gps_offline'); stat.style.color = "#f33"; }
+            if(!isSignalLost && !isManualPosMode) { if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 1000]); playSystemTone(300, 500); isSignalLost = true; OfflineWizard.start(); }
         }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }); 
     }
 }
 
-// === ОНОВЛЕНИЙ БЛОК КОМПАСА ТА ЗГЛАДЖУВАННЯ ===
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
@@ -1279,40 +804,22 @@ function handleOrientation(e) {
     currentPitch = e.beta || 0;
     currentRoll = e.gamma || 0;
 
-    if (e.webkitCompassHeading !== undefined) {
-        hw = e.webkitCompassHeading;
-    } else {
-        if (e.type === 'deviceorientationabsolute' || e.absolute === true) {
-            hasAbsoluteOrientation = true;
-        }
-        if (e.type === 'deviceorientation' && hasAbsoluteOrientation) {
-            return;
-        }
-        if (e.alpha !== null) {
-            hw = 360 - e.alpha; 
-        } else {
-            return;
-        }
+    if (e.webkitCompassHeading !== undefined) { hw = e.webkitCompassHeading; } else {
+        if (e.type === 'deviceorientationabsolute' || e.absolute === true) { hasAbsoluteOrientation = true; }
+        if (e.type === 'deviceorientation' && hasAbsoluteOrientation) { return; }
+        if (e.alpha !== null) { hw = 360 - e.alpha; } else { return; }
     }
     
     hardwareHeading = hw;
-    let trueH = (hardwareHeading + compassOffset) % 360;
-    if (trueH < 0) trueH += 360;
+    let trueH = (hardwareHeading + compassOffset) % 360; if (trueH < 0) trueH += 360;
     
     if (isFirstCompassUpdate) {
-        currentDisplayAngle = trueH;
-        targetDisplayAngle = trueH;
-        displayPitch = currentPitch;
-        displayRoll = currentRoll;
-        isFirstCompassUpdate = false;
-        updateCompassUI(); 
+        currentDisplayAngle = trueH; targetDisplayAngle = trueH;
+        displayPitch = currentPitch; displayRoll = currentRoll;
+        isFirstCompassUpdate = false; updateCompassUI(); 
     } else {
         targetDisplayAngle = trueH;
-        
-        if (!isCompassAnimating) {
-            isCompassAnimating = true;
-            requestAnimationFrame(animateCompass);
-        }
+        if (!isCompassAnimating) { isCompassAnimating = true; requestAnimationFrame(animateCompass); }
     }
 }
 
@@ -1320,9 +827,12 @@ function animateCompass() {
     let delta = targetDisplayAngle - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
 
-    let smoothing = isTransportMode ? 0.02 : 0.15;
+    // Трохи збільшуємо згладжування, щоб горизонт не стрибав
+    let smoothing = isTransportMode ? 0.02 : 0.1;
     
     currentDisplayAngle += delta * smoothing; 
+    
+    // Стабілізація лінії горизонту
     displayPitch += (currentPitch - displayPitch) * smoothing;
     displayRoll += (currentRoll - displayRoll) * smoothing;
     
@@ -1337,28 +847,21 @@ function animateCompass() {
         return;
     }
 
-    if (isCompassAnimating) {
-        requestAnimationFrame(animateCompass);
-    }
+    if (isCompassAnimating) { requestAnimationFrame(animateCompass); }
 }
 
 function updateCompassUI() {
     let displayDeg = Math.round(((currentDisplayAngle % 360) + 360) % 360);
     
     if (!isEcoMode) {
-        let ring = document.getElementById('tc-ring'); 
-        let deg = document.getElementById('tc-deg');
+        let ring = document.getElementById('tc-ring'); let deg = document.getElementById('tc-deg');
         if(ring) ring.style.transform = `rotate(${-currentDisplayAngle}deg)`;
         if(deg) deg.innerText = displayDeg + "°"; 
         
-        let tri = document.getElementById('user-tri'); 
-        if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
+        let tri = document.getElementById('user-tri'); if(tri) tri.style.transform = `rotate(${currentDisplayAngle}deg)`;
 
         let clinoBar = document.getElementById('clino-bar');
-        if(clinoBar) { 
-            let boundedPitch = Math.max(-90, Math.min(90, displayPitch)); 
-            clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; 
-        }
+        if(clinoBar) { let boundedPitch = Math.max(-90, Math.min(90, displayPitch)); clinoBar.style.bottom = (100 - (((boundedPitch + 90) / 180) * 100)) + '%'; }
     }
 
     if (currentBearing !== null) {
@@ -1367,11 +870,7 @@ function updateCompassUI() {
 
         if (!isEcoMode) {
             let arr = document.getElementById('tc-arrow');
-            if (arr) { 
-                arr.style.display = 'block'; 
-                arr.style.transform = `rotate(${relAngle}deg)`; 
-                arr.style.borderBottomColor = 'var(--danger)';
-            }
+            if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; arr.style.borderBottomColor = 'var(--danger)'; }
         }
 
         if (isEcoMode && isEcoPeeking) {
@@ -1382,96 +881,15 @@ function updateCompassUI() {
             else if (relMod >= 225 && relMod < 315) document.getElementById('eco-left').style.opacity = '1';
         }
 
-        let astroMod = document.getElementById('mod-astro');
-        if (astroMod && astroMod.classList.contains('active')) {
-            if (currentDistanceToTarget !== null) {
-                document.getElementById('astro-dist-text').innerText = Math.round(currentDistanceToTarget) + " m";
-            }
-            
-            let elevation = displayPitch - horizonBeta;
-            let astroHint = document.getElementById('astro-hint');
-            if (astroHint) {
-                let prefixAz = currentLang === 'uk' ? 'АЗИМУТ' : (currentLang === 'pt' ? 'AZIMUTE' : 'AZIMUTH');
-                let prefixAlt = currentLang === 'uk' ? 'ВИСОТА' : (currentLang === 'pt' ? 'ALTITUDE' : 'ALTITUDE');
-                astroHint.innerHTML = `${prefixAz}: ${displayDeg}° | ${prefixAlt}: ${Math.round(elevation)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(${getT('astro_hint')})</span>`;
-            }
-
-            let astroStencil = document.getElementById('astro-stencil');
-            let astroStencilFixed = document.getElementById('astro-stencil-fixed'); 
-            let horizonLine = document.getElementById('astro-horizon-line'); 
-            
-            let aLeft = document.getElementById('astro-dir-left');
-            let aRight = document.getElementById('astro-dir-right');
-            let aTop = document.getElementById('astro-dir-top');
-            let aBottom = document.getElementById('astro-dir-bottom');
-            let aMsg = document.getElementById('astro-target-msg');
-            let astroPointer = document.getElementById('astro-pointer');
-            
-            if (astroStencil && astroStencilFixed) {
-                let diffAz = (((0 - displayDeg) % 360) + 540) % 360 - 180; 
-                let diffPitch = 48 - elevation; 
-
-                let screenW = window.innerWidth || 360;
-                let pDeg = screenW / 50; 
-                
-                let tx = diffAz * pDeg; 
-                let ty = -diffPitch * pDeg; 
-
-                let d = new Date();
-                let month = d.getMonth() + 1;
-                let hour = d.getHours() + (d.getMinutes() / 60);
-                let siderealAngle = (month * 30 + hour * 15) % 360;
-
-                astroStencilFixed.style.transform = `translate(${tx}px, ${ty}px)`;
-                
-                astroStencil.style.transformOrigin = "50% 50%";
-                astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
-
-                if (horizonLine) {
-                    let tyHor = elevation * pDeg;
-                    horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-displayRoll}deg)`;
-                }
-
-                let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20));
-                let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
-
-                aLeft.style.opacity = diffAz > 10 ? opAz : '0';
-                aRight.style.opacity = diffAz < -10 ? opAz : '0';
-                aTop.style.opacity = diffPitch > 10 ? opPitch : '0';
-                aBottom.style.opacity = diffPitch < -10 ? opPitch : '0';
-
-                if (Math.abs(diffAz) <= 5 && Math.abs(diffPitch) <= 5) {
-                    astroStencil.classList.add('astro-target-locked');
-                    astroStencilFixed.classList.add('astro-target-locked');
-                    aMsg.style.display = 'block';
-                    if (astroPointer) astroPointer.style.display = 'none';
-                } else {
-                    astroStencil.classList.remove('astro-target-locked');
-                    astroStencilFixed.classList.remove('astro-target-locked');
-                    aMsg.style.display = 'none';
-                    if (astroPointer) {
-                        astroPointer.style.display = 'block';
-                        let angleRad = Math.atan2(diffPitch, diffAz);
-                        let arrowDeg = 90 - (angleRad * 180 / Math.PI);
-                        astroPointer.style.transform = `translate(-50%, -50%) rotate(${arrowDeg}deg) translateY(-100px)`;
-                    }
-                }
-            }
-        }
-
         if ((guideMode || isVoiceEnabled) && (!isSignalLost || isManualPosMode)) {
             const timeNow = Date.now();
             let relativeAngle = (((currentBearing - displayDeg) % 360) + 540) % 360 - 180; 
             let absDiff = Math.abs(relativeAngle);
             
             if (guideMode) {
-                if (absDiff <= 5) {
-                    if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); lastVibroTime = timeNow; }
-                } else if (absDiff <= 15) {
-                    if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; }
-                } else if (absDiff <= 30) {
-                    if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); lastVibroTime = timeNow; }
-                }
+                if (absDiff <= 5) { if (timeNow - lastVibroTime > 200) { if (navigator.vibrate) navigator.vibrate(100); lastVibroTime = timeNow; } } 
+                else if (absDiff <= 15) { if (timeNow - lastVibroTime > 600) { if (navigator.vibrate) navigator.vibrate(50); lastVibroTime = timeNow; } } 
+                else if (absDiff <= 30) { if (timeNow - lastVibroTime > 1500) { if (navigator.vibrate) navigator.vibrate(30); lastVibroTime = timeNow; } }
             }
 
             let voiceIntervalMs = parseInt(document.getElementById('voice-interval') ? document.getElementById('voice-interval').value : 10) * 1000;
@@ -1479,192 +897,139 @@ function updateCompassUI() {
             if (isVoiceEnabled && (timeNow - lastVoiceTime > voiceIntervalMs)) {
                 if (currentDistanceToTarget !== null) {
                     let d = Math.round(currentDistanceToTarget);
-                    let txtDist = getT('voice_dist');
-                    let txtMeters = getT('voice_meters');
-
-                    if (isEcoMode) {
-                        speakText(`${txtDist} ${d} ${txtMeters}.`);
-                        lastVoiceTime = timeNow;
-                    } else if (currentSpeedKmh > 1.5 || isManualPosMode) {
-                        if (absDiff > 120) {
-                            speakText(`${getT('voice_turn')} ${txtDist} ${d} ${txtMeters}.`);
-                            lastVoiceTime = timeNow;
-                        } 
+                    let txtDist = getT('voice_dist'); let txtMeters = getT('voice_meters');
+                    if (isEcoMode) { speakText(`${txtDist} ${d} ${txtMeters}.`); lastVoiceTime = timeNow; } 
+                    else if (currentSpeedKmh > 1.5 || isManualPosMode) {
+                        if (absDiff > 120) { speakText(`${getT('voice_turn')} ${txtDist} ${d} ${txtMeters}.`); lastVoiceTime = timeNow; } 
                         else if (absDiff > 25) {
                             let dirText = relativeAngle > 0 ? getT('voice_right') : getT('voice_left');
-                            speakText(`${dirText} ${txtDist} ${d} ${txtMeters}.`);
-                            lastVoiceTime = timeNow;
+                            speakText(`${dirText} ${txtDist} ${d} ${txtMeters}.`); lastVoiceTime = timeNow;
                         }
                     }
                 }
             }
         }
     } else {
-        if (!isEcoMode) {
-            let relAngle = 0 - currentDisplayAngle;
-            let arr = document.getElementById('tc-arrow');
-            if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; }
-        }
+        if (!isEcoMode) { let relAngle = 0 - currentDisplayAngle; let arr = document.getElementById('tc-arrow'); if (arr) { arr.style.display = 'block'; arr.style.transform = `rotate(${relAngle}deg)`; } }
         if (isEcoMode) document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
+    }
+    
+    // === ОНОВЛЕНИЙ АСТРО-ТРЕНАЖЕР (СПРАВЖНІЙ ЗОРЯНИЙ ЧАС ТА ПРИЦІЛ) ===
+    let astroMod = document.getElementById('mod-astro');
+    if (astroMod && astroMod.classList.contains('active')) {
+        let elevation = displayPitch - horizonBeta;
+        let astroHint = document.getElementById('astro-hint');
+        if (astroHint) {
+            let prefixAz = currentLang === 'uk' ? 'АЗИМУТ' : (currentLang === 'pt' ? 'AZIMUTE' : 'AZIMUTH');
+            let prefixAlt = currentLang === 'uk' ? 'ВИСОТА' : (currentLang === 'pt' ? 'ALTITUDE' : 'ALTITUDE');
+            astroHint.innerHTML = `${prefixAz}: ${displayDeg}° | ${prefixAlt}: ${Math.round(elevation)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(${getT('astro_hint')})</span>`;
+        }
+
+        let astroStencil = document.getElementById('astro-stencil');
+        let astroStencilFixed = document.getElementById('astro-stencil-fixed'); 
+        let horizonLine = document.getElementById('astro-horizon-line'); 
+        let aLeft = document.getElementById('astro-dir-left'), aRight = document.getElementById('astro-dir-right');
+        let aTop = document.getElementById('astro-dir-top'), aBottom = document.getElementById('astro-dir-bottom');
+        let aMsg = document.getElementById('astro-target-msg');
         
-        let astroMod = document.getElementById('mod-astro');
-        if (astroMod && astroMod.classList.contains('active')) {
-            document.getElementById('astro-dist-text').innerText = getT('comp_target_none');
-            document.getElementById('astro-dir-left').style.opacity = '0';
-            document.getElementById('astro-dir-right').style.opacity = '0';
-            document.getElementById('astro-dir-top').style.opacity = '0';
-            document.getElementById('astro-dir-bottom').style.opacity = '0';
+        if (astroStencil && astroStencilFixed) {
+            let diffAz = (((0 - displayDeg) % 360) + 540) % 360 - 180; 
             
-            let elevation = displayPitch - horizonBeta;
-            let astroHint = document.getElementById('astro-hint');
-            if (astroHint) {
-                let prefixAz = currentLang === 'uk' ? 'АЗИМУТ' : (currentLang === 'pt' ? 'AZIMUTE' : 'AZIMUTH');
-                let prefixAlt = currentLang === 'uk' ? 'ВИСОТА' : (currentLang === 'pt' ? 'ALTITUDE' : 'ALTITUDE');
-                astroHint.innerHTML = `${prefixAz}: ${displayDeg}° | ${prefixAlt}: ${Math.round(elevation)}°<br><span style="color:#f1c40f; font-size:0.8rem;">(${getT('astro_hint')})</span>`;
+            // ТЕПЕР ВИСОТА ЗІРКИ ДОМІВНЮЄ ШИРОТІ БІЙЦЯ!
+            let userLat = lastGoodGPS ? lastGoodGPS.lat : 49.0;
+            let diffPitch = userLat - elevation; 
+
+            let screenW = window.innerWidth || 360;
+            let pDeg = screenW / 50; 
+            
+            let tx = diffAz * pDeg; 
+            let ty = -diffPitch * pDeg; 
+
+            // РЕАЛЬНА ФОРМУЛА РОЗРАХУНКУ ЗОРЯНОГО ЧАСУ (GMST/LST)
+            let d = new Date();
+            let jd = (d.getTime() / 86400000.0) + 2440587.5;
+            let dDays = jd - 2451545.0;
+            let gmst = 280.46061837 + 360.98564736629 * dDays;
+            let userLon = lastGoodGPS ? lastGoodGPS.lon : 31.0;
+            let lst = (gmst + userLon) % 360;
+            if (lst < 0) lst += 360;
+            
+            // Задаємо кут повороту Ковша відносно Півночі
+            let siderealAngle = lst;
+
+            astroStencilFixed.style.transform = `translate(${tx}px, ${ty}px)`;
+            astroStencil.style.transformOrigin = "50% 50%";
+            astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
+
+            if (horizonLine) {
+                let tyHor = elevation * pDeg;
+                horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-displayRoll}deg)`;
             }
 
-            let astroStencil = document.getElementById('astro-stencil');
-            let astroStencilFixed = document.getElementById('astro-stencil-fixed');
-            let horizonLine = document.getElementById('astro-horizon-line');
-            let aMsg = document.getElementById('astro-target-msg');
-            let astroPointer = document.getElementById('astro-pointer');
-            
-            if (astroStencil && astroStencilFixed) {
-                let diffAz = (((0 - displayDeg) % 360) + 540) % 360 - 180;
-                let diffPitch = 48 - elevation; 
+            let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20));
+            let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
 
-                let screenW = window.innerWidth || 360;
-                let pDeg = screenW / 50; 
-                
-                let tx = diffAz * pDeg; 
-                let ty = -diffPitch * pDeg; 
+            aLeft.style.opacity = diffAz > 10 ? opAz : '0';
+            aRight.style.opacity = diffAz < -10 ? opAz : '0';
+            aTop.style.opacity = diffPitch > 10 ? opPitch : '0';
+            aBottom.style.opacity = diffPitch < -10 ? opPitch : '0';
 
-                let d = new Date();
-                let month = d.getMonth() + 1;
-                let hour = d.getHours() + (d.getMinutes() / 60);
-                let siderealAngle = (month * 30 + hour * 15) % 360;
-
-                astroStencilFixed.style.transform = `translate(${tx}px, ${ty}px)`;
-                
-                astroStencil.style.transformOrigin = "50% 50%";
-                astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
-
-                if (horizonLine) {
-                    let tyHor = elevation * pDeg;
-                    horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-displayRoll}deg)`;
-                }
-
-                let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20));
-                let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
-
-                let aLeft = document.getElementById('astro-dir-left');
-                let aRight = document.getElementById('astro-dir-right');
-                let aTop = document.getElementById('astro-dir-top');
-                let aBottom = document.getElementById('astro-dir-bottom');
-
-                aLeft.style.opacity = diffAz > 10 ? opAz : '0';
-                aRight.style.opacity = diffAz < -10 ? opAz : '0';
-                aTop.style.opacity = diffPitch > 10 ? opPitch : '0';
-                aBottom.style.opacity = diffPitch < -10 ? opPitch : '0';
-
-                if (Math.abs(diffAz) <= 5 && Math.abs(diffPitch) <= 5) {
-                    astroStencil.classList.add('astro-target-locked');
-                    astroStencilFixed.classList.add('astro-target-locked');
-                    aMsg.style.display = 'block';
-                    if (astroPointer) astroPointer.style.display = 'none';
-                } else {
-                    astroStencil.classList.remove('astro-target-locked');
-                    astroStencilFixed.classList.remove('astro-target-locked');
-                    aMsg.style.display = 'none';
-                    if (astroPointer) {
-                        astroPointer.style.display = 'block';
-                        let angleRad = Math.atan2(diffPitch, diffAz);
-                        let arrowDeg = 90 - (angleRad * 180 / Math.PI);
-                        astroPointer.style.transform = `translate(-50%, -50%) rotate(${arrowDeg}deg) translateY(-100px)`;
-                    }
-                }
+            // Якщо зірка в прицілі (+/- 5 градусів)
+            if (Math.abs(diffAz) <= 5 && Math.abs(diffPitch) <= 5) {
+                astroStencil.classList.add('astro-target-locked');
+                astroStencilFixed.classList.add('astro-target-locked');
+                aMsg.style.display = 'block';
+            } else {
+                astroStencil.classList.remove('astro-target-locked');
+                astroStencilFixed.classList.remove('astro-target-locked');
+                aMsg.style.display = 'none';
             }
         }
     }
 }
 
-// Кнопка перемикання Голосу
 document.getElementById('btn-guide-voice').onclick = async () => { 
     isVoiceEnabled = !isVoiceEnabled; 
-    let btn = document.getElementById('btn-guide-voice'); 
-    let settings = document.getElementById('voice-settings');
+    let btn = document.getElementById('btn-guide-voice'), settings = document.getElementById('voice-settings');
     btn.innerText = isVoiceEnabled ? getT('btn_voice_on') : getT('btn_voice_off'); 
     btn.style.color = isVoiceEnabled ? "#4ade80" : "#ccc"; 
-    
-    if (isVoiceEnabled) {
-        if(settings) settings.style.display = 'block';
-    } else {
-        if(settings) settings.style.display = 'none';
-    }
+    if (isVoiceEnabled) { if(settings) settings.style.display = 'block'; } else { if(settings) settings.style.display = 'none'; }
 };
 
 let voiceSlider = document.getElementById('voice-interval');
-if (voiceSlider) {
-    voiceSlider.oninput = (e) => {
-        let valEl = document.getElementById('voice-interval-val');
-        if (valEl) valEl.innerText = e.target.value;
-    };
-}
+if (voiceSlider) { voiceSlider.oninput = (e) => { let valEl = document.getElementById('voice-interval-val'); if (valEl) valEl.innerText = e.target.value; }; }
 
-// Кнопка перемикання Вібро
 document.getElementById('btn-guide').onclick = async () => { 
     await initSensors(); guideMode = !guideMode; 
     let btn = document.getElementById('btn-guide'); 
-    btn.innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off'); 
-    btn.style.color = guideMode ? "#4ade80" : "#558"; 
+    btn.innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off'); btn.style.color = guideMode ? "#4ade80" : "#558"; 
 };
 
-// --- КАЛІБРУВАННЯ ГОРИЗОНТУ ---
 document.getElementById('btn-astro-horizon').onclick = () => {
     horizonBeta = currentPitch;
-    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    playSystemTone(800, 100);
+    if(navigator.vibrate) navigator.vibrate([100, 50, 100]); playSystemTone(800, 100);
     alert(`${getT('astro_hor_fix')} (${Math.round(horizonBeta)}°).\n${getT('astro_hor_next')}`);
 };
 
 function toggleEcoMode(state) { 
-    isEcoMode = state; 
-    const overlay = document.getElementById('eco-overlay'); 
-    if (state) { 
-        overlay.style.display = 'block'; 
-        if(navigator.vibrate) navigator.vibrate(100); 
-        playSystemTone(500, 100); 
-    } else { 
-        overlay.style.display = 'none'; 
-        isEcoPeeking = false; 
-    } 
+    isEcoMode = state; const overlay = document.getElementById('eco-overlay'); 
+    if (state) { overlay.style.display = 'block'; if(navigator.vibrate) navigator.vibrate(100); playSystemTone(500, 100); } 
+    else { overlay.style.display = 'none'; isEcoPeeking = false; } 
 }
 
-// НОВА ЛОГІКА ТАПУ В ЕКО-РЕЖИМІ (Озвучка відстані)
 function peekEco() { 
     if (!isEcoMode || isEcoPeeking) return; 
     isEcoPeeking = true; 
-    document.getElementById('eco-content').style.opacity = '1'; 
-    document.getElementById('eco-touch-area').style.color = '#000'; 
-    if(navigator.vibrate) navigator.vibrate(50); 
-    playSystemTone(800, 50); 
-    
-    if (isVoiceEnabled && currentDistanceToTarget !== null) {
-        speakText(`${getT('voice_dist')} ${Math.round(currentDistanceToTarget)} ${getT('voice_meters')}.`);
-    }
-    
+    document.getElementById('eco-content').style.opacity = '1'; document.getElementById('eco-touch-area').style.color = '#000'; 
+    if(navigator.vibrate) navigator.vibrate(50); playSystemTone(800, 50); 
+    if (isVoiceEnabled && currentDistanceToTarget !== null) { speakText(`${getT('voice_dist')} ${Math.round(currentDistanceToTarget)} ${getT('voice_meters')}.`); }
     clearTimeout(ecoPeekTimer); 
     ecoPeekTimer = setTimeout(() => { 
-        document.getElementById('eco-content').style.opacity = '0'; 
-        document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); 
-        document.getElementById('eco-touch-area').style.color = '#222'; 
-        isEcoPeeking = false; 
+        document.getElementById('eco-content').style.opacity = '0'; document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0'); 
+        document.getElementById('eco-touch-area').style.color = '#222'; isEcoPeeking = false; 
     }, 3000); 
 }
 
-// ==========================================
-// 6. АСТРО-КАЛІБРУВАННЯ
-// ==========================================
 function getSunAzimuth(lat, lon, date) {
     let rad = Math.PI / 180; let start = new Date(date.getFullYear(), 0, 0);
     let diff = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000;
@@ -1686,23 +1051,16 @@ document.getElementById('btn-astro-sun').onclick = () => {
     if(!lastGoodGPS) return;
     let az = getSunAzimuth(lastGoodGPS.lat, lastGoodGPS.lon, new Date());
     compassOffset = (az - hardwareHeading + 360) % 360; 
-    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-    playSystemTone(800, 100);
-    alert(getT('astro_sun_fix'));
-    OfflineWizard.finish();
+    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 100);
+    alert(getT('astro_sun_fix')); OfflineWizard.finish();
 };
 
 document.getElementById('btn-astro-star').onclick = () => {
     compassOffset = (0 - hardwareHeading + 360) % 360; 
-    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-    playSystemTone(800, 100);
-    alert(getT('astro_star_fix'));
-    OfflineWizard.finish();
+    if(navigator.vibrate) navigator.vibrate([200, 100, 200]); playSystemTone(800, 100);
+    alert(getT('astro_star_fix')); OfflineWizard.finish();
 };
 
-// ==========================================
-// 7. ОПТИКА, ЗУМ ТА ШІ
-// ==========================================
 let prevFrame = null;
 function processCamera() {
     const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
@@ -1717,8 +1075,7 @@ function processCamera() {
                 let diff = 0; for (let i=0; i<currFrame.length; i+=4) diff += Math.abs(currFrame[i]-prevFrame[i]);
                 let lvl = (diff / 3133440) * 1000;
                 if (lvl > 20) {
-                    if(navigator.vibrate) navigator.vibrate(50);
-                    playSystemTone(900, 100);
+                    if(navigator.vibrate) navigator.vibrate(50); playSystemTone(900, 100);
                     let scanBtn = document.getElementById('btn-scan');
                     if(scanBtn) { scanBtn.style.backgroundColor = "#f00"; setTimeout(()=>{ scanBtn.style.backgroundColor = "#111"; }, 150); }
                 }
@@ -1753,8 +1110,7 @@ document.getElementById('btn-cam').onclick = async () => {
         btn.innerText = "ЗАПУСК...";
         try {
             const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
-            video.srcObject = stream;
-            currentVideoTrack = stream.getVideoTracks()[0];
+            video.srcObject = stream; currentVideoTrack = stream.getVideoTracks()[0];
             setTimeout(() => {
                 const capabilities = currentVideoTrack.getCapabilities();
                 if (capabilities.zoom) {
@@ -1811,7 +1167,6 @@ async function detectAI() {
                 }
             }
         });
-        
         let prefixP = currentLang === 'uk' ? 'ЛЮДИ:' : (currentLang === 'pt' ? 'PESSOAS:' : 'PEOPLE:');
         let prefixV = currentLang === 'uk' ? 'ТЕХНІКА:' : (currentLang === 'pt' ? 'VEÍCULOS:' : 'VEHICLES:');
         document.getElementById('ai-stats').innerHTML = `${prefixP} ${pCount} | ${prefixV} ${vCount}`;
@@ -1819,9 +1174,6 @@ async function detectAI() {
     if(isAiLive) requestAnimationFrame(detectAI);
 }
 
-// ==========================================
-// 8. ЩИТ ТА МАТЕМАТИКА
-// ==========================================
 document.getElementById('btn-shield').onclick = async () => { 
     await initSensors(); isShielded = !isShielded; 
     let btn = document.getElementById('btn-shield');
@@ -1832,8 +1184,7 @@ document.getElementById('btn-shield').onclick = async () => {
 document.getElementById('btn-shield-sound').onclick = async () => { 
     await initSensors(); shieldSound = !shieldSound; 
     let btn = document.getElementById('btn-shield-sound'); 
-    btn.innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off'); 
-    btn.style.color = shieldSound ? "#4ade80" : "#fff"; 
+    btn.innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off'); btn.style.color = shieldSound ? "#4ade80" : "#fff"; 
 };
 
 window.addEventListener('devicemotion', e => {
@@ -1849,72 +1200,19 @@ function calcBearing(lat1, lon1, lat2, lon2) {
     return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 }
 
-// ==========================================
-// 9. МЕНЕДЖЕР АВТОНОМНОГО РЕЖИМУ ТА КРОКОМІР
-// ==========================================
 const OfflineWizard = {
-    isActive: false,
-    currentStep: 0,
-
-    start() {
-        if (confirm("⚠️ Супутники втрачено. Перейти в автономний режим (Крокомір + Астро)? / ENTER OFFLINE MODE?")) {
-            this.isActive = true;
-            this.step1_SetStart();
-        }
-    },
-
-    step1_SetStart() {
-        this.currentStep = 1;
-        isManualPosMode = true; 
-        showModule('mod-map');
-        
-        document.getElementById('wizard-panel').style.display = 'block';
-        document.getElementById('wizard-btn-next').style.display = 'none';
-    },
-
-    onStartPointSet() {
-        if (this.currentStep === 1) this.step2_CheckDestination();
-    },
-
-    step2_CheckDestination() {
-        this.currentStep = 2;
-        if (routePoints.length > 0) {
-            document.getElementById('wizard-btn-next').style.display = 'block';
-        }
-    },
-
-    onDestinationSet() {
-        if (this.currentStep === 2) {
-            document.getElementById('wizard-btn-next').style.display = 'block';
-        }
-    },
-
-    next() {
-        if (this.currentStep === 2) this.step3_AstroCalibrate();
-    },
-
-    step3_AstroCalibrate() {
-        this.currentStep = 3;
-        showModule('mod-astro'); 
-        document.getElementById('wizard-btn-next').style.display = 'none';
-    },
-
-    finish() {
-        if (this.isActive) {
-            this.isActive = false;
-            document.getElementById('wizard-panel').style.display = 'none';
-            toggleOfflineTracking(true); 
-        }
-    },
-
-    cancel() {
-        this.isActive = false;
-        isManualPosMode = false;
-        document.getElementById('wizard-panel').style.display = 'none';
-    }
+    isActive: false, currentStep: 0,
+    start() { if (confirm("⚠️ Супутники втрачено. Перейти в автономний режим (Крокомір + Астро)? / ENTER OFFLINE MODE?")) { this.isActive = true; this.step1_SetStart(); } },
+    step1_SetStart() { this.currentStep = 1; isManualPosMode = true; showModule('mod-map'); document.getElementById('wizard-panel').style.display = 'block'; document.getElementById('wizard-btn-next').style.display = 'none'; },
+    onStartPointSet() { if (this.currentStep === 1) this.step2_CheckDestination(); },
+    step2_CheckDestination() { this.currentStep = 2; if (routePoints.length > 0) { document.getElementById('wizard-btn-next').style.display = 'block'; } },
+    onDestinationSet() { if (this.currentStep === 2) { document.getElementById('wizard-btn-next').style.display = 'block'; } },
+    next() { if (this.currentStep === 2) this.step3_AstroCalibrate(); },
+    step3_AstroCalibrate() { this.currentStep = 3; showModule('mod-astro'); document.getElementById('wizard-btn-next').style.display = 'none'; },
+    finish() { if (this.isActive) { this.isActive = false; document.getElementById('wizard-panel').style.display = 'none'; toggleOfflineTracking(true); } },
+    cancel() { this.isActive = false; isManualPosMode = false; document.getElementById('wizard-panel').style.display = 'none'; }
 };
 
-// --- ФОНОВИЙ КРОКОМІР ---
 let isOfflineTracking = false;
 let stepLength = 0.75; 
 let lastAccel = 0;
@@ -1924,107 +1222,58 @@ function toggleOfflineTracking(forceStart = false) {
     if (forceStart) {
         isOfflineTracking = true;
         if(btn) { btn.innerText = getT('btn_pedo_on'); btn.style.color = "#f97316"; btn.style.borderColor = "#f97316"; }
-        if (!lastGoodGPS) alert(getT('alert_no_start'));
-        else alert(getT('alert_pedo_on'));
+        if (!lastGoodGPS) alert(getT('alert_no_start')); else alert(getT('alert_pedo_on'));
         playSystemTone(800, 200);
     } else {
         isOfflineTracking = false;
         if(btn) { btn.innerText = getT('btn_pedo_off'); btn.style.color = "#f1c40f"; btn.style.borderColor = "#f1c40f"; }
-        alert(getT('alert_pedo_off'));
-        playSystemTone(400, 200);
+        alert(getT('alert_pedo_off')); playSystemTone(400, 200);
     }
     updatePositioningLevel();
 }
 
 window.addEventListener('devicemotion', function(event) {
     if (!isOfflineTracking || !lastGoodGPS) return;
-
-    let accel = event.acceleration || event.accelerationIncludingGravity;
-    if (!accel) return;
-
+    let accel = event.acceleration || event.accelerationIncludingGravity; if (!accel) return;
     let currentAccel = Math.sqrt(accel.x ** 2 + accel.y ** 2 + accel.z ** 2);
     let delta = Math.abs(currentAccel - lastAccel);
 
     if (delta > 2.5) { 
-        const R = 6378137;
-        const bearingRad = currentDisplayAngle * Math.PI / 180;
-        
-        const dn = stepLength * Math.cos(bearingRad);
-        const de = stepLength * Math.sin(bearingRad);
-        
-        const dLat = dn / R;
-        let newLat = lastGoodGPS.lat + (dLat * 180 / Math.PI);
-        
-        const dLon = de / (R * Math.cos(lastGoodGPS.lat * Math.PI / 180));
-        let newLon = lastGoodGPS.lon + (dLon * 180 / Math.PI);
+        const R = 6378137; const bearingRad = currentDisplayAngle * Math.PI / 180;
+        const dn = stepLength * Math.cos(bearingRad); const de = stepLength * Math.sin(bearingRad);
+        const dLat = dn / R; let newLat = lastGoodGPS.lat + (dLat * 180 / Math.PI);
+        const dLon = de / (R * Math.cos(lastGoodGPS.lat * Math.PI / 180)); let newLon = lastGoodGPS.lon + (dLon * 180 / Math.PI);
         
         lastGoodGPS = { lat: newLat, lon: newLon };
-        if (userMarker) {
-            userMarker.setLatLng([newLat, newLon]);
-            let tri = document.getElementById('user-tri');
-            if (tri) tri.style.borderBottomColor = '#f97316'; 
-        }
-        
-        updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
-        updateRoute();
+        if (userMarker) { userMarker.setLatLng([newLat, newLon]); let tri = document.getElementById('user-tri'); if (tri) tri.style.borderBottomColor = '#f97316'; }
+        updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon); updateRoute();
     }
     lastAccel = currentAccel;
 });
 
-// ==========================================
-// 10. SOS МАЯК (ЗВУК + СТРОБОСКОП)
-// ==========================================
 async function toggleSOS() {
-    await initSensors();
-    isSosActive = !isSosActive;
-    let flasher = document.getElementById('sos-flasher');
-    let btn = document.getElementById('btn-sos-toggle');
+    await initSensors(); isSosActive = !isSosActive;
+    let flasher = document.getElementById('sos-flasher'); let btn = document.getElementById('btn-sos-toggle');
     
     if (isSosActive) {
-        btn.innerText = getT('btn_sos_off');
-        btn.style.background = "#111";
-        btn.style.color = "#f33";
-        btn.style.boxShadow = "none";
-        btn.style.borderColor = "#f33";
-        flasher.style.display = "block";
-        requestWakeLock();
+        btn.innerText = getT('btn_sos_off'); btn.style.background = "#111"; btn.style.color = "#f33"; btn.style.boxShadow = "none"; btn.style.borderColor = "#f33";
+        flasher.style.display = "block"; requestWakeLock();
         
-        if (navigator.getBattery) {
-            navigator.getBattery().then(batt => {
-                document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%";
-            });
-        }
+        if (navigator.getBattery) { navigator.getBattery().then(batt => { document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%"; }); }
         
         let isRed = true;
         sosInterval = setInterval(() => {
-            if (lastGoodGPS) {
-                document.getElementById('sos-latlon').innerHTML = `${lastGoodGPS.lat.toFixed(5)}<br>${lastGoodGPS.lon.toFixed(5)}`;
-            } else {
-                document.getElementById('sos-latlon').innerText = getT('sos_no_gps');
-            }
+            if (lastGoodGPS) { document.getElementById('sos-latlon').innerHTML = `${lastGoodGPS.lat.toFixed(5)}<br>${lastGoodGPS.lon.toFixed(5)}`; } 
+            else { document.getElementById('sos-latlon').innerText = getT('sos_no_gps'); }
 
-            if (navigator.getBattery) {
-                navigator.getBattery().then(batt => {
-                    document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%";
-                });
-            }
+            if (navigator.getBattery) { navigator.getBattery().then(batt => { document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%"; }); }
 
-            flasher.style.background = isRed ? "#f00" : "#fff";
-            isRed = !isRed;
-
-            playSystemTone(2500, 500); 
-            if(navigator.vibrate) navigator.vibrate([500]);
-            
+            flasher.style.background = isRed ? "#f00" : "#fff"; isRed = !isRed;
+            playSystemTone(2500, 500); if(navigator.vibrate) navigator.vibrate([500]);
         }, 3000);
 
     } else {
-        btn.innerText = getT('btn_sos_on');
-        btn.style.background = "#f33";
-        btn.style.color = "#fff";
-        btn.style.boxShadow = "0 0 20px #f33";
-        btn.style.borderColor = "#fff";
-        flasher.style.display = "none";
-        clearInterval(sosInterval);
-        releaseWakeLock();
+        btn.innerText = getT('btn_sos_on'); btn.style.background = "#f33"; btn.style.color = "#fff"; btn.style.boxShadow = "0 0 20px #f33"; btn.style.borderColor = "#fff";
+        flasher.style.display = "none"; clearInterval(sosInterval); releaseWakeLock();
     }
 }
