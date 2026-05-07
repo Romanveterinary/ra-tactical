@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.38 TACTICAL</title>
+    <title>RA_MOBILE v10.34 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.38">
+    <link rel="stylesheet" href="style.css?v=10.34">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -47,11 +47,20 @@
         
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
         .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
+
+        /* --- НОВІ СТИЛІ КОМПАСА --- */
+        #compass-container { width: 300px; height: 300px; margin: 10px auto; position: relative; border: 2px solid #222; border-radius: 50%; background: radial-gradient(circle, #111, #000); }
+        #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; transition: transform 0.1s linear; }
+        .compass-mark { position: absolute; top: 50%; left: 50%; transform-origin: center center; font-weight: bold; color: #888; font-size: 1rem; }
+        #tc-arrow { position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 140px solid #f33; margin-left: -8px; margin-top: -140px; transform-origin: 50% 100%; z-index: 15; display: none; filter: drop-shadow(0 0 5px red); }
+        #clinometer-wrap { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 12px; height: 160px; background: rgba(20,20,20,0.8); border: 1px solid #333; border-radius: 6px; overflow: hidden; }
+        #clino-bar { position: absolute; bottom: 50%; width: 100%; height: 4px; background: #4ade80; box-shadow: 0 0 8px #4ade80; transition: bottom 0.1s linear; }
+        .compass-data { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; z-index: 20; }
+        #tc-deg { font-size: 3.5rem; color: #4ade80; font-weight: bold; }
+        #tc-dist { font-size: 1.5rem; color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="sos-flasher"></div>
-
     <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
         <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
@@ -74,7 +83,7 @@
             <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.38</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.34</h3>
         <hr style="border: 0.5px solid #222;">
         
         <a href="#" onclick="toggleNightMode(); closeNav()" data-i18n="menu_day_night" style="font-weight:bold; color:#f33;">☀️ ДЕНЬ / 🔴 НІЧ</a>
@@ -274,44 +283,28 @@
         </section>
 
         <section id="mod-shield" class="module">
-            <h2 data-i18n="shield_title" style="text-align: center; color: var(--danger); margin-bottom: 20px;">ОХОРОНА / ЩИТ</h2>
-            
-            <div style="background:#111; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #333;">
-                <label style="color:#aaa; font-size:0.8rem;" data-i18n="sos_callsign">ПОЗИВНИЙ / ID:</label>
-                <input type="text" id="sos-callsign" placeholder="KOP" style="width:100%; background:#000; color:#0cf; border:1px solid #444; padding:10px; margin-top:5px; margin-bottom:15px; font-weight:bold; text-transform:uppercase; border-radius:5px;">
-                
-                <label style="color:#aaa; font-size:0.8rem;"><span data-i18n="sos_timer">АВТО-ЗНИЩЕННЯ (ГОДИН):</span> <span id="sos-timer-val" style="color:#f33; font-weight:bold;">1</span></label>
-                <input type="range" id="sos-timer-input" min="1" max="12" step="1" value="1" style="width:100%; margin-top:10px;">
-            </div>
-
-            <button id="btn-shield" class="tactical-btn" style="height:60px; font-size:1rem;" data-i18n="btn_shield_off">АКТИВУВАТИ ЗАХИСТ</button>
-            <button id="btn-shield-sound" class="tactical-btn" style="height:60px; font-size:1rem; margin-bottom:20px;" data-i18n="btn_shield_snd_off">ЗВУК СИРЕНИ: ВИМК</button>
-            
-            <div style="margin-top:20px; text-align:center;">
-                <div id="sos-status" style="color:#888; font-weight:bold; margin-bottom:10px; font-size: 1.2rem;" data-i18n="sos_status_idle">РЕЖИМ ТИШІ</div>
-                <button id="btn-sos-flare" class="sos-btn" onmousedown="startSosHold()" onmouseup="stopSosHold()" onmouseleave="stopSosHold()" ontouchstart="startSosHold()" ontouchend="stopSosHold()">
-                    <span data-i18n="sos_btn">SOS МАЯК (ЗАТИСНУТИ 3 СЕК)</span>
-                    <div id="sos-progress"></div>
-                </button>
-            </div>
+            <h2 data-i18n="shield_title">ОХОРОНА / ЩИТ</h2>
+            <button id="btn-shield" class="tactical-btn" style="height:150px; font-size: 1.2rem;" data-i18n="btn_shield_off">АКТИВУВАТИ ЗАХИСТ</button>
+            <button id="btn-shield-sound" class="tactical-btn" data-i18n="btn_shield_snd_off">ЗВУК СИРЕНИ: ВИМК</button>
         </section>
         
         <section id="mod-manual" class="module">
             <h2 style="color: var(--glow); text-align: center; margin-bottom: 20px;" data-i18n="man_title">БОЙОВИЙ ПОСІБНИК</h2>
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
-                <p data-i18n="man_intro" style="font-style:italic; margin-bottom:15px; color:#aaa;"></p>
-                <h3 style="color:#f1c40f; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h1"></h3>
-                <div data-i18n="man_p1" style="margin-bottom: 15px;"></div>
-                <h3 style="color:#4ade80; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h2"></h3>
-                <div data-i18n="man_p2" style="margin-bottom: 15px;"></div>
-                <h3 style="color:#0cf; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h3"></h3>
-                <div data-i18n="man_p3" style="margin-bottom: 15px;"></div>
-                <h3 style="color:#a855f7; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h4"></h3>
-                <div data-i18n="man_p4" style="margin-bottom: 15px;"></div>
-                <h3 style="color:#f97316; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h5"></h3>
-                <div data-i18n="man_p5" style="margin-bottom: 15px;"></div>
-                <h3 style="color:#f33; margin-top: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;" data-i18n="man_h6"></h3>
-                <div data-i18n="man_p6" style="margin-bottom: 15px;"></div>
+                <h3 style="color:#f1c40f; margin-top: 10px;" data-i18n="man_h1">⚠️ 0. ТАКТИЧНА БЕЗПЕКА (3 РІВНІ)</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p1">Програма автоматично контролює ваш рівень безпеки:<br><strong>РІВЕНЬ 1 (МАКС):</strong> Працює Інтернет та GPS. Небезпека пеленгації (Радіослід).<br><strong>РІВЕНЬ 2 (СТЕЛС):</strong> Інтернет вимкнено, працює лише прийом GPS. Ви невидимі.<br><strong>РІВЕНЬ 3 (АВТОНОМНИЙ):</strong> РЕБ або підвал. Працює автономний компас, крокомір та Астро-навігація.</p>
+
+                <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 1. МАРШРУТ ТА МАПА</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Встановити ціль:</strong> Подвійний тап по мапі створює точку маршруту (максимум 10 точок).<br><strong>Ручна позиція:</strong> Якщо немає GPS (Рівень 3), натисніть 'Я ТУТ (БЕЗ GPS)' і клікніть по мапі, де ви стоїте. Ваш маркер стане помаранчевим — це стартова точка для крокоміра.</p>
+
+                <h3 style="color:#0cf;" data-i18n="man_h3">🧭 2. КАЛІБРУВАННЯ ТА КРОКОМІР</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Калібрування 15м:</strong> Натисніть круглу кнопку '15м' на мапі і йдіть прямо. Це синхронізує магнітний компас із супутниковим вектором.<br><strong>Голос і Вібро:</strong> Голос попереджає про відхилення від маршруту. Вібро-поводир працює як 'сонар': чим точніше ви дивитесь на ціль, тим частіше вібрує телефон.<br><strong>Крокомір:</strong> В умовах РЕБ (без GPS) увімкніть його, і телефон буде рахувати кроки і рухати вашу помаранчеву фішку по мапі.</p>
+
+                <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 3. АСТРО-ТРЕНАЖЕР (Без GPS)</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Використовуйте цей модуль для калібрування компаса по світилам.<br>1. Тримайте телефон вертикально перед собою і натисніть 'КАЛІБРУВАТИ ГОРИЗОНТ'.<br>2. Підніміть телефон у небо (~48 градусів). Червона стрілка-радар покаже, де знаходиться Полярна зірка та Ковш.<br>3. Коли екран спалахне 'ЦІЛЬ ЗАХОПЛЕНО', натисніть кнопку фіксації Зірки або Сонця. Ваш компас ідеально відкалібровано на Північ.</p>
+                
+                <h3 style="color:#f33;" data-i18n="man_h5">💬 4. ОФЛАЙН РАЦІЯ ТА ЩИТ</h3>
+                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>Рація:</strong> Напишіть текст, створіть QR-код. Ваш напарник може просканувати його екраном свого смартфона. Код зашифровано.<br><strong>Щит:</strong> Увімкніть охорону і покладіть телефон. Будь-який рух або вібрація землі викличуть тривогу або вібро-сигнал.</p>
             </div>
         </section>
     </div>
@@ -336,6 +329,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.38"></script>
+    <script src="app.js?v=10.34"></script>
 </body>
 </html>
