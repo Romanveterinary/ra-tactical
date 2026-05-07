@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RA_MOBILE v10.38 TACTICAL</title>
+    <title>RA_MOBILE v10.40 TACTICAL</title>
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=10.38">
+    <link rel="stylesheet" href="style.css?v=10.40">
     <style>
         #eco-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; }
         .eco-edge { position: absolute; background: #0a4a0a; opacity: 0; transition: opacity 0.3s; }
@@ -40,7 +40,7 @@
         #astro-hint { position: absolute; bottom: 120px; width: 100%; text-align: center; color: #fff; font-size: 1rem; text-shadow: 0 0 5px #000; z-index: 4; font-family: monospace; font-weight: bold; }
         
         .astro-target-locked { stroke: #0cf !important; filter: drop-shadow(0 0 15px #0cf); }
-        #astro-target-msg { position:absolute; top:35%; left:0; width:100%; text-align:center; color:#0cf; font-size:2rem; font-weight:bold; text-shadow: 0 0 10px #000; z-index:3; display:none; }
+        #astro-target-msg { position:absolute; top:25%; left:0; width:100%; text-align:center; color:#0cf; font-size:2rem; font-weight:bold; text-shadow: 0 0 10px #000; z-index:3; display:none; }
 
         .lang-btn { background: #111; color: #aaa; border: 1px solid #333; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin: 0 2px; }
         .lang-btn.active { color: #4ade80; border-color: #4ade80; }
@@ -48,9 +48,9 @@
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
         .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 
-        /* СТИЛІ КОМПАСА */
+        /* ВИПРАВЛЕНІ СТИЛІ КОМПАСА (Без transition, щоб не смикався) */
         #compass-container { width: 300px; height: 300px; margin: 10px auto; position: relative; border: 2px solid #222; border-radius: 50%; background: radial-gradient(circle, #111, #000); }
-        #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; transition: transform 0.1s linear; }
+        #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; } 
         .compass-mark { position: absolute; top: 50%; left: 50%; transform-origin: center center; font-weight: bold; color: #888; font-size: 1rem; }
         #tc-arrow { position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 140px solid #f33; margin-left: -8px; margin-top: -140px; transform-origin: 50% 100%; z-index: 15; display: none; filter: drop-shadow(0 0 5px red); }
         #clinometer-wrap { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 12px; height: 160px; background: rgba(20,20,20,0.8); border: 1px solid #333; border-radius: 6px; overflow: hidden; }
@@ -83,7 +83,7 @@
             <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
-        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.38</h3>
+        <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.40</h3>
         <hr style="border: 0.5px solid #222;">
         
         <a href="#" onclick="toggleNightMode(); closeNav()" data-i18n="menu_day_night" style="font-weight:bold; color:#f33;">☀️ ДЕНЬ / 🔴 НІЧ</a>
@@ -180,6 +180,12 @@
             <video id="v-astro-stream" autoplay playsinline muted></video>
             <div id="astro-overlay">
                 
+                <div id="astro-crosshair" style="position:absolute; top:50%; left:50%; width:60px; height:60px; transform:translate(-50%, -50%); pointer-events:none; z-index:10; opacity: 0.8;">
+                    <div style="position:absolute; top:50%; left:0; width:100%; height:2px; background:#f33;"></div>
+                    <div style="position:absolute; top:0; left:50%; width:2px; height:100%; background:#f33;"></div>
+                    <div style="position:absolute; top:50%; left:50%; width:16px; height:16px; border:2px solid #f33; border-radius:50%; transform:translate(-50%, -50%);"></div>
+                </div>
+
                 <div id="astro-dir-left" class="astro-glow-v"></div>
                 <div id="astro-dir-right" class="astro-glow-v"></div>
                 <div id="astro-dir-top" class="astro-glow-h"></div>
@@ -193,16 +199,12 @@
 
                 <div style="position:absolute; top:50%; left:50%; width:300px; height:300px; transform:translate(-50%, -50%); overflow:visible; pointer-events:none;">
                     <svg width="300" height="300" style="overflow:visible;">
-                        <circle cx="150" cy="150" r="25" stroke="#f1c40f" stroke-width="2" fill="none"/>
-                        <line x1="150" y1="90" x2="150" y2="210" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
-                        <line x1="90" y1="150" x2="210" y2="150" stroke="#f1c40f" stroke-width="1" stroke-dasharray="4"/>
-                        
-                        <g id="astro-stencil-fixed" style="transition: all 0.2s linear;">
+                        <g id="astro-stencil-fixed" style="transition: transform 0.1s linear;">
                             <text x="160" y="155" fill="#fff" font-size="12px" font-weight="bold" data-i18n="astro_polar">ПОЛЯРНА ЗІРКА</text>
                             <circle cx="150" cy="150" r="4" fill="#fff" />
                         </g>
 
-                        <g id="astro-stencil" style="transition: all 0.2s linear;">
+                        <g id="astro-stencil" style="transition: transform 0.1s linear;">
                             <rect x="0" y="0" width="300" height="300" fill="transparent" />
                             <line x1="150" y1="40" x2="150" y2="150" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3"/>
                             <polyline points="230,130 210,110 190,80 170,50 150,40 150,10 180,20 170,50" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
@@ -225,8 +227,8 @@
             <div class="astro-btn-container">
                 <button id="btn-astro-horizon" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#0cf; margin: 0 5px 10px 5px; border-color:#0cf;" data-i18n="btn_astro_cal">⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)</button>
                 <div style="display:flex; justify-content: space-around; width: 100%;">
-                    <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin:0 5px;" data-i18n="btn_astro_sun">☀ СОНЦЕ</button>
-                    <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin:0 5px;" data-i18n="btn_astro_star">⭐ ЗІРКА (ФІКСАЦІЯ)</button>
+                    <button id="btn-astro-sun" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#f1c40f; flex:1; margin:0 5px;" data-i18n="btn_astro_sun">☀ СОНЦЕ (ЗАФІКСУВАТИ)</button>
+                    <button id="btn-astro-star" class="tactical-btn" style="background:rgba(0,0,0,0.8); color:#fff; flex:1; margin:0 5px;" data-i18n="btn_astro_star">⭐ ЗІРКА (ЗАФІКСУВАТИ)</button>
                 </div>
             </div>
         </section>
@@ -319,7 +321,7 @@
                 <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.</p>
 
                 <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 4. АСТРО / БЕЗ GPS</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце і натисни відповідну кнопку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце (прямо у снайперське перехрестя) і натисни відповідну кнопку.</p>
                 
                 <h3 style="color:#fff;" data-i18n="man_h5">👁 5. ОПТИКА / ШІ</h3>
                 <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
@@ -357,6 +359,6 @@
         </div>
     </div>
     
-    <script src="app.js?v=10.38"></script>
+    <script src="app.js?v=10.40"></script>
 </body>
 </html>
