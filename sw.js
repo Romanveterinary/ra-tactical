@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ra-tactical-v8.7';
+const CACHE_NAME = 'ra-tactical-v10.38';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -15,7 +15,7 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[SW] Збереження тактичного пакету v8.7');
+            console.log('[SW] Збереження тактичного пакету v10.38');
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
@@ -39,8 +39,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
 
-    // Кешування зовнішніх карт та мізків ШІ на льоту
-    if (req.url.includes('opentopomap.org') || req.url.includes('cartocdn.com') || req.url.includes('storage.googleapis.com')) {
+    // Кешування зовнішніх карт (додано mt0.google.com) та мізків ШІ на льоту
+    if (req.url.includes('opentopomap.org') || req.url.includes('cartocdn.com') || req.url.includes('storage.googleapis.com') || req.url.includes('mt0.google.com')) {
         event.respondWith(
             caches.match(req).then((cachedResponse) => {
                 if (cachedResponse) return cachedResponse; 
@@ -57,7 +57,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Для локальних файлів (КРИТИЧНО: ignoreSearch ігнорує ?v=8.6 у назві)
     event.respondWith(
         caches.match(req, { ignoreSearch: true }).then((response) => {
             return response || fetch(req);
