@@ -47,7 +47,6 @@
         .map-fab-cal { position:absolute; bottom:20px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#f1c40f; border:2px solid #f1c40f; z-index:1100; font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
         .map-fab-eco { position:absolute; bottom:90px; right:10px; width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.8); color:#0cf; border:2px solid #0cf; z-index:1100; font-weight:bold; font-size:1.5rem; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); cursor:pointer; }
 
-        /* ВИПРАВЛЕНІ СТИЛІ КОМПАСА (Без transition, щоб не смикався) */
         #compass-container { width: 300px; height: 300px; margin: 10px auto; position: relative; border: 2px solid #222; border-radius: 50%; background: radial-gradient(circle, #111, #000); }
         #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; } 
         .compass-mark { position: absolute; top: 50%; left: 50%; transform-origin: center center; font-weight: bold; color: #888; font-size: 1rem; }
@@ -306,12 +305,27 @@
             <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
                 <h2 style="color: #f33; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px #f33;" data-i18n="sos_title">МАЯК ВИЖИВАННЯ</h2>
                 
-                <div id="sos-info" style="font-size: 1.2rem; color: #fff; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 30px; font-family: monospace; width: 100%; border: 2px solid #555;">
+                <div id="sos-info" style="font-size: 1.2rem; color: #fff; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 15px; font-family: monospace; width: 100%; border: 2px solid #555;">
                     <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТИ:</span><br>
                     <span id="sos-latlon" style="color: #4ade80; font-weight: bold; font-size: 1.5rem;" data-i18n="sos_no_gps">ОЧІКУВАННЯ GPS</span><br><br>
                     <span data-i18n="sos_battery" style="color: #ccc;">БАТАРЕЯ:</span> <span id="sos-batt" style="color: #f1c40f; font-weight: bold; font-size: 1.5rem;">--%</span>
                 </div>
-                
+
+                <div style="background: rgba(0,30,50,0.8); border: 1px solid #0cf; border-radius: 10px; padding: 15px; margin-bottom: 30px; width: 100%; text-align: left;">
+                    <h3 style="color: #0cf; font-size: 1.1rem; text-align: center; margin-bottom: 10px;">📡 WI-FI МАЯК (РАДІОПОШУК)</h3>
+                    <div style="background: #000; padding: 10px; text-align: center; border: 1px dashed #4ade80; border-radius: 5px; margin-bottom: 10px;">
+                        <span id="wifi-name" style="color: #4ade80; font-family: monospace; font-size: 1.1rem; font-weight: bold;">ОЧІКУВАННЯ GPS</span>
+                    </div>
+                    <button class="tactical-btn" style="background: #111; color: #0cf; border-color: #0cf; padding: 10px; margin-top: 0; font-size: 0.9rem;" onclick="copyWifiName()">📋 СКОПІЮВАТИ НАЗВУ</button>
+                    
+                    <ul style="color: #ccc; font-size: 0.75rem; margin-top: 15px; padding-left: 20px; line-height: 1.5;">
+                        <li>Натисніть "Скопіювати" вище.</li>
+                        <li>Відкрийте <b>Налаштування ➔ Точка доступу (Hotspot)</b>.</li>
+                        <li>Вставте текст як ім'я мережі.</li>
+                        <li><span style="color:#f33; font-weight:bold;">ОБОВ'ЯЗКОВО:</span> Вимкніть пароль (Відкрита мережа).</li>
+                        <li>Вмикайте на 5 хв, потім вимикайте на 5 хв для економії батареї.</li>
+                    </ul>
+                </div>
                 <button id="btn-sos-toggle" class="tactical-btn" style="background: #f33; color: #fff; height: 120px; font-size: 2rem; border-radius: 20px; box-shadow: 0 0 20px #f33; border: 2px solid #fff;" onclick="toggleSOS()" data-i18n="btn_sos_on">АЛАРМ (УВІМКНУТИ)</button>
             </div>
         </section>
@@ -324,25 +338,25 @@
                 <p style="margin-bottom: 10px;" data-i18n="man_p1">Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 2. МАРШРУТ / МАПА</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Як поставити ціль:</strong> Двічі швидко тапни по карті. З'явиться лінія маршруту.<br><strong>Кнопка 'Я ТУТ (БЕЗ GPS)':</strong> Використовуй, коли працює РЕБ. Натисни її, а потім ткни пальцем у карту туди, де ти зараз знаходишся.<br><strong>Кнопка '15м':</strong> Натисни її і пройди прямо 15 метрів для точного калібрування компаса.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Як поставити ціль:</strong> Двічі швидко тапни по карті.<br><strong>Я ТУТ (БЕЗ GPS):</strong> Використовуй під РЕБом. Натисни і ткни пальцем у карту туди, де ти зараз.<br><strong>15м:</strong> Натисни і пройди 15 метрів для точного калібрування.</p>
 
                 <h3 style="color:#0cf;" data-i18n="man_h3">🧭 3. КОМПАС / ПОВОДИР</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Крокомір:</strong> Якщо немає GPS, увімкни його і він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Телефон вібрує, коли дивишся точно на ціль.<br><strong>ЕКО-Блекаут:</strong> Поклади палець на чорний екран на 3 сек, щоб дізнатися відстань.</p>
 
                 <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 4. АСТРО / БЕЗ GPS</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце (прямо у снайперське перехрестя) і натисни відповідну кнопку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився: Тримаєш телефон рівно -> 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце в приціл і натисни кнопку.</p>
                 
                 <h3 style="color:#fff;" data-i18n="man_h5">👁 5. ОПТИКА / ШІ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
 
                 <h3 style="color:#0cf;" data-i18n="man_h6">💬 6. ТЕКСТ / QR-РАЦІЯ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p6">Пишеш текст -> 'Створити зашифрований QR'. Твій напарник відкриває програму, тисне 'Увімкнути камеру' і сканує твій екран. Повідомлення розшифровано без зв'язку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p6">Пишеш текст -> 'Створити QR'. Напарник відкриває програму і сканує. Розшифровано без зв'язку.</p>
 
                 <h3 style="color:#888;" data-i18n="man_h7">🛡 7. ОХОРОНА / ЩИТ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p7">Лягаєш спати: Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон біля себе. Якщо хтось торкнеться телефону або земля завібрує — спрацює тривога.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p7">Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон. Якщо земля завібрує — спрацює тривога.</p>
 
                 <h3 style="color:#f33;" data-i18n="man_h8">🆘 8. SOS / МАЯК ВИЖИВАННЯ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p8">Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран почне яскраво блимати, лунатиме пронизливий звук кожні 3 секунди, а на екрані з'являться твої координати та заряд батареї.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p8">Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран яскраво блимає, лунає звук, показуються координати.</p>
 
             </div>
         </section>
