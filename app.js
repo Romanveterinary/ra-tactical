@@ -16,8 +16,8 @@ const translations = {
         chat_title: "ОФЛАЙН РАЦІЯ", chat_desc: "Введіть текст та створіть зашифрований QR-код для передачі напарнику.", btn_chat_cam: "📷 УВІМКНУТИ КАМЕРУ ДЛЯ ЧИТАННЯ", chat_left: "Залишилось: 200 символів", btn_chat_gen: "СТВОРИТИ ЗАШИФРОВАНИЙ QR", btn_chat_clear: "ОЧИСТИТИ ТЕКСТ",
         shield_title: "ОХОРОНА / ЩИТ", btn_shield_off: "АКТИВУВАТИ ЗАХИСТ", btn_shield_on: "ОХОРОНА АКТИВНА", btn_shield_snd_off: "ЗВУК СИРЕНИ: ВИМК", btn_shield_snd_on: "ЗВУК СИРЕНИ: УВІМК",
         sos_title: "МАЯК ВИЖИВАННЯ", sos_coords: "КООРДИНАТИ:", sos_battery: "БАТАРЕЯ:", btn_sos_on: "АЛАРМ (УВІМКНУТИ)", btn_sos_off: "ВИМКНУТИ SOS", sos_no_gps: "ОЧІКУВАННЯ GPS",
-        man_title: "БОЙОВИЙ ПОСІБНИК", man_h1: "🔐 1. ВХІД У СИСТЕМУ", man_p1: "Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.", man_h2: "📍 2. МАРШРУТ / МАПА", man_p2: "<strong>Як поставити ціль:</strong> Двічі швидко тапни по карті.<br><strong>Я ТУТ (БЕЗ GPS):</strong> Використовуй під РЕБом. Натисни і ткни пальцем у карту туди, де ти зараз.<br><strong>15м:</strong> Натисни і пройди 15 метров для точного калібрування.", man_h3: "🧭 3. КОМПАС / ПОВОДИР", man_p3: "<strong>Крокомір:</strong> Якщо немає GPS, увімкни його і він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Телефон вібрує, коли дивишся точно на ціль.<br><strong>ЕКО-Блекаут:</strong> Поклади палець на чорний екран на 3 сек, щоб дізнатися відстань.", man_h4: "🌌 4. АСТРО / БЕЗ GPS", man_p4: "Коли компас збився: Тримаєш телефон рівно -> 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце в приціл і натисни кнопку.", man_h5: "👁 5. ОПТИКА / ШІ", man_p5: "<strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.", man_h6: "💬 6. ТЕКСТ / QR-РАЦІЯ", man_p6: "Пишеш текст -> 'Створити QR'. Напарник відкриває програму і сканує. Розшифровано без зв'язку.", man_h7: "🛡 7. ОХОРОНА / ЩИТ", man_p7: "Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон. Якщо земля завібрує — спрацює тривога.", man_h8: "🆘 8. SOS / МАЯК ВИЖИВАННЯ", man_p8: "Якщо тебя присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран яскраво блимає, лунає звук, показуються координати.",
-        eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)", btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ", wizard_title: "MODO OFFLINE", wizard_text: "Texto", btn_wiz_cancel: "CANCELAR", btn_wiz_next: "PRÓXIMO ➡",
+        man_title: "БОЙОВИЙ ПОСІБНИК", man_h1: "🔐 1. ВХІД У СИСТЕМУ", man_p1: "Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором.", man_h2: "📍 2. МАРШРУТ / МАПА", man_p2: "<strong>Як поставити ціль:</strong> Двічі швидко тапни по карті.<br><strong>Я ТУТ (БЕЗ GPS):</strong> Використовуй під РЕБом. Натисни і ткни пальцем у карту туди, де ти зараз.<br><strong>15м:</strong> Натисни і пройди 15 метров для точного калібрування.", man_h3: "🧭 3. КОМПАС / ПОВОДИР", man_p3: "<strong>Крокомір:</strong> Якщо немає GPS, увімкни його і він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Телефон вібрує, коли дивишся точно на ціль.<br><strong>ЕКО-Блекаут:</strong> Поклади палець на чорний екран на 3 сек, щоб дізнатися відстань.", man_h4: "🌌 4. АСТРО / БЕЗ GPS", man_p4: "Коли компас збився: Тримаєш телефон рівно -> 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце в приціл і натисни кнопку.", man_h5: "👁 5. ОПТИКА / ШІ", man_p5: "<strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.", man_h6: "💬 6. ТЕКСТ / QR-РАЦІЯ", man_p6: "Пишеш текст -> 'Створити QR'. Напарник відкриває програму і сканує. Розшифровано без зв'язку.", man_h7: "🛡 7. ОХОРОНА / ЩИТ", man_p7: "Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон. Якщо земля завібрує — спрацює тривога.", man_h8: "🆘 8. SOS / МАЯК ВИЖИВАННЯ", man_p8: "Якщо тебя присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран яскраво блимає, лунає звук, показуються координати.",
+        eco_touch: "ТОРКНІТЬСЯ ЕКРАНА<br>(3 сек)", btn_eco_exit: "ВИЙТИ З БЛЕКАУТУ", wizard_title: "ОФЛАЙН РЕЖИМ", wizard_text: "Текст підказки", btn_wiz_cancel: "СКАСУВАТИ", btn_wiz_next: "ДАЛІ ➡",
         lvl3: "РІВЕНЬ 3: АВТОНОМНИЙ", lvl2: "РІВЕНЬ 2: СТЕЛС (GPS)", lvl1: "РІВЕНЬ 1: МАКС (РАДІОСЛІД)", gps_delay: "⚠️ GPS ЗАТРИМКА", gps_manual: "📍 МАРШРУТ ВРУЧНУ", gps_lost: "❌ GPS ЗГЛУШЕНО (>200м)", gps_ok: "GPS: OK", gps_offline: "❌ GPS ВТРАЧЕНО (OFFLINE)",
         voice_dist: "Відстань", voice_meters: "метрів", voice_turn: "Розверніться! Ви віддаляєтесь.", voice_right: "Правіше.", voice_left: "Лівіше.", alert_no_start: "Увага: Немає початкової точки. Встановіть її кнопкою Я ТУТ (БЕЗ GPS).", alert_pedo_on: "✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!", alert_pedo_off: "Офлайн трекінг зупинено.", alert_man_pos: "📍 РУЧНИЙ РЕЖИМ:\nТапніть по мапі в тому місці, де ви зараз знаходитесь.", astro_sun_fix: "☀️ Сонце зафіксовано. Компас відкалібровано!", astro_star_fix: "⭐ Зірка зафіксована. Компас відкалібровано на Північ!", astro_hor_fix: "⚖️ Горизонт зафіксовано", astro_hor_next: "Тепер підніміть телефон вертикально перед собою для пошуку зірок.", lbl_meters_short: "м", cal_done: "КАЛІБР: ГОТОВО", alert_no_gps_cal: "Немає сигналу GPS!"
     },
@@ -37,6 +37,23 @@ const translations = {
         eco_touch: "TOUCH SCREEN<br>(3 sec)", btn_eco_exit: "EXIT BLACKOUT", wizard_title: "OFFLINE MODE", wizard_text: "Hint text", btn_wiz_cancel: "CANCEL", btn_wiz_next: "NEXT ➡",
         lvl3: "LEVEL 3: AUTONOMOUS", lvl2: "LEVEL 2: STEALTH (GPS)", lvl1: "LEVEL 1: MAX (RADIO TRACE)", gps_delay: "⚠️ GPS DELAY", gps_manual: "📍 MANUAL MODE", gps_lost: "❌ GPS JAMMED (>200m)", gps_ok: "GPS: OK", gps_offline: "❌ GPS LOST (OFFLINE)",
         voice_dist: "Distance", voice_meters: "meters", voice_turn: "Turn around!", voice_right: "More to the right.", voice_left: "More to the left.", alert_no_start: "Warning: No start point set.", alert_pedo_on: "✅ AUTONOMOUS NAVIGATION ON!", alert_pedo_off: "Offline tracking stopped.", alert_man_pos: "📍 MANUAL MODE:\nTap the map where you are.", astro_sun_fix: "☀️ Sun locked!", astro_star_fix: "⭐ Star locked!", astro_hor_fix: "⚖️ Horizon locked", astro_hor_next: "Now lift the phone up to search for stars.", lbl_meters_short: "m", cal_done: "CAL: DONE", alert_no_gps_cal: "No GPS signal!"
+    },
+    'pt': {
+        btn_login: "ENTRAR", err_access_denied: "❌ ACESSO NEGADO", title_qr_scan: "CÓDIGO DE DADOS", btn_close: "FECHAR", menu_day_night: "☀️ DIA / 🔴 NOITE", menu_map: "📍 ROTA / MAPA", menu_compass: "🧭 BÚSSOLA / GUIA", menu_astro: "🌌 ASTRO / SEM GPS", menu_optics: "👁 ÓPTICA / IA", menu_radio: "💬 TEXTO / RÁDIO QR", menu_shield: "🛡 SEGURANÇA / ESCUDO", menu_manual: "📖 INSTRUÇÕES", menu_power_off: "🛑 DESLIGAR APP", menu_destroy: "💥 DESTRUIR DADOS", menu_sos: "🆘 SOS / SINALIZADOR",
+        hud_gps_search: "GPS: BUSCANDO...", hud_alt: "ALT: --- m", hud_level_analysis: "NÍVEL: ANÁLISE", hud_speed: "VEL: 0.0 km/h", hud_target: "ALVO: --- m",
+        btn_map_manual: "📍 ESTOU AQUI (SEM GPS)", btn_map_transport: "🚙 TRANSPORTE", btn_map_share: "📤 COMPARTILHAR QR", btn_map_follow: "🎯 SEGUIR", btn_map_del_last: "✖ EXCLUIR ÚLTIMO", btn_map_clear: "🗑 LIMPAR ROTA", btn_map_layer: "🗺 CAMADA", btn_map_cache: "💾 CACHE 2x2 km",
+        comp_acc: "PRE: --", comp_alt: "ALT: --- m", btn_pedo_off: "👣 PEDÔMETRO: DESLIGADO", btn_pedo_on: "👣 PEDÔMETRO: LIGADO", btn_cal_walk: "CALIBRAR ANDANDO (15m)", comp_target_none: "ALVO: NENHUM",
+        btn_voice_off: "VOZ: DESL", btn_voice_on: "VOZ: LIGADA", btn_vibro_off: "GUIA (VIBRO): DESL", btn_vibro_on: "GUIA (VIBRO): LIG", lbl_voice_int: "DICAS:", lbl_sec: "seg", btn_eco: "🌑 BLACKOUT ECO",
+        astro_locked: "ALVO BLOQUEADO", astro_polar: "POLARIS", astro_hint: "PROCURE O NORTE", btn_astro_cal: "⚖ CALIBRAR HORIZONTE", btn_astro_sun: "☀ SOL (FIXAR)", btn_astro_star: "⭐ ESTRELA (FIXAR)",
+        ai_off: "IA INATIVA", lbl_cam_zoom: "ZOOM DA CÂMERA", lbl_ai_sens: "SENSIBILIDADE IA (%)", lbl_ai_focal: "ALCANCE IA", lbl_ir_sens: "IR / SENSIBILIDADE MOV",
+        btn_scan_cam: "🔴 LER DA CÂMERA", btn_scan_photo: "🖼 LER DA FOTO", btn_cam_off: "🔴 CÂMERA", btn_ai_scan: "🤖 IA SCAN", btn_ir: "🔭 FILTRO IR", btn_motion: "📉 DETECTOR MOVIMENTO",
+        chat_title: "RÁDIO OFFLINE", chat_desc: "Insira texto e gere um QR criptografado.", btn_chat_cam: "📷 LIGAR CÂMERA", chat_left: "Restante: 200 carac.", btn_chat_gen: "GERAR QR", btn_chat_clear: "LIMPAR TEXTO",
+        shield_title: "SEGURANÇA / ESCUDO", btn_shield_off: "ATIVAR ESCUDO", btn_shield_on: "ESCUDO ATIVO", btn_shield_snd_off: "SOM SIRENE: DESL", btn_shield_snd_on: "SOM SIRENE: LIG",
+        sos_title: "SINALIZADOR", sos_coords: "COORDENADAS:", sos_battery: "BATERIA:", btn_sos_on: "ALARME (LIGAR)", btn_sos_off: "DESLIGAR SOS", sos_no_gps: "AGUARDANDO GPS",
+        man_title: "MANUAL DE COMBATE", man_h1: "🔐 1. LOGIN", man_p1: "Insira PIN.", man_h2: "📍 2. ROTA / MAPA", man_p2: "Toque duplo define alvo.", man_h3: "🧭 3. BÚSSOLA", man_p3: "Pedômetro offline.", man_h4: "🌌 4. ASTRO", man_p4: "Calibre horizonte, mire na Estrela no centro.", man_h5: "👁 5. ÓPTICA", man_p5: "Filtro IR.", man_h6: "💬 6. RÁDIO QR", man_p6: "QR encriptado.", man_h7: "🛡 7. ESCUDO", man_p7: "Alarme de movimento.", man_h8: "🆘 8. SOS", man_p8: "Som e flash.",
+        eco_touch: "TOQUE NA TELA<br>(3 seg)", btn_eco_exit: "SAIR DO BLACKOUT", wizard_title: "MODO OFFLINE", wizard_text: "Texto", btn_wiz_cancel: "CANCELAR", btn_wiz_next: "PRÓXIMO ➡",
+        lvl3: "NÍVEL 3: AUTÔNOMO", lvl2: "NÍVEL 2: FURTIVO (GPS)", lvl1: "NÍVEL 1: MÁX", gps_delay: "⚠️ ATRASO GPS", gps_manual: "📍 MODO MANUAL", gps_lost: "❌ GPS BLOQUEADO", gps_ok: "GPS: OK", gps_offline: "❌ GPS PERDIDO",
+        voice_dist: "Distância", voice_meters: "metros", voice_turn: "Vire-se!", voice_right: "Para a direita.", voice_left: "Para a esquerda.", alert_no_start: "Aviso: Sem ponto.", alert_pedo_on: "✅ NAVEGAÇÃO LIGADA!", alert_pedo_off: "Parado.", alert_man_pos: "📍 MANUAL:\nToque no mapa.", astro_sun_fix: "☀️ Sol fixado!", astro_star_fix: "⭐ Estrela fixada!", astro_hor_fix: "⚖️ Horizonte fixado", astro_hor_next: "Levante o telefone.", lbl_meters_short: "m", cal_done: "CAL: PRONTO", alert_no_gps_cal: "Sem sinal GPS!"
     }
 };
 
@@ -67,7 +84,9 @@ function toggleNightMode() {
     if (isNightMode) { document.body.classList.add('tactical-night'); } else { document.body.classList.remove('tactical-night'); }
 }
 
-// ЛОГІКА РЕЖИМІВ
+// ==========================================
+// ЛОГІКА РЕЖИМІВ (ЛАЙТ / МАКС)
+// ==========================================
 let isLiteMode = true; 
 function toggleAppMode() {
     let toggle = document.getElementById('mode-toggle');
@@ -94,6 +113,49 @@ function applyModeRestrictions() {
 const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 
+// ЗМІННІ СИСТЕМИ ТА ДАТЧИКІВ
+const CRYPTO_KEY = "RA_STORM_2026"; 
+let audioCtx = null, osc = null, gain = null;
+let lastGoodGPS = null, watchId = null;
+
+let hardwareHeading = 0, compassOffset = 7, currentBearing = null; 
+let currentPitch = 0, currentRoll = 0; 
+let displayPitch = 0, displayRoll = 0; 
+let currentDisplayAngle = 0, targetDisplayAngle = 0;
+let isFirstCompassUpdate = true; let isCompassAnimating = false; let hasAbsoluteOrientation = false; 
+
+let horizonBeta = 0; 
+let currentSpeedKmh = 0; let currentDistanceToTarget = null;
+let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
+let aiModel = null, isAiLive = false, isScanningQR = false;
+let currentVideoTrack = null, currentAstroTrack = null;
+
+let map = null, userMarker = null;
+let routePoints = [], routeMarkers = [], routeLine = null;
+let isWalkCalibrating = false, walkStartPoint = null;
+
+let mapLayers = [];
+let layerNames = ['ОСНОВНА (Легка)', 'ТОПОГРАФІЯ', 'СУПУТНИК (Важка)', 'ГІБРИД', 'НІЧНА (Стелс)'];
+let currentLayerIdx = 0; let activeMapLayer = null;
+let isMapFollowing = true, tracePoints = [], traceLineLayer = null; let userToTargetLine = null;
+
+let guideMode = false, isVoiceEnabled = false;
+let lastVibroTime = 0, lastVoiceTime = 0, lastGpsPing = 0;
+let isSignalLost = true, firstFix = true;
+let lastGpsProcessTime = Date.now(), gpsLostTimer = null; 
+
+let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
+let isManualPosMode = false; let wakeLock = null;
+let isTransportMode = false, lastGpsCoordsForTransport = null;
+
+const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
+
+let isSosActive = false, sosPhase = 0;
+let sosInterval = null, sosPhaseTimer = null; let sosBlackout = null; 
+
+// ==========================================
+// СТАРТ СИСТЕМИ ПІСЛЯ ВХОДУ
+// ==========================================
 async function checkPin() {
     let input = document.getElementById('pin-input').value;
     if (input === SECRET_PIN) {
@@ -125,45 +187,6 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.error(e)); });
 }
 
-const CRYPTO_KEY = "RA_STORM_2026"; 
-let audioCtx = null, osc = null, gain = null;
-let lastGoodGPS = null, watchId = null;
-
-let hardwareHeading = 0, compassOffset = 7, currentBearing = null; 
-let currentPitch = 0, currentRoll = 0; 
-let displayPitch = 0, displayRoll = 0; 
-let currentDisplayAngle = 0, targetDisplayAngle = 0;
-let isFirstCompassUpdate = true; let isCompassAnimating = false; let hasAbsoluteOrientation = false; 
-
-let horizonBeta = 0; // Нахил калібрування нуля
-let currentSpeedKmh = 0; let currentDistanceToTarget = null;
-let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
-let aiModel = null, isAiLive = false, isScanningQR = false;
-let currentVideoTrack = null, currentAstroTrack = null;
-
-let map = null, userMarker = null;
-let routePoints = [], routeMarkers = [], routeLine = null;
-let isWalkCalibrating = false, walkStartPoint = null;
-
-let mapLayers = [];
-let layerNames = ['ОСНОВНА (Легка)', 'ТОПОГРАФІЯ', 'СУПУТНИК (Важка)', 'ГІБРИД', 'НІЧНА (Стелс)'];
-let currentLayerIdx = 0; let activeMapLayer = null;
-let isMapFollowing = true, tracePoints = [], traceLineLayer = null; let userToTargetLine = null;
-
-let guideMode = false, isVoiceEnabled = false;
-let lastVibroTime = 0, lastVoiceTime = 0, lastGpsPing = 0;
-let isSignalLost = true, firstFix = true;
-let lastGpsProcessTime = Date.now(), gpsLostTimer = null; 
-
-let isEcoMode = false, ecoPeekTimer = null, isEcoPeeking = false;
-let isManualPosMode = false; let wakeLock = null;
-let isTransportMode = false, lastGpsCoordsForTransport = null;
-
-const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
-
-let isSosActive = false, sosPhase = 0;
-let sosInterval = null, sosPhaseTimer = null; let sosBlackout = null; 
-
 function initSystem() {
     setLanguage('uk'); updatePositioningLevel();
     let chatSection = document.getElementById('mod-chat');
@@ -180,7 +203,11 @@ function initSystem() {
             chatSection.insertBefore(btnAddLoc, chatInput);
         }
     }
-    try{initMap();}catch(e){} try{initGPS();}catch(e){} try{processCamera();}catch(e){}
+    
+    // ПРАВИЛЬНИЙ ПОРЯДОК ІНІЦІАЛІЗАЦІЇ
+    try{initMap();}catch(e){} 
+    try{initGPS();}catch(e){} 
+    try{processCamera();}catch(e){}
     sidebarIntervals();
 }
 
@@ -421,7 +448,7 @@ function initGPS() {
             updateTargetDistance(lat, lon); if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
             if (isTransportMode && lastGpsCoordsForTransport) { if (currentSpeedKmh > 4) { let gpsH = pos.coords.heading; if (gpsH === null || isNaN(gpsH)) { gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon); } let fakeAlpha = (360 - gpsH) % 360; handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true }); } }
             lastGpsCoordsForTransport = { lat, lon }; lastGoodGPS = { lat, lon };
-            updateWifiName(); updateUserToTargetLine(); 
+            updateWifiName(); try{updateUserToTargetLine();}catch(e){} 
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : (currentLang === 'pt' ? 'VEL:' : 'SPD:'); let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `${prefixSpd} ${currentSpeedKmh.toFixed(1)} km/h`; let coordsEl = document.getElementById('tc-coords-small'); if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`; let prefixAcc = currentLang === 'uk' ? 'ТОЧН:' : (currentLang === 'pt' ? 'PRE:' : 'ACC:'); let accEl = document.getElementById('tc-acc'); if(accEl) accEl.innerText = `${prefixAcc} ${Math.round(acc)}m`;
             tracePoints.push([lat, lon]); if(tracePoints.length > 200) tracePoints.shift(); if(map) { if(traceLineLayer) map.removeLayer(traceLineLayer); traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map); }
             updateSunPosition(lat, lon);
@@ -454,8 +481,6 @@ function handleOrientation(e) {
 
 function animateCompass() {
     let delta = targetDisplayAngle - currentDisplayAngle; delta = ((delta % 360) + 540) % 360 - 180; 
-    
-    // Плавна, але швидка відповідь у 3D площині
     let smoothing = isTransportMode ? 0.02 : 0.12;
     currentDisplayAngle += delta * smoothing; displayPitch += (currentPitch - displayPitch) * smoothing; displayRoll += (currentRoll - displayRoll) * smoothing;
     updateCompassUI();
@@ -508,17 +533,25 @@ function updateCompassUI() {
         if (isEcoMode) document.querySelectorAll('.eco-edge').forEach(el => el.style.opacity = '0');
     }
     
-    // ==========================================
-    // ОНОВЛЕНА 3D-МАТЕМАТИКА АСТРО ПРИЦІЛУ
-    // ==========================================
+    // АСТРО РОЗРАХУНОК
     let astroMod = document.getElementById('mod-astro');
     if (astroMod && astroMod.classList.contains('active')) {
-        
-        // Визначаємо положення телефона: якщо він стоїть вертикально (pitch > 45), 
-        // крен (Roll) стає справжнім азимутом, а нахил (Pitch) — висотою об'єкта.
-        let isVertical = Math.abs(displayPitch) > 45;
-        let realAstroDeg = isVertical ? Math.round(((displayRoll % 360) + 360) % 360) : displayDeg;
-        let elevation = isVertical ? (90 - Math.abs(displayPitch) + horizonBeta) : (displayPitch + horizonBeta);
+        // Коли пристрій вертикально в руках, датчики міняються місцями
+        let isVertical = Math.abs(displayPitch) > 40;
+        let realAstroDeg = displayDeg;
+        let elevation = 0;
+
+        if (isVertical) {
+            // Roll стає азимутом, Pitch стає висотою
+            let signedRoll = displayRoll;
+            if (displayPitch < 0) { signedRoll = -signedRoll; }
+            realAstroDeg = Math.round(((360 - signedRoll) + compassOffset) % 360);
+            if (realAstroDeg < 0) realAstroDeg += 360;
+            elevation = (90 - Math.abs(displayPitch)) + horizonBeta;
+        } else {
+            realAstroDeg = displayDeg;
+            elevation = displayPitch + horizonBeta;
+        }
         
         let astroHint = document.getElementById('astro-hint');
         if (astroHint) {
@@ -529,13 +562,13 @@ function updateCompassUI() {
         let astroStencil = document.getElementById('astro-stencil'); let astroStencilFixed = document.getElementById('astro-stencil-fixed'); let horizonLine = document.getElementById('astro-horizon-line'); let aLeft = document.getElementById('astro-dir-left'), aRight = document.getElementById('astro-dir-right'); let aTop = document.getElementById('astro-dir-top'), aBottom = document.getElementById('astro-dir-bottom'); let aMsg = document.getElementById('astro-target-msg');
         
         if (astroStencil && astroStencilFixed) {
-            // Полярна зірка висить суворо на Півночі (0°) і на висоті географічної широти
             let diffAz = (((0 - realAstroDeg) % 360) + 540) % 360 - 180; 
             let userLat = lastGoodGPS ? lastGoodGPS.lat : 49.0;
             let diffPitch = userLat - elevation; 
 
             let screenW = window.innerWidth || 360; let pDeg = screenW / 50; 
-            let tx = diffAz * pDeg; let ty = diffPitch * pDeg; 
+            let tx = diffAz * pDeg; 
+            let ty = -diffPitch * pDeg; 
 
             let d = new Date(); let jd = (d.getTime() / 86400000.0) + 2440587.5; let dDays = jd - 2451545.0; let gmst = 280.46061837 + 360.98564736629 * dDays; let userLon = lastGoodGPS ? lastGoodGPS.lon : 31.0; let lst = (gmst + userLon) % 360; if (lst < 0) lst += 360;
             let siderealAngle = lst;
@@ -544,7 +577,7 @@ function updateCompassUI() {
             astroStencil.style.transformOrigin = "50% 50%";
             astroStencil.style.transform = `translate(${tx}px, ${ty}px) rotate(${-siderealAngle}deg)`;
 
-            if (horizonLine) { let tyHor = elevation * pDeg; horizonLine.style.transform = `translateY(${-tyHor}px) rotate(${-displayRoll}deg)`; }
+            if (horizonLine) { let tyHor = elevation * pDeg; horizonLine.style.transform = `translateY(${tyHor}px) rotate(${-displayRoll}deg)`; }
 
             let opAz = Math.min(1, Math.max(0, (Math.abs(diffAz) - 10) / 20)); let opPitch = Math.min(1, Math.max(0, (Math.abs(diffPitch) - 10) / 20));
             aLeft.style.opacity = diffAz > 10 ? opAz : '0'; aRight.style.opacity = diffAz < -10 ? opAz : '0'; aTop.style.opacity = diffPitch > 10 ? opPitch : '0'; aBottom.style.opacity = diffPitch < -10 ? opPitch : '0';
@@ -560,8 +593,7 @@ let voiceSlider = document.getElementById('voice-interval'); if (voiceSlider) { 
 document.getElementById('btn-guide').onclick = async () => { await initSensors(); guideMode = !guideMode; let btn = document.getElementById('btn-guide'); btn.innerText = guideMode ? getT('btn_vibro_on') : getT('btn_vibro_off'); btn.style.color = guideMode ? "#4ade80" : "#558"; };
 
 document.getElementById('btn-astro-horizon').onclick = () => {
-    // Автоматично беремо Pitch як точку відліку нахилу
-    horizonBeta = 0; 
+    if (Math.abs(currentPitch) > 40) { horizonBeta = -(90 - Math.abs(currentPitch)); } else { horizonBeta = -currentPitch; }
     if(navigator.vibrate) navigator.vibrate([100, 50, 100]); playSystemTone(800, 100);
     alert(`${getT('astro_hor_fix')}.\n${getT('astro_hor_next')}`);
 };
@@ -628,6 +660,21 @@ async function detectAI() {
 document.getElementById('btn-shield').onclick = async () => { await initSensors(); isShielded = !isShielded; let btn = document.getElementById('btn-shield'); btn.style.backgroundColor = isShielded ? "#500" : "#111"; btn.style.color = isShielded ? "#fff" : "#f44"; btn.innerText = isShielded ? getT('btn_shield_on') : getT('btn_shield_off'); };
 document.getElementById('btn-shield-sound').onclick = async () => { await initSensors(); shieldSound = !shieldSound; let btn = document.getElementById('btn-shield-sound'); btn.innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off'); btn.style.color = shieldSound ? "#4ade80" : "#fff"; };
 
+window.addEventListener('devicemotion', e => {
+    if (e.accelerationIncludingGravity) {
+        let a = e.accelerationIncludingGravity; let f = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
+        let delta = Math.abs(f - 9.8);
+        if (isShielded && delta > 3) { if(navigator.vibrate) navigator.vibrate([500, 200, 500]); if(shieldSound) playSystemTone(1000, 1000); }
+        if (isSosActive && sosPhase === 2 && delta > 4) { triggerSosActive(); }
+    }
+});
+
+function calcBearing(lat1, lon1, lat2, lon2) {
+    const dL = (lon2 - lon1) * Math.PI / 180; const l1 = lat1 * Math.PI / 180; const l2 = lat2 * Math.PI / 180;
+    const y = Math.sin(dL) * Math.cos(l2); const x = Math.cos(l1) * Math.sin(l2) - Math.sin(l1) * Math.cos(l2) * Math.cos(dL);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
 const OfflineWizard = {
     isActive: false, currentStep: 0,
     start() { if (confirm("⚠️ Супутники втрачено. Перейти в автономний режим?")) { this.isActive = true; this.step1_SetStart(); } },
@@ -665,7 +712,7 @@ async function toggleSOS() {
     await initSensors(); isSosActive = !isSosActive; let btn = document.getElementById('btn-sos-toggle');
     if (!sosBlackout) {
         sosBlackout = document.createElement('div'); sosBlackout.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999999; display:none;";
-        sosBlackout.onclick = () => { if(sosPhase === 2) triggerSosActive(); }; // Тап відновлює 5 хв крику
+        sosBlackout.onclick = () => { if(sosPhase === 2) triggerSosActive(); }; 
         document.body.appendChild(sosBlackout);
     }
     if (isSosActive) { btn.innerText = getT('btn_sos_off'); btn.style.background = "#111"; btn.style.color = "#f33"; btn.style.borderColor = "#f33"; btn.style.boxShadow = "none"; requestWakeLock(); triggerSosActive(); } 
@@ -681,11 +728,11 @@ function triggerSosActive() {
         if (navigator.getBattery) { navigator.getBattery().then(b => { document.getElementById('sos-batt').innerText = Math.round(b.level * 100) + "%"; }); }
         flasher.style.background = isRed ? "#f00" : "#fff"; isRed = !isRed; playSystemTone(2500, 500); if(navigator.vibrate) navigator.vibrate([500]);
     }, 3000);
-    sosPhaseTimer = setTimeout(triggerSosSleep, 300000); // 5 хвилин активності
+    sosPhaseTimer = setTimeout(triggerSosSleep, 300000); 
 }
 
 function triggerSosSleep() {
     if(!isSosActive) return; sosPhase = 2; clearTimeout(sosPhaseTimer); clearInterval(sosInterval); document.getElementById('sos-flasher').style.display = "none"; sosBlackout.style.display = "block";
-    sosInterval = setInterval(() => { playSystemTone(50, 10); }, 3000); // Системний імпульс проти засинання
-    sosPhaseTimer = setTimeout(triggerSosActive, 300000); // 5 хвилин сну
+    sosInterval = setInterval(() => { playSystemTone(50, 10); }, 3000); 
+    sosPhaseTimer = setTimeout(triggerSosActive, 300000); 
 }
