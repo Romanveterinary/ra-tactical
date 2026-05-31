@@ -193,6 +193,46 @@ function toggleNightMode() {
     if (isNightMode) { document.body.classList.add('tactical-night'); } else { document.body.classList.remove('tactical-night'); }
 }
 
+// ==========================================
+// ЛОГІКА РЕЖИМІВ (ЛАЙТ / МАКС)
+// ==========================================
+let isLiteMode = true; 
+
+function toggleAppMode() {
+    let toggle = document.getElementById('mode-toggle');
+    if(!toggle) return;
+    isLiteMode = !toggle.checked;
+    document.getElementById('lbl-lite').classList.toggle('active-lite', isLiteMode);
+    document.getElementById('lbl-max').classList.toggle('active-max', !isLiteMode);
+    applyModeRestrictions();
+}
+
+function applyModeRestrictions() {
+    const btnAi = document.getElementById('btn-ai-cam');
+    const btnMotion = document.getElementById('btn-scan');
+    
+    if(btnAi) {
+        btnAi.style.opacity = isLiteMode ? '0.3' : '1';
+        btnAi.style.pointerEvents = isLiteMode ? 'none' : 'auto';
+    }
+    if(btnMotion) {
+        btnMotion.style.opacity = isLiteMode ? '0.3' : '1';
+        btnMotion.style.pointerEvents = isLiteMode ? 'none' : 'auto';
+    }
+
+    // Примусово вмикаємо легку карту (OSM), якщо обрано ЛАЙТ і активна важка карта
+    if (isLiteMode && map && activeMapLayer) {
+        if (currentLayerIdx === 2 || currentLayerIdx === 3) {
+            map.removeLayer(activeMapLayer);
+            currentLayerIdx = 0; // Повернення до OSM
+            activeMapLayer = mapLayers[currentLayerIdx];
+            activeMapLayer.addTo(map);
+            let btn = document.getElementById('btn-layer-toggle');
+            if(btn) btn.innerText = "🗺 " + layerNames[currentLayerIdx];
+        }
+    }
+}
+
 const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 
@@ -200,6 +240,8 @@ async function checkPin() {
     let input = document.getElementById('pin-input').value;
     if (input === SECRET_PIN) {
         document.getElementById('pin-screen').style.display = 'none';
+        
+        applyModeRestrictions(); // Застосовуємо вибраний режим після входу
         
         await initSensors();
         if(navigator.vibrate) navigator.vibrate(50); 
@@ -251,7 +293,15 @@ let currentVideoTrack = null, currentAstroTrack = null;
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
 let isWalkCalibrating = false, walkStartPoint = null;
-let topoLayer = null, darkLayer = null, currentLayer = 'topo';
+
+// ==========================================
+// ШАРИ МАП (5 варіантів)
+// ==========================================
+let mapLayers = [];
+let layerNames = ['ОСНОВНА (Легка)', 'ТОПОГРАФІЯ', 'СУПУТНИК (Важка)', 'ГІБРИД', 'НІЧНА (Стелс)'];
+let currentLayerIdx = 0;
+let activeMapLayer = null;
+
 let isMapFollowing = true, tracePoints = [], traceLineLayer = null;
 
 let guideMode = false, isVoiceEnabled = false;
@@ -266,11 +316,35 @@ let isTransportMode = false, lastGpsCoordsForTransport = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
 
-let isSosActive = false, sosInterval = null;
+// SOS ЗМІННІ
+let isSosActive = false, sosPhase = 0; // 0=off, 1=active, 2=sleep
+let sosInterval = null, sosPhaseTimer = null;
+let sosBlackout = null; 
 
 function initSystem() {
     setLanguage('uk'); 
     updatePositioningLevel();
+    
+    // Додаємо кнопку координат у вкладку РАЦІЇ
+    let chatSection = document.getElementById('mod-chat');
+    if(chatSection) {
+        let chatInput = document.getElementById('chat-input');
+        if(chatInput) {
+            let btnAddLoc = document.createElement('button');
+            btnAddLoc.className = "tactical-btn";
+            btnAddLoc.style.cssText = "background:#111; color:#f1c40f; border-color:#f1c40f; margin:0 5% 10px 5%; width:90%; padding:10px;";
+            btnAddLoc.innerText = "📍 ВСТАВИТИ МОЇ КООРДИНАТИ";
+            btnAddLoc.onclick = () => {
+                if(lastGoodGPS) {
+                    chatInput.value += `\nPOS: ${lastGoodGPS.lat.toFixed(5)}, ${lastGoodGPS.lon.toFixed(5)}`;
+                    updateCharCount();
+                    if(navigator.vibrate) navigator.vibrate(50);
+                } else alert("❌ Немає GPS координат!");
+            };
+            chatSection.insertBefore(btnAddLoc, chatInput);
+        }
+    }
+
     try{initMap();}catch(e){} 
     try{initGPS();}catch(e){} 
     try{processCamera();}catch(e){}
@@ -413,9 +487,9 @@ function turnOffCamera() {
     } catch(e) {}
     isAiLive = false; isScanning = false; isScanningQR = false;
     let btnCam = document.getElementById('btn-cam'); if(btnCam) btnCam.innerText = getT('btn_cam_off');
-    let btnAiCam = document.getElementById('btn-ai-cam'); if(btnAiCam) { btnAiCam.innerText = getT('btn_ai_scan'); btnAiCam.style.color = "#fff"; }
+    let btnAiCam = document.getElementById('btn-ai-cam'); if(btnAiCam) { btnAiCam.innerText = isLiteMode ? "🤖 ШІ (ВИМК В ЛАЙТ)" : getT('btn_ai_scan'); btnAiCam.style.color = "#fff"; }
     let btnScanQR = document.getElementById('btn-scan-qr'); if(btnScanQR) btnScanQR.style.color = "#0cf";
-    let btnScan = document.getElementById('btn-scan'); if(btnScan) { btnScan.innerText = getT('btn_motion'); btnScan.style.color = "#fff"; }
+    let btnScan = document.getElementById('btn-scan'); if(btnScan) { btnScan.innerText = isLiteMode ? "📉 РУХ (ВИМК В ЛАЙТ)" : getT('btn_motion'); btnScan.style.color = "#fff"; }
     let aiStats = document.getElementById('ai-stats'); if(aiStats) aiStats.innerText = getT('ai_off');
     const canvas = document.getElementById('ui-canvas'); if(canvas) canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
 }
@@ -429,10 +503,18 @@ function toggleMapMenu() {
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
-        topoLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 });
-        darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+        let topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 });
+        let sat = L.tileLayer('http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20 });
+        let hyb = L.tileLayer('http://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20 });
+        let dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        
+        mapLayers = [osm, topo, sat, hyb, dark];
+        currentLayerIdx = 0; // За замовчуванням OSM
+        activeMapLayer = mapLayers[currentLayerIdx];
+
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
-        topoLayer.addTo(map);
+        activeMapLayer.addTo(map);
 
         let pressTimer;
         map.on('mousedown contextmenu', (e) => {
@@ -646,9 +728,21 @@ document.getElementById('btn-follow').onclick = () => {
 };
 
 document.getElementById('btn-layer-toggle').onclick = () => {
-    if(!map || !topoLayer || !darkLayer) return;
-    if(currentLayer === 'topo') { map.removeLayer(topoLayer); darkLayer.addTo(map); currentLayer = 'dark'; }
-    else { map.removeLayer(darkLayer); topoLayer.addTo(map); currentLayer = 'topo'; }
+    if(!map || mapLayers.length === 0) return;
+    map.removeLayer(activeMapLayer);
+    
+    // Циклічне перемикання 5 мап (пропуск важких в ЛАЙТ режимі)
+    do {
+        currentLayerIdx = (currentLayerIdx + 1) % mapLayers.length;
+    } while (isLiteMode && (currentLayerIdx === 2 || currentLayerIdx === 3)); // 2=Супутник, 3=Гібрид
+    
+    activeMapLayer = mapLayers[currentLayerIdx];
+    activeMapLayer.addTo(map);
+    
+    let btn = document.getElementById('btn-layer-toggle');
+    btn.innerText = "🗺 " + layerNames[currentLayerIdx];
+    
+    if(navigator.vibrate) navigator.vibrate(30);
     toggleMapMenu();
 };
 
@@ -827,8 +921,8 @@ function animateCompass() {
     let delta = targetDisplayAngle - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
 
-    // Трохи збільшуємо згладжування, щоб горизонт не стрибав
-    let smoothing = isTransportMode ? 0.02 : 0.1;
+    // ПЛАВНИЙ LERP алгоритм для слабких телефонів та Транспорту
+    let smoothing = isTransportMode ? 0.05 : 0.15;
     
     currentDisplayAngle += delta * smoothing; 
     
@@ -1187,10 +1281,24 @@ document.getElementById('btn-shield-sound').onclick = async () => {
     btn.innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off'); btn.style.color = shieldSound ? "#4ade80" : "#fff"; 
 };
 
+// ==========================================
+// ДАТЧИК ВІБРАЦІЇ ТА СЕЙСМО-SOS
+// ==========================================
 window.addEventListener('devicemotion', e => {
-    if (isShielded && e.accelerationIncludingGravity) {
+    if (e.accelerationIncludingGravity) {
         let a = e.accelerationIncludingGravity; let f = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
-        if (Math.abs(f - 9.8) > 3) { if(navigator.vibrate) navigator.vibrate([500, 200, 500]); if(shieldSound) playSystemTone(1000, 1000); }
+        let delta = Math.abs(f - 9.8);
+        
+        // 1. Модуль Щит/Охорона
+        if (isShielded && delta > 3) {
+            if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
+            if(shieldSound) playSystemTone(1000, 1000); 
+        }
+        
+        // 2. Сейсмо-активація SOS (якщо телефон спить, але фіксує гуркіт або кроки рятувальників)
+        if (isSosActive && sosPhase === 2 && delta > 4) {
+            triggerSosActive(); 
+        }
     }
 });
 
@@ -1251,29 +1359,77 @@ window.addEventListener('devicemotion', function(event) {
     lastAccel = currentAccel;
 });
 
+// ==========================================
+// УЛЬТРА-ЕКОНОМ SOS 
+// ==========================================
 async function toggleSOS() {
-    await initSensors(); isSosActive = !isSosActive;
-    let flasher = document.getElementById('sos-flasher'); let btn = document.getElementById('btn-sos-toggle');
-    
+    await initSensors();
+    isSosActive = !isSosActive;
+    let btn = document.getElementById('btn-sos-toggle');
+
+    if (!sosBlackout) {
+        sosBlackout = document.createElement('div');
+        sosBlackout.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999999; display:none;";
+        sosBlackout.onclick = () => { if(sosPhase === 2) triggerSosActive(); }; // Тап для швидкого перезапуску
+        document.body.appendChild(sosBlackout);
+    }
+
     if (isSosActive) {
-        btn.innerText = getT('btn_sos_off'); btn.style.background = "#111"; btn.style.color = "#f33"; btn.style.boxShadow = "none"; btn.style.borderColor = "#f33";
-        flasher.style.display = "block"; requestWakeLock();
-        
-        if (navigator.getBattery) { navigator.getBattery().then(batt => { document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%"; }); }
-        
-        let isRed = true;
-        sosInterval = setInterval(() => {
-            if (lastGoodGPS) { document.getElementById('sos-latlon').innerHTML = `${lastGoodGPS.lat.toFixed(5)}<br>${lastGoodGPS.lon.toFixed(5)}`; } 
-            else { document.getElementById('sos-latlon').innerText = getT('sos_no_gps'); }
-
-            if (navigator.getBattery) { navigator.getBattery().then(batt => { document.getElementById('sos-batt').innerText = Math.round(batt.level * 100) + "%"; }); }
-
-            flasher.style.background = isRed ? "#f00" : "#fff"; isRed = !isRed;
-            playSystemTone(2500, 500); if(navigator.vibrate) navigator.vibrate([500]);
-        }, 3000);
-
+        btn.innerText = getT('btn_sos_off'); btn.style.background = "#111"; btn.style.color = "#f33"; btn.style.borderColor = "#f33"; btn.style.boxShadow = "none";
+        requestWakeLock();
+        triggerSosActive();
     } else {
         btn.innerText = getT('btn_sos_on'); btn.style.background = "#f33"; btn.style.color = "#fff"; btn.style.boxShadow = "0 0 20px #f33"; btn.style.borderColor = "#fff";
-        flasher.style.display = "none"; clearInterval(sosInterval); releaseWakeLock();
+        sosPhase = 0;
+        clearTimeout(sosPhaseTimer);
+        clearInterval(sosInterval);
+        document.getElementById('sos-flasher').style.display = "none";
+        sosBlackout.style.display = "none";
+        releaseWakeLock();
     }
+}
+
+function triggerSosActive() {
+    if(!isSosActive) return;
+    sosPhase = 1; // Фаза 1: 1 Хвилина Крику
+    clearTimeout(sosPhaseTimer);
+    clearInterval(sosInterval);
+    sosBlackout.style.display = "none";
+    document.getElementById('sos-flasher').style.display = "block";
+
+    // Авто-копіювання координат для Wi-Fi маяка (якщо доступно)
+    let batt = "--";
+    if (navigator.getBattery) { navigator.getBattery().then(b => { batt = Math.round(b.level * 100); }); }
+    if (lastGoodGPS) {
+        let wifiName = `SOS_${lastGoodGPS.lat.toFixed(4).replace('.','')}_${lastGoodGPS.lon.toFixed(4).replace('.','')}_B${batt}`;
+        try { navigator.clipboard.writeText(wifiName); } catch(e){}
+    }
+
+    let isRed = true;
+    sosInterval = setInterval(() => {
+        let flasher = document.getElementById('sos-flasher');
+        if (lastGoodGPS) { document.getElementById('sos-latlon').innerHTML = `${lastGoodGPS.lat.toFixed(5)}<br>${lastGoodGPS.lon.toFixed(5)}`; } 
+        else { document.getElementById('sos-latlon').innerText = getT('sos_no_gps'); }
+
+        if (navigator.getBattery) { navigator.getBattery().then(b => { document.getElementById('sos-batt').innerText = Math.round(b.level * 100) + "%"; }); }
+
+        flasher.style.background = isRed ? "#f00" : "#fff"; isRed = !isRed;
+        playSystemTone(2500, 500); if(navigator.vibrate) navigator.vibrate([500]);
+    }, 3000);
+
+    sosPhaseTimer = setTimeout(triggerSosSleep, 60000); // Через 1 хв йдемо спати
+}
+
+function triggerSosSleep() {
+    if(!isSosActive) return;
+    sosPhase = 2; // Фаза 2: 3 Хвилини AMOLED Сну
+    clearTimeout(sosPhaseTimer);
+    clearInterval(sosInterval);
+    document.getElementById('sos-flasher').style.display = "none";
+    sosBlackout.style.display = "block"; // AMOLED блекаут
+    
+    // Тихий звуковий плейбек, щоб Android не закрив вкладку
+    sosInterval = setInterval(() => { playSystemTone(50, 10); }, 3000);
+
+    sosPhaseTimer = setTimeout(triggerSosActive, 180000); // Через 3 хв знову кричати
 }
