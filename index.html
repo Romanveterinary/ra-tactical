@@ -7,8 +7,7 @@
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
-    <script src="tf.min.js"></script>
-    <script src="coco-ssd.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
@@ -63,6 +62,16 @@
 <body>
     <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
+        
+        <div class="mode-switch-wrapper">
+            <span id="lbl-lite" class="mode-label active-lite">ЛАЙТ</span>
+            <label class="mode-switch">
+                <input type="checkbox" id="mode-toggle" onchange="toggleAppMode()">
+                <span class="slider-track"></span>
+            </label>
+            <span id="lbl-max" class="mode-label">МАКС</span>
+        </div>
+
         <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
         <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:20px;" data-i18n="btn_login">ВХІД</button>
         <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;" data-i18n="err_access_denied">❌ ДОСТУП ЗАБОРОНЕНО</div>
@@ -133,7 +142,7 @@
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;" data-i18n="btn_map_follow">🎯 СЛІДКУВАТИ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;" data-i18n="btn_map_del_last">✖ ОСТАННЯ ТОЧКА</button>
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;" data-i18n="btn_map_clear">🗑 ОЧИСТИТИ МАРШРУТ</button>
-                <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР</button>
+                <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР (Легка мапа)</button>
                 <button id="btn-cache-map" class="map-btn" data-i18n="btn_map_cache">💾 КЕШ 2х2 км</button>
             </div>
         </section>
@@ -262,11 +271,11 @@
             
             <div class="flex-row">
                 <button id="btn-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_cam_off">🔴 КАМЕРА</button>
-                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_ai_scan">🤖 ШІ SCAN</button>
+                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_ai_scan">🤖 ШІ SCAN (НЕ для слабких)</button>
             </div>
             <div class="flex-row">
                 <button id="btn-ir" class="tactical-btn" data-i18n="btn_ir">🔭 ІЧ-ФІЛЬТР</button>
-                <button id="btn-scan" class="tactical-btn" data-i18n="btn_motion">📉 ДЕТЕКТОР РУХУ</button>
+                <button id="btn-scan" class="tactical-btn" data-i18n="btn_motion">📉 ДЕТЕКТОР РУХУ (НЕ для слабких)</button>
             </div>
         </section>
 
