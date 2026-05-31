@@ -39,11 +39,7 @@ body {
     font-size: 1.2rem;
     color: #555;
 }
-.mode-switch {
-    position: relative;
-    width: 80px;
-    height: 36px;
-}
+.mode-switch { position: relative; width: 80px; height: 36px; }
 .mode-switch input { opacity: 0; width: 0; height: 0; }
 .slider-track {
     position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -90,15 +86,14 @@ input:checked + .slider-track:before { transform: translateX(44px); background-c
 #mod-map.active { padding: 0; }
 #map-container { height: 100%; width: 100%; background: #000; }
 
-/* КНОПКИ ТА КОМПАС (Твій робочий код) */
 .map-overlay-controls { position: absolute; z-index: 1000; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px; border: 1px solid #333; }
 .map-btn { background: rgba(0,0,0,0.9); color: var(--glow); border: 1px solid #444; padding: 12px; border-radius: 5px; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
 
+/* КОМПАС */
 #compass-container { width: 300px; height: 300px; margin: 10px auto; position: relative; border: 2px solid #222; border-radius: 50%; background: radial-gradient(circle, #111, #000); }
 #tc-ring { width: 100%; height: 100%; position: absolute; border-radius: 50%; border: 1px dashed #444; transition: transform 0.1s linear; }
 .compass-mark { position: absolute; top: 50%; left: 50%; transform-origin: center center; font-weight: bold; color: #888; font-size: 1rem; }
 #tc-arrow { position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 140px solid var(--danger); margin-left: -8px; margin-top: -140px; transform-origin: 50% 100%; z-index: 15; display: none; filter: drop-shadow(0 0 5px red); }
-
 #clinometer-wrap { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 12px; height: 160px; background: rgba(20,20,20,0.8); border: 1px solid #333; border-radius: 6px; overflow: hidden; }
 #clino-bar { position: absolute; bottom: 50%; width: 100%; height: 4px; background: var(--glow); box-shadow: 0 0 8px var(--glow); transition: bottom 0.1s linear; }
 .compass-data { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; z-index: 20; }
@@ -117,6 +112,52 @@ input:checked + .slider-track:before { transform: translateX(44px); background-c
 input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 8px; border-radius: 4px; margin-bottom: 15px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--glow); border-radius: 50%; cursor: pointer; }
 
-/* НІЧНИЙ РЕЖИМ (Твій код) */
+/* =========================================
+   ВІДНОВЛЕНІ СТИЛІ МАРКЕРА ТА ЛІНІЙ
+========================================== */
+.map-trace { stroke-opacity: 0.7; stroke-dasharray: 4, 6; }
+.u-icon { background: none !important; border: none !important; }
+#user-tri { 
+    width: 0; height: 0; 
+    border-left: 10px solid transparent; 
+    border-right: 10px solid transparent; 
+    border-bottom: 35px solid var(--accent); 
+    transform-origin: 50% 100%; 
+    filter: drop-shadow(0 0 5px var(--accent)); 
+    transition: transform 0.1s linear; /* Плавне обертання на мапі */
+}
+
+/* =========================================
+   НІЧНИЙ РЕЖИМ (ТАКТИЧНИЙ ЧЕРВОНИЙ)
+========================================== */
 body.tactical-night { --glow: #f33 !important; --accent: #f33 !important; --danger: #a00 !important; background: #050000 !important; color: #f33 !important; }
-/* ... (решта стилів нічного режиму без змін) ... */
+body.tactical-night #menu-trigger { color: #f33 !important; border-color: #500 !important; background: rgba(50,0,0,0.7) !important; }
+body.tactical-night .side-nav { background: #080000 !important; border-color: #300 !important; }
+body.tactical-night .side-nav a { color: #d33 !important; border-color: #300 !important; }
+body.tactical-night .side-nav a:hover { background: #300 !important; color: #f33 !important; }
+body.tactical-night .tactical-btn, body.tactical-night .map-btn, body.tactical-night .lang-btn { background: #100 !important; color: #f33 !important; border-color: #500 !important; }
+body.tactical-night .lang-btn.active { color: #f33 !important; border-color: #f33 !important; font-weight: bold; background: #300 !important; }
+body.tactical-night #tactical-hud { background: rgba(20,0,0,0.85) !important; border-color: #500 !important; }
+body.tactical-night #compass-container { border-color: #500 !important; background: radial-gradient(circle, #200, #000) !important; }
+body.tactical-night #tc-ring { border-color: #500 !important; }
+body.tactical-night .compass-mark { color: #f33 !important; }
+body.tactical-night #tc-deg, body.tactical-night #tc-dist { color: #f33 !important; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 0 10px #000 !important; z-index: 30; position: relative; }
+body.tactical-night #tc-arrow { border-bottom-color: #600 !important; filter: drop-shadow(0 0 2px #f00) !important; z-index: 10; }
+body.tactical-night #user-tri { border-bottom-color: #f33 !important; filter: drop-shadow(0 0 5px #f33) !important; }
+body.tactical-night .map-trace { stroke: #f33 !important; }
+body.tactical-night .map-fab-eco, body.tactical-night .map-fab-cal { background: rgba(50,0,0,0.8) !important; color: #f33 !important; border-color:#f33 !important; }
+body.tactical-night #astro-horizon-line { background: rgba(255,51,51,0.8) !important; box-shadow: 0 0 5px #f33 !important; }
+body.tactical-night svg circle { fill: none !important; stroke: #f33 !important; }
+body.tactical-night svg line, body.tactical-night svg polyline { stroke: #f33 !important; }
+body.tactical-night svg text { fill: #f33 !important; }
+body.tactical-night .astro-target-locked { stroke: #f33 !important; filter: drop-shadow(0 0 15px #f33) !important; }
+body.tactical-night #astro-target-msg { color: #f33 !important; text-shadow: 0 0 10px #f33 !important; }
+body.tactical-night #eco-dist { color: #f33 !important; }
+body.tactical-night .eco-edge { background: #500 !important; }
+body.tactical-night input[type=range]::-webkit-slider-thumb { background: #f33 !important; }
+body.tactical-night input[type=range] { background: #300 !important; }
+body.tactical-night #clino-bar { background: #f33 !important; box-shadow: 0 0 8px #f33 !important; }
+body.tactical-night #clinometer-wrap { background: rgba(50,0,0,0.8) !important; border-color: #500 !important; }
+body.tactical-night #tc-alt, body.tactical-night #tc-acc, body.tactical-night #route-info { color: #d33 !important; }
+body.tactical-night .sos-btn { border-color: #f33 !important; color: #f33 !important; }
+body.tactical-night .leaflet-layer { filter: grayscale(100%) sepia(100%) hue-rotate(320deg) saturate(500%) brightness(0.6) contrast(1.5) !important; }
