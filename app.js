@@ -84,11 +84,7 @@ function toggleNightMode() {
     if (isNightMode) { document.body.classList.add('tactical-night'); } else { document.body.classList.remove('tactical-night'); }
 }
 
-// ==========================================
-// ЛОГІКА РЕЖИМІВ (ЛАЙТ / МАКС)
-// ==========================================
 let isLiteMode = true; 
-
 function toggleAppMode() {
     let toggle = document.getElementById('mode-toggle');
     if(!toggle) return;
@@ -183,14 +179,13 @@ let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
 let isWalkCalibrating = false, walkStartPoint = null;
 
-// ШАРИ МАП
 let mapLayers = [];
 let layerNames = ['ОСНОВНА (Легка)', 'ТОПОГРАФІЯ', 'СУПУТНИК (Важка)', 'ГІБРИД', 'НІЧНА (Стелс)'];
 let currentLayerIdx = 0;
 let activeMapLayer = null;
 
 let isMapFollowing = true, tracePoints = [], traceLineLayer = null;
-let userToTargetLine = null; // СТРІЛОЧКА-ЛІНІЯ ДО ЦІЛІ
+let userToTargetLine = null;
 
 let guideMode = false, isVoiceEnabled = false;
 let lastVibroTime = 0, lastVoiceTime = 0, lastGpsPing = 0;
@@ -204,7 +199,6 @@ let isTransportMode = false, lastGpsCoordsForTransport = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
 
-// SOS
 let isSosActive = false, sosPhase = 0;
 let sosInterval = null, sosPhaseTimer = null;
 let sosBlackout = null; 
@@ -387,18 +381,14 @@ function toggleMapMenu() {
     else { m.style.display = 'none'; btn.style.color = '#fff'; btn.style.borderColor = '#333'; }
 }
 
-// ==========================================
-// ТАКТИЧНА СІТКА НА МАПІ
-// ==========================================
 let gridLayer = null;
 function updateTacticalGrid() {
     if (!map) return;
     if (gridLayer) { map.removeLayer(gridLayer); gridLayer = null; }
     
     let zoom = map.getZoom();
-    if (zoom < 13) return; // Не малюємо сітку, якщо дуже віддалено (економимо процесор)
+    if (zoom < 13) return; 
     
-    // 100 метрів на високому зумі, 1 км на низькому
     let stepMeters = (zoom >= 16) ? 100 : 1000;
     let bounds = map.getBounds();
     let latStep = stepMeters / 111320;
@@ -416,7 +406,6 @@ function updateTacticalGrid() {
         lines.push([[bounds.getSouth(), lon], [bounds.getNorth(), lon]]);
     }
     
-    // Легкий зеленуватий пунктир для сітки
     gridLayer = L.polyline(lines, { color: 'var(--accent)', weight: 1, opacity: 0.3, dashArray: '4, 4' }).addTo(map);
 }
 
@@ -436,7 +425,6 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         activeMapLayer.addTo(map);
         
-        // Малюємо сітку при русі мапи
         map.on('moveend', updateTacticalGrid);
         map.on('zoomend', updateTacticalGrid);
 
@@ -455,7 +443,7 @@ function initMap() {
                 if(navigator.vibrate) navigator.vibrate(100); playSystemTone(800, 100);
                 let stat = document.getElementById('gps-status'); if (stat) { stat.innerText = getT('gps_manual'); stat.style.color = "#f97316"; }
                 updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon);
-                updateUserToTargetLine(); // Оновлюємо стрілочку напрямку
+                updateUserToTargetLine(); 
                 return;
             }
 
@@ -482,9 +470,6 @@ function initMap() {
 
 document.getElementById('btn-manual-pos').onclick = () => { isManualPosMode = true; alert(getT('alert_man_pos')); toggleMapMenu(); };
 
-// ==========================================
-// ЛІНІЯ НАПРЯМКУ ДО ЦІЛІ НА МАПІ
-// ==========================================
 function updateUserToTargetLine() {
     if (!map || routePoints.length === 0 || !lastGoodGPS) {
         if (userToTargetLine) { map.removeLayer(userToTargetLine); userToTargetLine = null; }
@@ -492,7 +477,6 @@ function updateUserToTargetLine() {
     }
     let latlngs = [ [lastGoodGPS.lat, lastGoodGPS.lon], routePoints[0] ];
     if (!userToTargetLine) {
-        // Червоний пунктир від бійця до цілі
         userToTargetLine = L.polyline(latlngs, {color: '#f33', weight: 3, dashArray: '5, 8'}).addTo(map);
     } else {
         userToTargetLine.setLatLngs(latlngs);
@@ -510,7 +494,7 @@ function updateRoute() {
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
         currentBearing = null; currentDistanceToTarget = null;
         localStorage.removeItem('savedRoute'); 
-        updateUserToTargetLine(); // Видаляємо стрілочку
+        updateUserToTargetLine(); 
         return;
     }
 
@@ -522,7 +506,7 @@ function updateRoute() {
     
     if(lastGoodGPS && routePoints.length > 0) { updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon); }
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
-    updateUserToTargetLine(); // Оновлюємо стрілочку
+    updateUserToTargetLine(); 
 }
 
 function traceVanishing() {
@@ -745,7 +729,6 @@ function updateTargetDistance(lat, lon) {
     } else { currentDistanceToTarget = null; currentBearing = null; }
 }
 
-// ОНОВЛЕННЯ НАЗВИ ДЛЯ WI-FI МАЯКА
 function updateWifiName() {
     let wifiEl = document.getElementById('wifi-name');
     if (!wifiEl || !lastGoodGPS) return;
@@ -818,7 +801,7 @@ function initGPS() {
             lastGpsCoordsForTransport = { lat, lon }; lastGoodGPS = { lat, lon };
             
             updateWifiName();
-            updateUserToTargetLine(); // Оновлюємо стрілочку до цілі
+            updateUserToTargetLine(); 
             
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : (currentLang === 'pt' ? 'VEL:' : 'SPD:');
             let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `${prefixSpd} ${currentSpeedKmh.toFixed(1)} km/h`;
@@ -892,7 +875,8 @@ function animateCompass() {
     let delta = targetDisplayAngle - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
 
-    let smoothing = isTransportMode ? 0.05 : 0.15;
+    // СИЛЬНЕ ЗГЛАДЖУВАННЯ (0.04 замість 0.15)
+    let smoothing = isTransportMode ? 0.02 : 0.04;
     
     currentDisplayAngle += delta * smoothing; 
     
@@ -979,7 +963,9 @@ function updateCompassUI() {
     
     let astroMod = document.getElementById('mod-astro');
     if (astroMod && astroMod.classList.contains('active')) {
-        let elevation = displayPitch - horizonBeta;
+        // ТОЧНА ФОРМУЛА ВИСОТИ
+        let elevation = horizonBeta - displayPitch;
+        
         let astroHint = document.getElementById('astro-hint');
         if (astroHint) {
             let prefixAz = currentLang === 'uk' ? 'АЗИМУТ' : (currentLang === 'pt' ? 'AZIMUTE' : 'AZIMUTH');
@@ -1000,7 +986,7 @@ function updateCompassUI() {
             let diffPitch = userLat - elevation; 
 
             let screenW = window.innerWidth || 360;
-            let pDeg = screenW / 50; 
+            let pDeg = screenW / 60; // Адекватний кут зору
             
             let tx = diffAz * pDeg; 
             let ty = -diffPitch * pDeg; 
@@ -1063,7 +1049,7 @@ document.getElementById('btn-guide').onclick = async () => {
 };
 
 document.getElementById('btn-astro-horizon').onclick = () => {
-    horizonBeta = currentPitch;
+    horizonBeta = displayPitch; // Фіксуємо згладжений кут
     if(navigator.vibrate) navigator.vibrate([100, 50, 100]); playSystemTone(800, 100);
     alert(`${getT('astro_hor_fix')} (${Math.round(horizonBeta)}°).\n${getT('astro_hor_next')}`);
 };
@@ -1252,6 +1238,8 @@ window.addEventListener('devicemotion', e => {
             if(navigator.vibrate) navigator.vibrate([500, 200, 500]); 
             if(shieldSound) playSystemTone(1000, 1000); 
         }
+        
+        // Сейсмо-пробудження SOS з чорного екрана
         if (isSosActive && sosPhase === 2 && delta > 4) {
             triggerSosActive(); 
         }
@@ -1315,6 +1303,9 @@ window.addEventListener('devicemotion', function(event) {
     lastAccel = currentAccel;
 });
 
+// ==========================================
+// УЛЬТРА-ЕКОНОМ SOS ТА WI-FI МАЯК
+// ==========================================
 async function toggleSOS() {
     await initSensors();
     isSosActive = !isSosActive;
@@ -1323,6 +1314,7 @@ async function toggleSOS() {
     if (!sosBlackout) {
         sosBlackout = document.createElement('div');
         sosBlackout.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999999; display:none;";
+        // Якщо тапнути по чорному екрану — тривога відновлюється
         sosBlackout.onclick = () => { if(sosPhase === 2) triggerSosActive(); }; 
         document.body.appendChild(sosBlackout);
     }
@@ -1350,12 +1342,7 @@ function triggerSosActive() {
     sosBlackout.style.display = "none";
     document.getElementById('sos-flasher').style.display = "block";
 
-    let batt = "--";
-    if (navigator.getBattery) { navigator.getBattery().then(b => { batt = Math.round(b.level * 100); }); }
-    if (lastGoodGPS) {
-        let wifiName = `SOS_${lastGoodGPS.lat.toFixed(4).replace('.','')}_${lastGoodGPS.lon.toFixed(4).replace('.','')}_B${batt}`;
-        try { navigator.clipboard.writeText(wifiName); } catch(e){}
-    }
+    updateWifiName();
 
     let isRed = true;
     sosInterval = setInterval(() => {
@@ -1369,7 +1356,8 @@ function triggerSosActive() {
         playSystemTone(2500, 500); if(navigator.vibrate) navigator.vibrate([500]);
     }, 3000);
 
-    sosPhaseTimer = setTimeout(triggerSosSleep, 60000); 
+    // 300 000 мс = 5 хвилин АКТИВНОСТІ
+    sosPhaseTimer = setTimeout(triggerSosSleep, 300000); 
 }
 
 function triggerSosSleep() {
@@ -1382,5 +1370,6 @@ function triggerSosSleep() {
     
     sosInterval = setInterval(() => { playSystemTone(50, 10); }, 3000);
 
-    sosPhaseTimer = setTimeout(triggerSosActive, 180000); 
+    // 300 000 мс = 5 хвилин СНУ
+    sosPhaseTimer = setTimeout(triggerSosActive, 300000); 
 }
