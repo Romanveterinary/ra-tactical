@@ -64,9 +64,10 @@
 
         /* HUD TRANSPORT STYLES */
         .hud-transport-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; background: #000; }
-        .hud-mirrored { transform: scaleY(-1); }
-        .hud-speed-display { font-size: 7rem; font-weight: bold; color: #4ade80; text-shadow: 0 0 15px #4ade80; line-height: 1; }
-        .hud-dist-display { font-size: 2.5rem; font-weight: bold; color: #0cf; text-shadow: 0 0 10px #0cf; margin-top: 20px; }
+        .hud-mirrored { transform: scaleX(-1); }
+        .hud-speed-display { font-size: 13rem; font-weight: bold; color: #4ade80; text-shadow: 0 0 15px #4ade80; line-height: 1; transition: color 0.3s, text-shadow 0.3s; }
+        .hud-dist-display { font-size: 2.5rem; font-weight: bold; color: #0cf; text-shadow: 0 0 10px #0cf; margin-top: 10px; }
+        #hud-message { margin-top: 20px; font-size: 1.8rem; font-weight: bold; font-family: monospace; }
         
         /* CITY GUIDE STYLES */
         .city-nav-box { background: rgba(0,0,0,0.8); border: 2px solid #0cf; border-radius: 10px; padding: 15px; margin: 15px; text-align: center; box-shadow: 0 0 10px #0cf; }
@@ -178,8 +179,6 @@
                 </div>
             </div>
             
-            <button id="btn-orientation-mode" class="tactical-btn" style="background:#111; color:#a855f7; border-color:#a855f7; margin-bottom:10px;" data-i18n="btn_orient_flat">📱 ПОЛОЖЕННЯ: ПЛОСКО</button>
-
             <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk" onclick="startWalkCalibration()">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
@@ -206,8 +205,7 @@
                 <div style="color: #aaa; margin-top: 5px;" id="city-dist-text">-- м</div>
             </div>
             
-            <button id="btn-city-route-mode" class="tactical-btn" style="background:#111; color:#4ade80; border-color:#4ade80; margin-bottom: 15px;" data-i18n="btn_city_online">🌐 МАРШРУТ: ПО ВУЛИЦЯХ (ОНЛАЙН)</button>
-            <button id="btn-city-orient" class="tactical-btn" style="background:#111; color:#a855f7; border-color:#a855f7; margin-bottom: 25px;" data-i18n="btn_orient_flat">📱 ПОЛОЖЕННЯ: ПЛОСКО</button>
+            <button id="btn-city-route-mode" class="tactical-btn" style="background:#111; color:#4ade80; border-color:#4ade80; margin-bottom: 25px;" data-i18n="btn_city_online">🌐 МАРШРУТ: ПО ВУЛИЦЯХ (ОНЛАЙН)</button>
             
             <div class="flex-row">
                 <button id="btn-city-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;" data-i18n="btn_voice_off">ГОЛОС: ВИМК</button>
@@ -221,6 +219,7 @@
             <div class="hud-transport-container" id="hud-transport-wrap">
                 <div class="hud-speed-display" id="hud-big-speed">0</div>
                 <div style="color: #4ade80; font-weight: bold; font-size: 1.5rem;">KM/H</div>
+                <div id="hud-message" style="display:none;"></div>
                 <div class="hud-dist-display" id="hud-big-dist">--- м</div>
                 <button id="btn-hud-mirror" class="tactical-btn" style="margin-top: 40px; width: 80%; border-color: #fff; color: #fff;" data-i18n="btn_hud_mirror">ВІДДЗЕРКАЛИТИ (НА СКЛО)</button>
             </div>
