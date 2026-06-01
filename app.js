@@ -66,7 +66,6 @@ function setLanguage(lang) {
     document.getElementById('btn-shield').innerText = isShielded ? getT('btn_shield_on') : getT('btn_shield_off');
     document.getElementById('btn-shield-sound').innerText = shieldSound ? getT('btn_shield_snd_on') : getT('btn_shield_snd_off');
     document.getElementById('btn-sos-toggle').innerText = isSosActive ? getT('btn_sos_off') : getT('btn_sos_on');
-    updateOrientationButtons();
 }
 
 let isNightMode = false;
@@ -93,7 +92,7 @@ async function checkPin() {
         }
         
         await initSensors();
-        startAntiSleepAudio(); // Запуск тихого плеєра (Анти-сон)
+        startAntiSleepAudio(); 
         
         if(navigator.vibrate) navigator.vibrate(50); 
         playNavTone(1000, 100);
@@ -156,11 +155,17 @@ let isManualPosMode = false;
 let wakeLock = null;
 let isTransportMode = false, lastGpsCoordsForTransport = null;
 
-// Нові стани
-let isEdgeOrientation = false;
 let isCityOnline = true;
 let isARActive = false;
 let alarmActive = false, alarmTriggered = false, alarmRadiusKm = 10, alarmOsc = null;
+
+// Змінні для "Розумного таймера" мапи
+let isUserDraggingMap = false;
+let mapInteractionTimer = null;
+
+// Змінні для Пасхалок HUD
+let hudState = 0; // 0: зелений, 1: жовтий, 2: червоний
+let hudMsgTimer = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
 
@@ -229,7 +234,7 @@ function startAntiSleepAudio() {
     if (!audioCtx) return;
     keepAwakeOsc = audioCtx.createOscillator();
     let silentGain = audioCtx.createGain();
-    silentGain.gain.value = 0; // Абсолютна тиша
+    silentGain.gain.value = 0; 
     keepAwakeOsc.frequency.value = 0;
     keepAwakeOsc.connect(silentGain);
     silentGain.connect(audioCtx.destination);
@@ -304,7 +309,7 @@ async function showModule(id) {
         if (videoAstro && videoAstro.srcObject) { videoAstro.srcObject.getTracks().forEach(t => t.stop()); videoAstro.srcObject = null; }
     }
     
-    if (id !== 'mod-ar' && isARActive) startAR(); // Вимкнути AR, якщо пішли з вкладки
+    if (id !== 'mod-ar' && isARActive) startAR();
 }
 
 function turnOffCamera() {
@@ -330,24 +335,39 @@ function toggleMapMenu() {
     else { m.style.display = 'none'; btn.style.color = '#fff'; btn.style.borderColor = '#333'; }
 }
 
+function handleMapInteraction() {
+    isUserDraggingMap = true;
+    if(mapInteractionTimer) clearTimeout(mapInteractionTimer);
+    mapInteractionTimer = setTimeout(() => {
+        isUserDraggingMap = false;
+        if(lastGoodGPS && !isManualPosMode) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]);
+    }, 10000); // 10 СЕКУНД ТАЙМЕР
+}
+
 function initMap() {
     if (typeof L === 'undefined') return;
     try {
         mapLayers = {
             'osm': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }),
+            'tourist': L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }),
             'topo': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 }),
             'sat': L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', { maxZoom: 20 }),
             'dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
         };
         
-        currentLayerKeys = isLiteMode ? ['osm', 'dark'] : ['osm', 'topo', 'sat', 'dark'];
+        currentLayerKeys = isLiteMode ? ['osm', 'dark'] : ['osm', 'tourist', 'topo', 'sat', 'dark'];
         currentLayerIdx = 0;
 
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         mapLayers[currentLayerKeys[currentLayerIdx]].addTo(map);
 
+        // Таймер авто-повернення
+        map.on('dragstart', handleMapInteraction);
+        map.on('zoomstart', handleMapInteraction);
+
         let pressTimer;
-        map.on('mousedown contextmenu', (e) => {
+        map.on('mousedown contextmenu touchstart', (e) => {
+            handleMapInteraction();
             if (isManualPosMode) {
                 lastGoodGPS = { lat: e.latlng.lat, lon: e.latlng.lng };
                 if(!userMarker) {
@@ -369,8 +389,9 @@ function initMap() {
                 routePoints.push(e.latlng); updateRoute(); buildCityRoute();
             }, 700); 
         });
-        map.on('mouseup mousemove dragstart', () => { clearTimeout(pressTimer); });
+        map.on('mouseup mousemove dragend touchend', () => { clearTimeout(pressTimer); });
         map.on('dblclick', (e) => {
+            handleMapInteraction();
             if (isManualPosMode || routePoints.length >= 10) return;
             if(navigator.vibrate) navigator.vibrate(50);
             routePoints.push(e.latlng); updateRoute(); buildCityRoute();
@@ -408,7 +429,6 @@ function updateRoute() {
     localStorage.setItem('savedRoute', JSON.stringify(routePoints));
 }
 
-// 🔄 ПОВЕРНЕННЯ ПРОЙДЕНИМ ШЛЯХОМ
 document.getElementById('btn-show-trace').onclick = () => {
     if (tracePoints.length < 2) { alert(currentLang === 'uk' ? "Немає збереженого сліду." : "No trace saved."); return; }
     if (confirm(currentLang === 'uk' ? "Повернутися пройденим шляхом до початкової точки?" : "Return along the tracked path?")) {
@@ -429,7 +449,6 @@ function traceVanishing() {
     }
 }
 
-// --- CITY / ONLINE ROUTING (Спрощений OSRM) ---
 document.getElementById('btn-city-route-mode').onclick = (e) => {
     isCityOnline = !isCityOnline; let btn = e.target;
     if(isCityOnline) { btn.innerText = getT('btn_city_online'); btn.style.color = "#4ade80"; btn.style.borderColor = "#4ade80"; buildCityRoute(); } 
@@ -625,7 +644,6 @@ if(btnTransport) {
     };
 }
 
-// 🚙 TRANSPORT HUD MIRROR
 document.getElementById('btn-hud-mirror').onclick = () => { document.getElementById('hud-transport-wrap').classList.toggle('hud-mirrored'); };
 
 function updateSunPosition(lat, lon) {
@@ -660,7 +678,6 @@ function updateTargetDistance(lat, lon) {
     } else { currentDistanceToTarget = null; currentBearing = null; }
 }
 
-// ⏰ ГЕО-БУДИЛЬНИК
 document.getElementById('alarm-radius').oninput = (e) => {
     alarmRadiusKm = e.target.value;
     document.getElementById('alarm-radius-val').innerText = alarmRadiusKm + " км";
@@ -686,9 +703,16 @@ function triggerAlarmWakeup() {
         alarmOsc.connect(alarmGain); alarmGain.connect(audioCtx.destination);
         alarmOsc.type = 'square'; alarmOsc.frequency.value = 400;
         alarmGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-        alarmGain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 60); // Плавно за 1 хв
+        alarmGain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 60); 
         alarmOsc.start();
     }
+}
+
+function showHudMsg(text, color) {
+    let el = document.getElementById('hud-message'); if(!el) return;
+    el.innerText = text; el.style.color = color; el.style.display = 'block';
+    if(hudMsgTimer) clearTimeout(hudMsgTimer);
+    hudMsgTimer = setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
 function initGPS() {
@@ -728,7 +752,6 @@ function initGPS() {
 
             updateTargetDistance(lat, lon);
             
-            // Будильник
             if (alarmActive && !alarmTriggered && routePoints.length > 0) {
                 let dAlarm = map.distance([lat, lon], routePoints[0]);
                 if (dAlarm <= alarmRadiusKm * 1000) { alarmTriggered = true; triggerAlarmWakeup(); }
@@ -746,7 +769,25 @@ function initGPS() {
             
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : 'SPD:';
             let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `${prefixSpd} ${currentSpeedKmh.toFixed(1)} km/h`;
-            let hudBigSpeed = document.getElementById('hud-big-speed'); if(hudBigSpeed) hudBigSpeed.innerText = Math.round(currentSpeedKmh);
+            
+            // ПАСХАЛКИ ТА ВЕЛИКІ ЦИФРИ (HUD)
+            let spdRound = Math.round(currentSpeedKmh);
+            let hudBigSpeed = document.getElementById('hud-big-speed'); 
+            if(hudBigSpeed) {
+                hudBigSpeed.innerText = spdRound;
+                if (spdRound >= 110 && hudState !== 2) {
+                    hudState = 2; hudBigSpeed.style.color = "#f33"; hudBigSpeed.style.textShadow = "0 0 20px #f33";
+                    showHudMsg("Куди так спішиш? А ну менше газу !!!", "#f33");
+                } else if (spdRound >= 55 && spdRound < 110 && hudState === 0) {
+                    hudState = 1; hudBigSpeed.style.color = "#f1c40f"; hudBigSpeed.style.textShadow = "0 0 20px #f1c40f";
+                    showHudMsg("Ти вже виїхав за місто?", "#f1c40f");
+                } else if (spdRound < 100 && hudState === 2) {
+                    hudState = 1; hudBigSpeed.style.color = "#f1c40f"; hudBigSpeed.style.textShadow = "0 0 20px #f1c40f";
+                    showHudMsg("Молодець ! тебе чекають дома.", "#4ade80");
+                } else if (spdRound < 55 && hudState !== 0) {
+                    hudState = 0; hudBigSpeed.style.color = "#4ade80"; hudBigSpeed.style.textShadow = "0 0 20px #4ade80";
+                }
+            }
             
             let coordsEl = document.getElementById('tc-coords-small'); if(coordsEl) coordsEl.innerHTML = `LAT: ${lat.toFixed(5)}<br>LON: ${lon.toFixed(5)}`;
             let prefixAcc = currentLang === 'uk' ? 'ТОЧН:' : 'ACC:';
@@ -757,8 +798,9 @@ function initGPS() {
             updateSunPosition(lat, lon);
 
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
-            // АВТО-ЦЕНТРУВАННЯ МАПИ ЗАВЖДИ
-            if (!firstFix && map && !isManualPosMode) map.panTo([lat, lon]);
+            
+            // АВТО-ЦЕНТРУВАННЯ МАПИ (з перевіркою таймера)
+            if (!firstFix && map && !isManualPosMode && !isUserDraggingMap) map.panTo([lat, lon]);
 
             if(!userMarker && map && typeof L !== 'undefined') {
                 userMarker = L.marker([lat, lon], { zIndexOffset: 1000, icon: L.divIcon({ className: 'u-icon', html: `<div id="user-tri"></div>`, iconSize: [16, 35], iconAnchor: [8, 35] }) }).addTo(map);
@@ -789,16 +831,6 @@ function initGPS() {
     }
 }
 
-// 📱 ПЕРЕМИКАЧ ОРІЄНТАЦІЇ (ПЛОСКО / РЕБРОМ)
-function updateOrientationButtons() {
-    let txt = isEdgeOrientation ? getT('btn_orient_edge') : getT('btn_orient_flat');
-    let btnComp = document.getElementById('btn-orientation-mode'), btnCity = document.getElementById('btn-city-orient');
-    if(btnComp) { btnComp.innerText = txt; btnComp.style.color = isEdgeOrientation ? "#f1c40f" : "#a855f7"; btnComp.style.borderColor = isEdgeOrientation ? "#f1c40f" : "#a855f7"; }
-    if(btnCity) { btnCity.innerText = txt; btnCity.style.color = isEdgeOrientation ? "#f1c40f" : "#a855f7"; btnCity.style.borderColor = isEdgeOrientation ? "#f1c40f" : "#a855f7"; }
-}
-document.getElementById('btn-orientation-mode').onclick = () => { isEdgeOrientation = !isEdgeOrientation; updateOrientationButtons(); };
-document.getElementById('btn-city-orient').onclick = () => { isEdgeOrientation = !isEdgeOrientation; updateOrientationButtons(); };
-
 function handleOrientation(e) {
     if (isTransportMode && !e.isGpsSimulated) return;
 
@@ -828,9 +860,9 @@ function handleOrientation(e) {
 function animateCompass() {
     let target = targetDisplayAngle;
     
-    // Якщо телефон "РЕБРОМ" - використовуємо нахил (Roll) як компас
-    if (isEdgeOrientation || Math.abs(currentPitch) > 60) {
-        target = currentRoll + compassOffset; 
+    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ"
+    if (Math.abs(currentPitch) > 50) {
+        target = currentRoll + compassOffset; // Беремо дані гіроскопа, якщо телефон опущений/вертикальний
     }
 
     let delta = target - currentDisplayAngle;
@@ -1042,7 +1074,7 @@ document.getElementById('btn-astro-star').onclick = () => {
     alert(getT('astro_star_fix')); OfflineWizard.finish();
 };
 
-// 📹 AR ВІЗІЯ
+// 📹 AR ВІЗІЯ (ОНОВЛЕНА: 3D СТОВПИ)
 async function startAR() {
     const video = document.getElementById('v-ar-stream'); let btn = document.getElementById('btn-start-ar');
     if (video.srcObject) {
@@ -1074,17 +1106,30 @@ function drawAR() {
             
             if (Math.abs(relAngle) < fov / 2) {
                 let x = canvas.width / 2 + (relAngle / (fov / 2)) * (canvas.width / 2);
-                let factor = Math.max(0.2, 1 - (d / 3000)); 
-                let pillarWidth = 100 * factor;
+                let factor = Math.max(0.1, 1 - (d / 3000)); 
                 
-                let grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
-                grad.addColorStop(0, `rgba(74, 222, 128, ${factor * 0.8})`);
-                grad.addColorStop(1, `rgba(74, 222, 128, 0)`);
+                // ТРАПЕЦІЯ (3D Стовп світла)
+                ctx.fillStyle = `rgba(74, 222, 128, ${0.4 * factor})`;
+                ctx.beginPath();
+                ctx.moveTo(x - 60*factor, canvas.height); // Низ ліво
+                ctx.lineTo(x + 60*factor, canvas.height); // Низ право
+                ctx.lineTo(x + 10*factor, canvas.height/2); // Верх право
+                ctx.lineTo(x - 10*factor, canvas.height/2); // Верх ліво
+                ctx.fill();
+
+                // Яскраве ядро стовпа
+                ctx.fillStyle = `rgba(74, 222, 128, ${0.8 * factor})`;
+                ctx.beginPath();
+                ctx.moveTo(x - 20*factor, canvas.height);
+                ctx.lineTo(x + 20*factor, canvas.height);
+                ctx.lineTo(x + 2*factor, canvas.height/2);
+                ctx.lineTo(x - 2*factor, canvas.height/2);
+                ctx.fill();
                 
-                ctx.fillStyle = grad; ctx.fillRect(x - pillarWidth/2, 0, pillarWidth, canvas.height);
+                // Текст над стовпом
                 ctx.fillStyle = "#fff"; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
-                ctx.fillText(`${Math.round(d)} м`, x, canvas.height / 2);
-                ctx.fillText(`ЦІЛЬ ${index+1}`, x, canvas.height / 2 + 25);
+                ctx.fillText(`${Math.round(d)} м`, x, canvas.height / 2 - 10);
+                ctx.fillText(`ЦІЛЬ ${index+1}`, x, canvas.height / 2 + 15);
             }
         });
     }
@@ -1283,7 +1328,6 @@ window.addEventListener('devicemotion', function(event) {
     lastAccel = currentAccel;
 });
 
-// === ОНОВЛЕНА ЛОГІКА SOS (3 ХВ АКТИВНО / 3 ХВ СОН) ===
 document.getElementById('btn-sos-copy-wifi').onclick = () => {
     if(lastGoodGPS) {
         let name = `SOS_${lastGoodGPS.lat.toFixed(4)}_${lastGoodGPS.lon.toFixed(4)}`;
