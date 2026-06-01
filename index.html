@@ -7,7 +7,8 @@
     
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
-    
+    <script src="tf.min.js"></script>
+    <script src="coco-ssd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
@@ -56,23 +57,23 @@
         .compass-data { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; pointer-events: none; z-index: 20; }
         #tc-deg { font-size: 3.5rem; color: #4ade80; font-weight: bold; }
         #tc-dist { font-size: 1.5rem; color: #fff; font-weight: bold; }
+        
+        .lite-mode-container { margin-top: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
+        .lite-mode-container input { width: 22px; height: 22px; accent-color: #f1c40f; cursor: pointer; }
+        .lite-mode-container label { color: #f1c40f; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
-        
-        <div class="mode-switch-wrapper">
-            <span id="lbl-lite" class="mode-label active-lite">ЛАЙТ</span>
-            <label class="mode-switch">
-                <input type="checkbox" id="mode-toggle" onchange="toggleAppMode()">
-                <span class="slider-track"></span>
-            </label>
-            <span id="lbl-max" class="mode-label">МАКС</span>
-        </div>
-
         <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
-        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:20px;" data-i18n="btn_login">ВХІД</button>
+        
+        <label class="lite-mode-container">
+            <input type="checkbox" id="lite-mode-toggle">
+            <span>РЕЖИМ "ЛАЙТ" (Слабкий телефон)</span>
+        </label>
+
+        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:25px;" data-i18n="btn_login">ВХІД</button>
         <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;" data-i18n="err_access_denied">❌ ДОСТУП ЗАБОРОНЕНО</div>
     </div>
 
@@ -88,7 +89,6 @@
         <div style="text-align: center; margin-bottom: 10px; padding-left: 20px;">
             <button class="lang-btn active" onclick="setLanguage('uk')" id="btn-lang-uk">UK</button>
             <button class="lang-btn" onclick="setLanguage('en')" id="btn-lang-en">EN</button>
-            <button class="lang-btn" onclick="setLanguage('pt')" id="btn-lang-pt">PT</button>
         </div>
 
         <h3 style="color: #4ade80; padding-left: 32px;">RA_MOBILE v10.40</h3>
@@ -100,7 +100,7 @@
         <a href="#" onclick="showModule('mod-map'); closeNav()" data-i18n="menu_map">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;" data-i18n="menu_astro">🌌 АСТРО / БЕЗ GPS</a>
-        <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics">👁 ОПТИКА / ШІ</a>
+        <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics" class="heavy-module">👁 ОПТИКА / ШІ</a>
         <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #0cf;" data-i18n="menu_radio">💬 ТЕКСТ / QR-РАЦІЯ</a>
         <a href="#" onclick="showModule('mod-shield'); closeNav()" data-i18n="menu_shield">🛡 ОХОРОНА / ЩИТ</a>
         <a href="#" onclick="showModule('mod-sos'); closeNav()" style="color: #fff; font-weight: bold; background: rgba(255,0,0,0.3); border-radius: 5px; margin: 5px 10px; padding-left: 22px;" data-i18n="menu_sos">🆘 SOS / МАЯК</a>
@@ -141,7 +141,7 @@
                 <button id="btn-follow" class="map-btn" style="color:#4ade80;" data-i18n="btn_map_follow">🎯 СЛІДКУВАТИ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;" data-i18n="btn_map_del_last">✖ ОСТАННЯ ТОЧКА</button>
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;" data-i18n="btn_map_clear">🗑 ОЧИСТИТИ МАРШРУТ</button>
-                <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР (Легка мапа)</button>
+                <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР</button>
                 <button id="btn-cache-map" class="map-btn" data-i18n="btn_map_cache">💾 КЕШ 2х2 км</button>
             </div>
         </section>
@@ -181,7 +181,7 @@
                     <input type="range" id="voice-interval" min="10" max="60" step="10" value="10" style="width:100%;">
                 </div>
             </div>
-            <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;" data-i18n="btn_eco">🌑 ЕКО-БЛЕКАУТ (ЕКРАН-КОМПАС)</button>
+            <button onclick="toggleEcoMode(true)" class="tactical-btn" style="margin-top:20px; background-color:#111; color:#0cf; border: 1px solid #048;" data-i18n="btn_eco">🌑 ЕКО-БЛЕКАУТ</button>
         </section>
 
         <section id="mod-astro" class="module">
@@ -229,7 +229,7 @@
                 </div>
                 
                 <div id="astro-dist-text">--- м</div>
-                <div id="astro-hint" data-i18n="astro_hint">ШУКАЙТЕ ПІВНІЧ</div>
+                <div id="astro-hint" data-i18n="astro_hint">НАВЕДІТЬ ПРИЦІЛ НА ВІРТУАЛЬНУ ЗІРКУ</div>
             </div>
             
             <div class="astro-btn-container">
@@ -241,7 +241,7 @@
             </div>
         </section>
 
-        <section id="mod-eye" class="module">
+        <section id="mod-eye" class="module heavy-module">
             <div class="cam-box">
                 <video id="v-stream" autoplay playsinline muted></video>
                 <canvas id="proc-canvas" style="display:none;"></canvas>
@@ -270,11 +270,11 @@
             
             <div class="flex-row">
                 <button id="btn-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_cam_off">🔴 КАМЕРА</button>
-                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_ai_scan">🤖 ШІ SCAN (НЕ для слабких)</button>
+                <button id="btn-ai-cam" class="tactical-btn" style="margin-top:0;" data-i18n="btn_ai_scan">🤖 ШІ SCAN</button>
             </div>
             <div class="flex-row">
                 <button id="btn-ir" class="tactical-btn" data-i18n="btn_ir">🔭 ІЧ-ФІЛЬТР</button>
-                <button id="btn-scan" class="tactical-btn" data-i18n="btn_motion">📉 ДЕТЕКТОР РУХУ (НЕ для слабких)</button>
+                <button id="btn-scan" class="tactical-btn" data-i18n="btn_motion">📉 ДЕТЕКТОР РУХУ</button>
             </div>
         </section>
 
@@ -310,23 +310,13 @@
                     <span id="sos-latlon" style="color: #4ade80; font-weight: bold; font-size: 1.5rem;" data-i18n="sos_no_gps">ОЧІКУВАННЯ GPS</span><br><br>
                     <span data-i18n="sos_battery" style="color: #ccc;">БАТАРЕЯ:</span> <span id="sos-batt" style="color: #f1c40f; font-weight: bold; font-size: 1.5rem;">--%</span>
                 </div>
-
-                <div style="background: rgba(0,30,50,0.8); border: 1px solid #0cf; border-radius: 10px; padding: 15px; margin-bottom: 30px; width: 100%; text-align: left;">
-                    <h3 style="color: #0cf; font-size: 1.1rem; text-align: center; margin-bottom: 10px;">📡 WI-FI МАЯК (РАДІОПОШУК)</h3>
-                    <div style="background: #000; padding: 10px; text-align: center; border: 1px dashed #4ade80; border-radius: 5px; margin-bottom: 10px;">
-                        <span id="wifi-name" style="color: #4ade80; font-family: monospace; font-size: 1.1rem; font-weight: bold;">ОЧІКУВАННЯ GPS</span>
-                    </div>
-                    <button class="tactical-btn" style="background: #111; color: #0cf; border-color: #0cf; padding: 10px; margin-top: 0; font-size: 0.9rem;" onclick="copyWifiName()">📋 СКОПІЮВАТИ НАЗВУ</button>
-                    
-                    <ul style="color: #ccc; font-size: 0.75rem; margin-top: 15px; padding-left: 20px; line-height: 1.5;">
-                        <li>Натисніть "Скопіювати" вище.</li>
-                        <li>Відкрийте <b>Налаштування ➔ Точка доступу (Hotspot)</b>.</li>
-                        <li>Вставте текст як ім'я мережі.</li>
-                        <li><span style="color:#f33; font-weight:bold;">ОБОВ'ЯЗКОВО:</span> Вимкніть пароль (Відкрита мережа).</li>
-                        <li>Вмикайте на 5 хв, потім вимикайте на 5 хв для економії батареї.</li>
-                    </ul>
+                
+                <div id="sos-wifi-hint" style="margin-bottom: 20px; padding: 12px; background: rgba(255,255,0,0.1); border-left: 4px solid #f1c40f; text-align: left; font-size: 0.85rem; color: #ddd; border-radius: 0 5px 5px 0;">
+                    <strong style="color: #f1c40f;">📡 WI-FI МАЯК:</strong><br><br>
+                    Щоб допомогти рятувальникам знайти вас під завалами без інтернету, увімкніть на телефоні <strong>Точку доступу (Wi-Fi Hotspot)</strong> і назвіть її вашими координатами вище (наприклад: <em>SOS_49.42_31.98</em>).
                 </div>
-                <button id="btn-sos-toggle" class="tactical-btn" style="background: #f33; color: #fff; height: 120px; font-size: 2rem; border-radius: 20px; box-shadow: 0 0 20px #f33; border: 2px solid #fff;" onclick="toggleSOS()" data-i18n="btn_sos_on">АЛАРМ (УВІМКНУТИ)</button>
+                
+                <button id="btn-sos-toggle" class="tactical-btn" style="background: #f33; color: #fff; height: 100px; font-size: 1.8rem; border-radius: 20px; box-shadow: 0 0 20px #f33; border: 2px solid #fff;" onclick="toggleSOS()" data-i18n="btn_sos_on">АЛАРМ (УВІМКНУТИ)</button>
             </div>
         </section>
         
@@ -335,28 +325,28 @@
             <div style="color:#ccc; font-size: 0.95rem; line-height: 1.6; padding: 0 10px; text-align: left; overflow-y: auto; height: 70vh; padding-bottom: 50px;">
                 
                 <h3 style="color:#f1c40f; margin-top: 10px;" data-i18n="man_h1">🔐 1. ВХІД У СИСТЕМУ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p1">Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором, якщо телефон потрапить до нього.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p1">Введи цифри (PIN-код) і натисни 'ВХІД'. Це захист, щоб ворог не міг скористатися навігатором. Якщо у вас слабкий пристрій, обов'язково увімкніть галочку "ЛАЙТ РЕЖИМ".</p>
 
                 <h3 style="color:#4ade80; margin-top: 10px;" data-i18n="man_h2">📍 2. МАРШРУТ / МАПА</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Як поставити ціль:</strong> Двічі швидко тапни по карті.<br><strong>Я ТУТ (БЕЗ GPS):</strong> Використовуй під РЕБом. Натисни і ткни пальцем у карту туди, де ти зараз.<br><strong>15м:</strong> Натисни і пройди 15 метрів для точного калібрування.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p2"><strong>Як поставити ціль:</strong> Двічі швидко тапни по карті. З'явиться лінія маршруту.<br><strong>Кнопка 'Я ТУТ (БЕЗ GPS)':</strong> Використовуй, коли працює РЕБ. Натисни її, а потім ткни пальцем у карту туди, де ти зараз знаходишся.</p>
 
                 <h3 style="color:#0cf;" data-i18n="man_h3">🧭 3. КОМПАС / ПОВОДИР</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Крокомір:</strong> Якщо немає GPS, увімкни його і він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Телефон вібрує, коли дивишся точно на ціль.<br><strong>ЕКО-Блекаут:</strong> Поклади палець на чорний екран на 3 сек, щоб дізнатися відстань.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p3"><strong>Режим крокоміра:</strong> Якщо немає GPS, увімкніть крокомір і поклади телефон у кишеню. Він сам рахуватиме кроки.<br><strong>Поводир (Вібро):</strong> Коли ти повертаєшся обличчям точно до цілі, телефон вібрує.<br><strong>ЕКО-Блекаут:</strong> Гасить екран. Щоб подивитися відстань, поклади палець на екран на 3 сек.</p>
 
                 <h3 style="color:#f1c40f;" data-i18n="man_h4">🌌 4. АСТРО / БЕЗ GPS</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився: Тримаєш телефон рівно -> 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце в приціл і натисни кнопку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p4">Коли компас збився через РЕБ: Тримаєш телефон рівно -> тиснеш 'КАЛІБРУВАТИ ГОРИЗОНТ' -> піднімаєш у небо. Наведись на Полярну зірку або Сонце (прямо у снайперське перехрестя) і натисни відповідну кнопку.</p>
                 
                 <h3 style="color:#fff;" data-i18n="man_h5">👁 5. ОПТИКА / ШІ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p5"><strong>ІЧ-ФІЛЬТР:</strong> Робить картинку контрастною для сутінків.<br><strong>Детектор руху:</strong> Телефон вібрує, якщо в кадрі щось поворухнеться.<br><strong>ШІ SCAN:</strong> Камера сама шукає людей або техніку.</p>
 
                 <h3 style="color:#0cf;" data-i18n="man_h6">💬 6. ТЕКСТ / QR-РАЦІЯ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p6">Пишеш текст -> 'Створити QR'. Напарник відкриває програму і сканує. Розшифровано без зв'язку.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p6">Пишеш текст -> 'Створити зашифрований QR'. Твій напарник відкриває програму, тисне 'Увімкнути камеру' і сканує твій екран. Повідомлення розшифровано без зв'язку.</p>
 
                 <h3 style="color:#888;" data-i18n="man_h7">🛡 7. ОХОРОНА / ЩИТ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p7">Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон. Якщо земля завібрує — спрацює тривога.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p7">Лягаєш спати: Натискаєш 'АКТИВУВАТИ ЗАХИСТ' і кладеш телефон біля себе. Якщо хтось торкнеться телефону або земля завібрує — спрацює тривога.</p>
 
                 <h3 style="color:#f33;" data-i18n="man_h8">🆘 8. SOS / МАЯК ВИЖИВАННЯ</h3>
-                <p style="margin-bottom: 10px;" data-i18n="man_p8">Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран яскраво блимає, лунає звук, показуються координати.</p>
+                <p style="margin-bottom: 10px;" data-i18n="man_p8">Якщо тебе присипало: Натискаєш ВЕЛИКУ кнопку SOS. Екран почне яскраво блимати 3 хвилини, лунатиме пронизливий звук кожні 3 секунди, а на екрані з'являться твої координати. Потім телефон "засне" на 3 хвилини для економії батареї. Будь-який дотик до екрана миттєво його розбудить.</p>
 
             </div>
         </section>
