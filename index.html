@@ -156,6 +156,8 @@
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;" data-i18n="btn_map_clear">🗑 ОЧИСТИТИ МАРШРУТ</button>
                 <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР</button>
                 <button id="btn-cache-map" class="map-btn" data-i18n="btn_map_cache">💾 КЕШ 2х2 км</button>
+                
+                <button id="btn-follow" style="display:none;"></button>
             </div>
         </section>
 
@@ -179,6 +181,8 @@
                 </div>
             </div>
             
+            <button id="btn-orientation-mode" style="display:none;"></button>
+
             <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk" onclick="startWalkCalibration()">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
@@ -206,6 +210,8 @@
             </div>
             
             <button id="btn-city-route-mode" class="tactical-btn" style="background:#111; color:#4ade80; border-color:#4ade80; margin-bottom: 25px;" data-i18n="btn_city_online">🌐 МАРШРУТ: ПО ВУЛИЦЯХ (ОНЛАЙН)</button>
+            
+            <button id="btn-city-orient" style="display:none;"></button>
             
             <div class="flex-row">
                 <button id="btn-city-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;" data-i18n="btn_voice_off">ГОЛОС: ВИМК</button>
@@ -373,7 +379,7 @@
                 <h2 style="color: #f33; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px #f33;" data-i18n="sos_title">МАЯК ВИЖИВАННЯ</h2>
                 
                 <div id="sos-info" style="font-size: 1.2rem; color: #fff; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 15px; font-family: monospace; width: 100%; border: 2px solid #555;">
-                    <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТИ:</span><br>
+                    <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТ:</span><br>
                     <span id="sos-latlon" style="color: #4ade80; font-weight: bold; font-size: 1.5rem;" data-i18n="sos_no_gps">ОЧІКУВАННЯ GPS</span><br><br>
                     <span data-i18n="sos_battery" style="color: #ccc;">БАТАРЕЯ:</span> <span id="sos-batt" style="color: #f1c40f; font-weight: bold; font-size: 1.5rem;">--%</span>
                 </div>
