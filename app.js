@@ -86,11 +86,6 @@ async function checkPin() {
     if (input === SECRET_PIN) {
         document.getElementById('pin-screen').style.display = 'none';
         
-        if(isLiteMode) {
-            let aiBtn = document.getElementById('btn-ai-cam');
-            if(aiBtn) { aiBtn.style.opacity = '0.3'; aiBtn.style.pointerEvents = 'none'; }
-        }
-        
         await initSensors();
         startAntiSleepAudio(); 
         
@@ -159,11 +154,9 @@ let isCityOnline = true;
 let isARActive = false;
 let alarmActive = false, alarmTriggered = false, alarmRadiusKm = 10, alarmOsc = null;
 
-// Змінні для "Розумного таймера" мапи
 let isUserDraggingMap = false;
 let mapInteractionTimer = null;
 
-// Змінні для Пасхалок HUD
 let hudState = 0; // 0: зелений, 1: жовтий, 2: червоний
 let hudMsgTimer = null;
 
@@ -341,7 +334,7 @@ function handleMapInteraction() {
     mapInteractionTimer = setTimeout(() => {
         isUserDraggingMap = false;
         if(lastGoodGPS && !isManualPosMode) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]);
-    }, 10000); // 10 СЕКУНД ТАЙМЕР
+    }, 10000); 
 }
 
 function initMap() {
@@ -361,7 +354,6 @@ function initMap() {
         map = L.map('map-container', { zoomControl: false, doubleClickZoom: false }).setView([49.0, 31.0], 6);
         mapLayers[currentLayerKeys[currentLayerIdx]].addTo(map);
 
-        // Таймер авто-повернення
         map.on('dragstart', handleMapInteraction);
         map.on('zoomstart', handleMapInteraction);
 
@@ -860,15 +852,18 @@ function handleOrientation(e) {
 function animateCompass() {
     let target = targetDisplayAngle;
     
-    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ"
-    if (Math.abs(currentPitch) > 50) {
-        target = currentRoll + compassOffset; // Беремо дані гіроскопа, якщо телефон опущений/вертикальний
+    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" (Якщо кут > 45 град, зчитуємо гіроскоп)
+    if (Math.abs(currentPitch) > 45) {
+        target = currentRoll + compassOffset; 
     }
 
     let delta = target - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
     
-    let smoothing = isTransportMode ? 0.02 : 0.1;
+    // РЕЖИМ ЛАЙТ: Жорстка фільтрація "смикань" компаса (ігноруємо шум менше 2 градусів)
+    if (isLiteMode && Math.abs(delta) < 2.0 && currentSpeedKmh < 1.0) delta = 0;
+    let smoothing = isLiteMode ? 0.05 : (isTransportMode ? 0.02 : 0.15);
+    
     currentDisplayAngle += delta * smoothing; 
     currentDisplayAngle = (currentDisplayAngle + 360) % 360;
     
@@ -1074,8 +1069,10 @@ document.getElementById('btn-astro-star').onclick = () => {
     alert(getT('astro_star_fix')); OfflineWizard.finish();
 };
 
-// 📹 AR ВІЗІЯ (ОНОВЛЕНА: 3D СТОВПИ)
+// 📹 AR ВІЗІЯ (ПРАВИЛЬНА 3D ПЕРСПЕКТИВА І ВЕРТИКАЛЬНА РОБОТА)
 async function startAR() {
+    if (isLiteMode) { alert(currentLang === 'uk' ? "AR вимкнено у ЛАЙТ режимі." : "AR disabled in LITE mode."); return; }
+    
     const video = document.getElementById('v-ar-stream'); let btn = document.getElementById('btn-start-ar');
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null;
@@ -1099,37 +1096,50 @@ function drawAR() {
 
     if (routePoints.length > 0 && lastGoodGPS) {
         let fov = 60; 
+        // Вираховуємо "горизонт" на екрані (залежить від нахилу телефону)
+        let horizonY = canvas.height / 2 + (displayPitch - 90) * (canvas.height / 90);
+
         routePoints.forEach((pt, index) => {
             let bearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, pt.lat, pt.lng);
             let d = index === 0 ? currentDistanceToTarget : map.distance([lastGoodGPS.lat, lastGoodGPS.lon], pt);
-            let relAngle = (((bearing - currentDisplayAngle) % 360) + 540) % 360 - 180;
+            
+            // Якщо телефон вертикально, беремо Roll (поворот) замість компаса
+            let viewAngle = currentDisplayAngle;
+            if (Math.abs(currentPitch) > 50) { viewAngle = currentRoll + compassOffset; }
+            
+            let relAngle = (((bearing - viewAngle) % 360) + 540) % 360 - 180;
             
             if (Math.abs(relAngle) < fov / 2) {
                 let x = canvas.width / 2 + (relAngle / (fov / 2)) * (canvas.width / 2);
-                let factor = Math.max(0.1, 1 - (d / 3000)); 
+                let factor = Math.max(0.1, 1 - (d / 5000)); // Масштабування від 0 до 5 км
                 
-                // ТРАПЕЦІЯ (3D Стовп світла)
+                let startY = horizonY; // Промінь починається з горизонту (за будинками)
+                if (d < 50) startY = canvas.height; // Якщо ціль ближче 50м, малюємо з-під ніг
+                
+                // ТРАПЕЦІЯ (3D Стовп світла в небо)
                 ctx.fillStyle = `rgba(74, 222, 128, ${0.4 * factor})`;
                 ctx.beginPath();
-                ctx.moveTo(x - 60*factor, canvas.height); // Низ ліво
-                ctx.lineTo(x + 60*factor, canvas.height); // Низ право
-                ctx.lineTo(x + 10*factor, canvas.height/2); // Верх право
-                ctx.lineTo(x - 10*factor, canvas.height/2); // Верх ліво
+                ctx.moveTo(x - 60*factor, startY); // Низ ліво (на горизонті)
+                ctx.lineTo(x + 60*factor, startY); // Низ право
+                ctx.lineTo(x + 5*factor, 0); // Верх право (у небо)
+                ctx.lineTo(x - 5*factor, 0); // Верх ліво
                 ctx.fill();
 
                 // Яскраве ядро стовпа
                 ctx.fillStyle = `rgba(74, 222, 128, ${0.8 * factor})`;
                 ctx.beginPath();
-                ctx.moveTo(x - 20*factor, canvas.height);
-                ctx.lineTo(x + 20*factor, canvas.height);
-                ctx.lineTo(x + 2*factor, canvas.height/2);
-                ctx.lineTo(x - 2*factor, canvas.height/2);
+                ctx.moveTo(x - 15*factor, startY);
+                ctx.lineTo(x + 15*factor, startY);
+                ctx.lineTo(x + 2*factor, 0);
+                ctx.lineTo(x - 2*factor, 0);
                 ctx.fill();
                 
-                // Текст над стовпом
+                // Текст дистанції (Метри або Кілометри)
+                let distText = d >= 1000 ? (d/1000).toFixed(1) + " км" : Math.round(d) + " м";
+                
                 ctx.fillStyle = "#fff"; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
-                ctx.fillText(`${Math.round(d)} м`, x, canvas.height / 2 - 10);
-                ctx.fillText(`ЦІЛЬ ${index+1}`, x, canvas.height / 2 + 15);
+                ctx.fillText(distText, x, startY - 20); // Текст над базою лазера
+                ctx.fillText(`ЦІЛЬ ${index+1}`, x, startY + 5);
             }
         });
     }
