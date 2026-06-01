@@ -24,8 +24,8 @@
         #eco-dist { font-size: 3rem; color: #4ade80; font-family: monospace; font-weight: bold; text-shadow: 0 0 5px #000; }
         #eco-touch-area { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 80px; display: flex; align-items: center; justify-content: center; color: #222; font-size: 1.2rem; }
         
-        #v-astro-stream, #v-ar-stream { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-        #astro-overlay, #ar-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
+        #v-astro-stream { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        #astro-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
         
         .astro-glow-v { position: absolute; top: 0; bottom: 0; width: 50px; opacity: 0; transition: opacity 0.2s; }
         #astro-dir-left { left: 0; background: linear-gradient(to right, rgba(74,222,128,0.8), transparent); }
@@ -113,7 +113,6 @@
         <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
         <a href="#" onclick="showModule('mod-city'); closeNav()" style="color: #0cf;" data-i18n="menu_city">🏙️ МІСТО / ГІД</a>
         <a href="#" onclick="showModule('mod-hud'); closeNav()" style="color: #4ade80;" data-i18n="menu_hud">🚙 ТРАНСПОРТ (HUD)</a>
-        <a href="#" onclick="showModule('mod-ar'); closeNav()" style="color: #a855f7;" data-i18n="menu_ar">📹 AR-ВІЗІЯ</a>
         <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;" data-i18n="menu_astro">🌌 АСТРО / БЕЗ GPS</a>
         <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics" class="heavy-module">👁 ОПТИКА / ШІ</a>
         <a href="#" onclick="showModule('mod-chat'); closeNav()" style="color: #fff;" data-i18n="menu_radio">💬 ТЕКСТ / QR-РАЦІЯ</a>
@@ -152,12 +151,12 @@
                 <button id="btn-manual-pos" class="map-btn" style="color:#f97316;" data-i18n="btn_map_manual">📍 Я ТУТ (БЕЗ GPS)</button>
                 <button id="btn-show-trace" class="map-btn" style="color:#a855f7;" data-i18n="btn_show_trace">🔄 ПОКАЗАТИ МІЙ СЛІД</button>
                 <button id="btn-share-qr" class="map-btn" style="color:#0cf;" data-i18n="btn_map_share">📤 ПЕРЕДАТИ QR</button>
+                <button id="btn-grid-toggle" class="map-btn" style="color:#fff;" data-i18n="btn_grid">🗺 СІТКА ON/OFF</button>
+                <button id="btn-route-type" class="map-btn" style="color:#f1c40f;" data-i18n="btn_route">🚗/🚶/🧭 МАРШРУТ</button>
                 <button id="btn-del-last" class="map-btn" style="color:#f33;" data-i18n="btn_map_del_last">✖ ОСТАННЯ ТОЧКА</button>
                 <button id="btn-clear-map" class="map-btn" style="color:#f33;" data-i18n="btn_map_clear">🗑 ОЧИСТИТИ МАРШРУТ</button>
                 <button id="btn-layer-toggle" class="map-btn" data-i18n="btn_map_layer">🗺 ШАР</button>
                 <button id="btn-cache-map" class="map-btn" data-i18n="btn_map_cache">💾 КЕШ 2х2 км</button>
-                
-                <button id="btn-follow" style="display:none;"></button>
             </div>
         </section>
 
@@ -181,8 +180,6 @@
                 </div>
             </div>
             
-            <button id="btn-orientation-mode" style="display:none;"></button>
-
             <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk" onclick="startWalkCalibration()">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
 
@@ -211,8 +208,6 @@
             
             <button id="btn-city-route-mode" class="tactical-btn" style="background:#111; color:#4ade80; border-color:#4ade80; margin-bottom: 25px;" data-i18n="btn_city_online">🌐 МАРШРУТ: ПО ВУЛИЦЯХ (ОНЛАЙН)</button>
             
-            <button id="btn-city-orient" style="display:none;"></button>
-            
             <div class="flex-row">
                 <button id="btn-city-voice" class="tactical-btn" style="flex:1; border-color:#555; color:#ccc;" data-i18n="btn_voice_off">ГОЛОС: ВИМК</button>
                 <button id="btn-city-vibro" class="tactical-btn" style="flex:1; color:#558; border-color:#224;" data-i18n="btn_vibro_off">ПОВОДИР (ВІБРО): ВИМК</button>
@@ -229,14 +224,6 @@
                 <div class="hud-dist-display" id="hud-big-dist">--- м</div>
                 <button id="btn-hud-mirror" class="tactical-btn" style="margin-top: 40px; width: 80%; border-color: #fff; color: #fff;" data-i18n="btn_hud_mirror">ВІДДЗЕРКАЛИТИ (НА СКЛО)</button>
             </div>
-        </section>
-
-        <section id="mod-ar" class="module">
-            <video id="v-ar-stream" autoplay playsinline muted></video>
-            <div id="ar-overlay">
-                <canvas id="ar-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%;"></canvas>
-            </div>
-            <button onclick="startAR()" class="tactical-btn" id="btn-start-ar" style="position: absolute; bottom: 20px; width: 80%; left: 10%; z-index: 10; background: rgba(0,0,0,0.7); border-color: #a855f7; color: #a855f7;" data-i18n="btn_start_ar">ВІДКРИТИ КАМЕРУ</button>
         </section>
 
         <section id="mod-astro" class="module">
@@ -379,7 +366,7 @@
                 <h2 style="color: #f33; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px #f33;" data-i18n="sos_title">МАЯК ВИЖИВАННЯ</h2>
                 
                 <div id="sos-info" style="font-size: 1.2rem; color: #fff; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 15px; font-family: monospace; width: 100%; border: 2px solid #555;">
-                    <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТ:</span><br>
+                    <span data-i18n="sos_coords" style="color: #ccc;">КООРДИНАТИ:</span><br>
                     <span id="sos-latlon" style="color: #4ade80; font-weight: bold; font-size: 1.5rem;" data-i18n="sos_no_gps">ОЧІКУВАННЯ GPS</span><br><br>
                     <span data-i18n="sos_battery" style="color: #ccc;">БАТАРЕЯ:</span> <span id="sos-batt" style="color: #f1c40f; font-weight: bold; font-size: 1.5rem;">--%</span>
                 </div>
