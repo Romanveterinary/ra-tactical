@@ -957,45 +957,61 @@ function handleOrientation(e) {
     currentPitch = e.beta || 0;
     currentRoll = e.gamma || 0;
 
-    if (e.webkitCompassHeading !== undefined) { hw = e.webkitCompassHeading; } else {
+    if (e.webkitCompassHeading !== undefined) { hw = e.webkitCompassHeading; } 
+    else {
         if (e.type === 'deviceorientationabsolute' || e.absolute === true) { hasAbsoluteOrientation = true; }
         if (e.type === 'deviceorientation' && hasAbsoluteOrientation) { return; }
         if (e.alpha !== null) { hw = 360 - e.alpha; } else { return; }
     }
     
     hardwareHeading = hw;
-    let trueH = (hardwareHeading + compassOffset) % 360; if (trueH < 0) trueH += 360;
+    let trueH = (hardwareHeading + compassOffset) % 360; 
+    if (trueH < 0) trueH += 360;
     
-    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" 
     let target = trueH;
     if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
     target = (target + 360) % 360;
 
-    // === РЕЖИМ ЛАЙТ: Прямий розрахунок без важкої анімації ===
+    // === СУПЕР-ЛАЙТ: Відеокарта (GPU) + Нескінченний кут ===
     if (isLiteMode) {
         let now = Date.now();
-        // Оновлюємо стрілку лише 6-7 разів на секунду (економія батареї)
-        if (now - lastLiteCompassUpdate > 150) { 
+        // Оновлюємо лише 3 рази на секунду! (Економія процесора 95%)
+        if (now - lastLiteCompassUpdate > 333) { 
             if (isFirstCompassUpdate) {
-                currentDisplayAngle = target; displayPitch = currentPitch; displayRoll = currentRoll;
+                currentDisplayAngle = target; 
+                displayPitch = currentPitch; 
+                displayRoll = currentRoll;
                 isFirstCompassUpdate = false;
-            } else {
-                let delta = target - currentDisplayAngle;
-                delta = ((delta % 360) + 540) % 360 - 180;
                 
-                if (Math.abs(delta) > 1.5) { // Відсікаємо мікро-тремтіння
-                    currentDisplayAngle = (currentDisplayAngle + delta * 0.6 + 360) % 360;
+                // Вмикаємо плавний CSS перехід (апаратне прискорення GPU)
+                let ring = document.getElementById('tc-ring');
+                if(ring) ring.style.transition = "transform 0.3s ease-out";
+                let tri = document.getElementById('user-tri');
+                if(tri) tri.style.transition = "transform 0.3s ease-out";
+            } else {
+                // Знаходимо найкоротший шлях і додаємо до "нескінченного кута" (напр. 350 -> 370)
+                let currentMod = ((currentDisplayAngle % 360) + 360) % 360;
+                let delta = target - currentMod;
+                delta = ((delta + 540) % 360) - 180;
+                
+                // Відсікаємо мікро-шум датчика (< 2 градусів)
+                if (Math.abs(delta) > 2) {
+                    currentDisplayAngle += delta; 
                 }
-                displayPitch = currentPitch; displayRoll = currentRoll;
+                displayPitch = currentPitch; 
+                displayRoll = currentRoll;
             }
             updateCompassUI();
             lastLiteCompassUpdate = now;
         }
-        return; // Виходимо, щоб не вантажити процесор анімацією
+        return; 
     }
 
-    // === ЗВИЧАЙНИЙ РЕЖИМ: Плавна 60FPS анімація ===
+    // === ЗВИЧАЙНИЙ РЕЖИМ: JS Анімація ===
     if (isFirstCompassUpdate) {
+        let ring = document.getElementById('tc-ring');
+        if(ring) ring.style.transition = "none"; // Вимикаємо CSS, бо JS малює кадри
+        
         currentDisplayAngle = target; targetDisplayAngle = target;
         displayPitch = currentPitch; displayRoll = currentRoll;
         isFirstCompassUpdate = false; updateCompassUI(); 
@@ -1003,6 +1019,25 @@ function handleOrientation(e) {
         targetDisplayAngle = target;
         if (!isCompassAnimating) { isCompassAnimating = true; requestAnimationFrame(animateCompass); }
     }
+}
+
+function animateCompass() {
+    let delta = targetDisplayAngle - currentDisplayAngle;
+    delta = ((delta % 360) + 540) % 360 - 180; 
+    
+    let smoothing = 0.15;
+    currentDisplayAngle = (currentDisplayAngle + delta * smoothing + 360) % 360; 
+    
+    displayPitch += (currentPitch - displayPitch) * smoothing;
+    displayRoll += (currentRoll - displayRoll) * smoothing;
+    
+    updateCompassUI();
+
+    if (Math.abs(delta) < 0.5 && Math.abs(currentPitch - displayPitch) < 0.5 && Math.abs(currentRoll - displayRoll) < 0.5) {
+        currentDisplayAngle = targetDisplayAngle; displayPitch = currentPitch; displayRoll = currentRoll;
+        updateCompassUI(); isCompassAnimating = false; return;
+    }
+    if (isCompassAnimating) requestAnimationFrame(animateCompass);
 }
 
 function animateCompass() {
