@@ -77,17 +77,29 @@ function toggleNightMode() {
 const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 let isLiteMode = false;
+let userProfile = 'civilian'; // 'civilian' або 'military'
 
-async function checkPin() {
+async function checkPin(profile) {
     let input = document.getElementById('pin-input').value;
     let toggle = document.getElementById('lite-mode-toggle');
     if (toggle) isLiteMode = toggle.checked;
 
     if (input === SECRET_PIN) {
+        userProfile = profile;
         document.getElementById('pin-screen').style.display = 'none';
         
+        // ЛОГІКА ПРОФІЛІВ
+        if (userProfile === 'military') {
+            document.getElementById('menu-item-city').style.display = 'none'; // Ховаємо місто
+            routeMode = 2; // Примусово "Напростець"
+            let routeBtn = document.getElementById('btn-route-type');
+            if(routeBtn) { routeBtn.innerHTML = "🧭 НАПРОСТЕЦЬ"; routeBtn.style.pointerEvents = 'none'; routeBtn.style.opacity = '0.5'; } // Блокуємо зміну
+            isCityOnline = false;
+        }
+
         await initSensors();
         startAntiSleepAudio(); 
+        startAntiSleepVideo(); // НОВИЙ ХАК ДЛЯ ЕКРАНА
         
         if(navigator.vibrate) navigator.vibrate(50); 
         playNavTone(1000, 100);
@@ -185,6 +197,15 @@ function initSystem() {
             if (stat && stat.innerText === getT('gps_ok')) { stat.innerText = getT('gps_delay'); stat.style.color = "#f1c40f"; }
         }
     }, 1000);
+}
+
+// НОВИЙ ВІДЕО ХАК ДЛЯ УТРИМАННЯ ЕКРАНА
+function startAntiSleepVideo() {
+    const video = document.getElementById('nosleep-video');
+    if(video) {
+        video.src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMQAAAAhmcmVlAAAAG21kYXQAAAHkQAAABgBAAAABAAAABgBAAAABAAABpG1vb3YAAABsbXZoZAAAAADahVMAANqFUwAAA+gAAD6AAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAlZXh0cwAAAB1leHRzAEQASQBDACAAVgBpAGQAZQBvAAAAE21kcmEAAABBbWRyYQAAADltaGN2AAAAFXV1aWQoIilP2iK6RUKz0oN2i8P1eAAAABh1dWlk1oZ8Tf0N1ku4mP9/uI2kegAAAAh1ZHRhAAAAHG1ldGEAAAAAAAAAAGhkbHIAAAAAAAAAAAAAAAAhbWRpcmFwcGwAAAAAAAAAAAAAAAAAAAAAAHlpbHN0AAAAOaWdnZwAAABRkYXRhAAAAAQAAAAAAH0AHAAMADwAhAAAAHwAcAAwAPACEAAAAHwAcAAwAPACEAAAAEHRvb2wAAAAAZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAC10cmFrAAAAXHRraGQAAAAD2oVTAADahVMAAAAAAQAAAAAAAAPoAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAEAAAABAAAAAABibWRpYQAAACBtZGhkAAAAANqFUwAA2oVTAAADYAAANwAAAAAAABVoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAK21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAALZzdGJsAAAAMHN0c2QAAAAAAAAAAQAAACBhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAABpG1vb3YAAABsbXZoZAAAAADahVMAANqFUwAAA+gAAD6AAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAlZXh0cwAAAB1leHRzAEQASQBDACAAVgBpAGQAZQBvAAAAE21kcmEAAABBbWRyYQAAADltaGN2AAAAFXV1aWQoIilP2iK6RUKz0oN2i8P1eAAAABh1dWlk1oZ8Tf0N1ku4mP9/uI2kegAAAAh1ZHRhAAAAHG1ldGEAAAAAAAAAAGhkbHIAAAAAAAAAAAAAAAAhbWRpcmFwcGwAAAAAAAAAAAAAAAAAAAAAAHlpbHN0AAAAOaWdnZwAAABRkYXRhAAAAAQAAAAAAH0AHAAMADwAhAAAAHwAcAAwAPACEAAAAHwAcAAwAPACEAAAAEHRvb2wAAAAAZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAC10cmFrAAAAXHRraGQAAAAD2oVTAADahVMAAAAAAQAAAAAAAAPoAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAEAAAABAAAAAABibWRpYQAAACBtZGhkAAAAANqFUwAA2oVTAAADYAAANwAAAAAAABVoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAK21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAALZzdGJsAAAAMHN0c2QAAAAAAAAAAQAAACBhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAABpG1vb3Y=";
+        video.play().catch(e => console.log(e));
+    }
 }
 
 async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} } }
@@ -496,7 +517,6 @@ function updateRoute() {
     if(routeLine) map.removeLayer(routeLine);
 
     if (routePoints.length === 0) {
-        document.getElementById('route-info').innerText = getT('comp_target_none');
         document.getElementById('alarm-target-info').innerText = getT('comp_target_none');
         document.getElementById('tc-dist').innerText = "--- м"; document.getElementById('eco-dist').innerText = "--- м";
         let hudDistEl = document.getElementById('hud-dist'); if(hudDistEl) hudDistEl.innerText = getT('hud_target');
@@ -508,7 +528,6 @@ function updateRoute() {
     if(routePoints.length > 1) { routeLine = L.polyline(routePoints, { color: '#f0f', weight: 3, dashArray: '5, 10' }).addTo(map); }
     
     let targetStr = currentLang === 'uk' ? "ЦІЛЬ: ТОЧКА 1 З" : "TGT: POINT 1 OF";
-    document.getElementById('route-info').innerText = `${targetStr} ${routePoints.length}`;
     document.getElementById('alarm-target-info').innerText = `${targetStr} ${routePoints.length}`;
     
     if(lastGoodGPS && routePoints.length > 0) { updateTargetDistance(lastGoodGPS.lat, lastGoodGPS.lon); }
@@ -671,6 +690,12 @@ function processDecodedQR(data) {
 
 document.getElementById('btn-layer-toggle').onclick = () => {
     if(!map || currentLayerKeys.length === 0) return;
+    
+    // ВІЙСЬКОВИЙ ПРОФІЛЬ: Перевірка безпеки перед завантаженням супутника
+    if(userProfile === 'military' && currentLayerKeys[currentLayerIdx] === 'osm') {
+        if(!confirm("⚠️ УВАГА! Використання шару мапи може споживати інтернет. Продовжити?")) return;
+    }
+
     map.removeLayer(mapLayers[currentLayerKeys[currentLayerIdx]]);
     currentLayerIdx = (currentLayerIdx + 1) % currentLayerKeys.length;
     mapLayers[currentLayerKeys[currentLayerIdx]].addTo(map);
@@ -755,11 +780,20 @@ document.getElementById('btn-alarm-toggle').onclick = () => {
         alert(currentLang === 'uk' ? "Будильник активовано. Екран можна вимкнути." : "Alarm active.");
     } else {
         btn.innerText = getT('btn_alarm_start'); btn.style.background = "#111"; btn.style.color = "#f97316";
-        if (alarmOsc) { alarmOsc.stop(); alarmOsc = null; }
+        stopAlarm(); // Зупиняємо сирену, якщо була
     }
 };
 
+document.getElementById('btn-compass-stop-alarm').onclick = () => {
+    alarmActive = false;
+    document.getElementById('btn-alarm-toggle').innerText = getT('btn_alarm_start');
+    document.getElementById('btn-alarm-toggle').style.background = "#111";
+    document.getElementById('btn-alarm-toggle').style.color = "#f97316";
+    stopAlarm();
+};
+
 function triggerAlarmWakeup() {
+    document.getElementById('btn-compass-stop-alarm').style.display = 'block'; // Показуємо кнопку вимкнення на компасі
     if(navigator.vibrate) setInterval(() => navigator.vibrate([1000, 500, 1000]), 2000); 
     if(audioCtx) {
         alarmOsc = audioCtx.createOscillator(); let alarmGain = audioCtx.createGain();
@@ -769,6 +803,11 @@ function triggerAlarmWakeup() {
         alarmGain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 60); 
         alarmOsc.start();
     }
+}
+
+function stopAlarm() {
+    document.getElementById('btn-compass-stop-alarm').style.display = 'none'; // Ховаємо кнопку
+    if (alarmOsc) { alarmOsc.stop(); alarmOsc = null; }
 }
 
 function showHudMsg(text, color) {
@@ -826,12 +865,12 @@ function initGPS() {
 
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
-            if (isTransportMode && lastGpsCoordsForTransport) {
-                if (currentSpeedKmh > 4) { 
-                    let gpsH = pos.coords.heading; if (gpsH === null || isNaN(gpsH)) { gpsH = calcBearing(lastGpsCoordsForTransport.lat, lastGpsCoordsForTransport.lon, lat, lon); }
-                    let fakeAlpha = (360 - gpsH) % 360; handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
-                }
+            // ВІДВЯЗКА ВІД МАГНІТА НА ШВИДКОСТІ > 15 км/год
+            if (currentSpeedKmh > 15) { 
+                let gpsH = pos.coords.heading; if (gpsH === null || isNaN(gpsH)) { gpsH = calcBearing(lastGoodGPS ? lastGoodGPS.lat : lat, lastGoodGPS ? lastGoodGPS.lon : lon, lat, lon); }
+                let fakeAlpha = (360 - gpsH) % 360; handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
             }
+            
             lastGpsCoordsForTransport = { lat, lon }; lastGoodGPS = { lat, lon };
             
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : 'SPD:';
@@ -897,7 +936,7 @@ function initGPS() {
 }
 
 function handleOrientation(e) {
-    if (isTransportMode && !e.isGpsSimulated) return;
+    if (currentSpeedKmh > 15 && !e.isGpsSimulated) return; // ІГНОР МАГНІТУ НА ШВИДКОСТІ
 
     let hw = null;
     currentPitch = e.beta || 0;
@@ -928,12 +967,13 @@ function animateCompass() {
     // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" 
     if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
 
+    // ЛОГІКА НАЙКОРОТШОГО ШЛЯХУ (ПРОТИ СТРИБКІВ ЧЕРЕЗ 0/360)
     let delta = target - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
     
     // РЕЖИМ ЛАЙТ: Жорсткий фільтр компаса
     if (isLiteMode && Math.abs(delta) < 2.0 && currentSpeedKmh < 1.0) delta = 0;
-    let smoothing = isLiteMode ? 0.05 : (isTransportMode ? 0.02 : 0.15);
+    let smoothing = isLiteMode ? 0.05 : 0.15;
     
     currentDisplayAngle += delta * smoothing; 
     currentDisplayAngle = (currentDisplayAngle + 360) % 360;
