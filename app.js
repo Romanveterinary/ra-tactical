@@ -7,19 +7,19 @@ const translations = {
     'uk': {
         btn_login: "ВХІД", err_access_denied: "❌ ДОСТУП ЗАБОРОНЕНО", title_qr_scan: "ОПТИЧНИЙ ДАНИЙ КОД", btn_close: "ЗАКРИТИ", 
         menu_day_night: "☀️ ДЕНЬ / 🔴 НІЧ", menu_map: "📍 МАРШРУТ / МАПА", menu_compass: "🧭 КОМПАС / ПОВОДИР", 
-        menu_city: "🏙️ МІСТО / ГІД", menu_hud: "🚙 ТРАНСПОРТ (HUD)", menu_ar: "📹 AR-ВІЗІЯ", 
+        menu_city: "🏙️ МІСТО / ГІД", menu_hud: "🚙 ТРАНСПОРТ (HUD)", 
         menu_astro: "🌌 АСТРО / БЕЗ GPS", menu_optics: "👁 ОПТИКА / ШІ", menu_radio: "💬 ТЕКСТ / QR-РАЦІЯ", 
         menu_alarm: "⏰ ГЕО-БУДИЛЬНИК", menu_shield: "🛡 ОХОРОНА / ЩИТ", menu_manual: "📖 ІНСТРУКЦІЯ", 
         menu_power_off: "🛑 ВИМКНУТИ ДОДАТОК", menu_destroy: "💥 ЗНИЩИТИ ДАНІ", menu_sos: "🆘 SOS / МАЯК",
         hud_gps_search: "GPS: ПОШУК...", hud_alt: "ВИС: --- м", hud_level_analysis: "РІВЕНЬ: АНАЛІЗ", hud_speed: "ШВИД: 0.0 км/г", hud_target: "ЦІЛЬ: --- м",
-        btn_map_manual: "📍 Я ТУТ (БЕЗ GPS)", btn_show_trace: "🔄 ПОКАЗАТИ МІЙ СЛІД", btn_map_transport: "🚙 ТРАНСПОРТ", btn_map_share: "📤 ПЕРЕДАТИ QR", 
+        btn_map_manual: "📍 Я ТУТ (БЕЗ GPS)", btn_show_trace: "🔄 ПОКАЗАТИ МІЙ СЛІД", btn_map_share: "📤 ПЕРЕДАТИ QR", 
         btn_map_del_last: "✖ ОСТАННЯ ТОЧКА", btn_map_clear: "🗑 ОЧИСТИТИ МАРШРУТ", btn_map_layer: "🗺 ШАР", btn_map_cache: "💾 КЕШ 2х2 км",
         comp_acc: "ТОЧН: --", comp_alt: "ВИСОТА: --- м", btn_pedo_off: "👣 РЕЖИМ КРОКОМІРА: ВИМК", btn_pedo_on: "👣 РЕЖИМ КРОКОМІРА: УВІМК", 
         btn_cal_walk: "КАЛІБРУВАТИ ПРОХОДОМ (15м)", comp_target_none: "ЦІЛЬ: НЕМАЄ", btn_voice_off: "ГОЛОС: ВИМК", btn_voice_on: "ГОЛОС: УВІМК", 
         btn_vibro_off: "ПОВОДИР (ВІБРО): ВИМК", btn_vibro_on: "ПОВОДИР (ВІБРО): УВІМК", lbl_voice_int: "ІНТЕРВАЛ ПІДКАЗОК:", lbl_sec: "сек", 
         btn_eco: "🌑 ЕКО-БЛЕКАУТ", btn_orient_flat: "📱 ПОЛОЖЕННЯ: ПЛОСКО", btn_orient_edge: "📱 ПОЛОЖЕННЯ: РЕБРОМ",
         city_title: "МІСЬКИЙ ГІД", city_waiting: "ОЧІКУВАННЯ...", btn_city_online: "🌐 МАРШРУТ: ПО ВУЛИЦЯХ", btn_city_offline: "🧭 МАРШРУТ: НАВПРОСТЕЦЬ", btn_back_to_map: "📍 ПОВЕРНУТИСЯ НА МАПУ",
-        btn_hud_mirror: "ВІДДЗЕРКАЛИТИ (НА СКЛО)", btn_start_ar: "ВІДКРИТИ КАМЕРУ",
+        btn_hud_mirror: "ВІДДЗЕРКАЛИТИ (НА СКЛО)",
         astro_locked: "ЦІЛЬ ЗАХОПЛЕНО", astro_polar: "ПОЛЯРНА ЗІРКА", astro_hint: "ШУКАЙТЕ ПІВНІЧ", btn_astro_cal: "⚖ КАЛІБРУВАТИ ГОРИЗОНТ (0°)", btn_astro_sun: "☀ СОНЦЕ (ЗАФІКСУВАТИ)", btn_astro_star: "⭐ ЗІРКА (ЗАФІКСУВАТИ)",
         ai_off: "ШІ НЕ АКТИВНИЙ", lbl_cam_zoom: "ЗУМ КАМЕРИ", lbl_ai_sens: "ЧУТЛИВІСТЬ ШІ (%)", lbl_ai_focal: "ДАЛЬНІСТЬ ШІ (ФОКУС)", lbl_ir_sens: "ЧУТЛИВІСТЬ ІЧ / РУХУ",
         btn_scan_cam: "🔴 СКАНУВАТИ З КАМЕРИ", btn_scan_photo: "🖼 ПРОЧИТАТИ З ФОТО", btn_cam_off: "🔴 КАМЕРА", btn_ai_scan: "🤖 ШІ SCAN", btn_ir: "🔭 ІЧ-ФІЛЬТР", btn_motion: "📉 ДЕТЕКТОР РУХУ",
@@ -32,10 +32,10 @@ const translations = {
         voice_dist: "Відстань", voice_meters: "метрів", voice_turn: "Розверніться! Ви віддаляєтесь.", voice_right: "Правіше.", voice_left: "Лівіше.", alert_no_start: "Немає початкової точки.", alert_pedo_on: "✅ АВТОНОМНА НАВІГАЦІЯ УВІМКНЕНА!", alert_pedo_off: "Офлайн трекінг зупинено.", alert_man_pos: "📍 РУЧНИЙ РЕЖИМ:\nТапніть по мапі в тому місці, де ви зараз.", astro_sun_fix: "☀️ Сонце зафіксовано!", astro_star_fix: "⭐ Зірка зафіксована!", astro_hor_fix: "⚖️ Горизонт зафіксовано", astro_hor_next: "Тепер підніміть телефон вгору.", lbl_meters_short: "м", cal_done: "КАЛІБР: ГОТОВО", alert_no_gps_cal: "Немає сигналу GPS!"
     },
     'en': {
-        btn_login: "LOGIN", err_access_denied: "❌ ACCESS DENIED", title_qr_scan: "OPTICAL DATA", btn_close: "CLOSE", menu_day_night: "☀️ DAY / 🔴 NIGHT", menu_map: "📍 ROUTE / MAP", menu_compass: "🧭 COMPASS / GUIDE", menu_city: "🏙️ CITY / GUIDE", menu_hud: "🚙 TRANSPORT (HUD)", menu_ar: "📹 AR-VISION", menu_astro: "🌌 ASTRO / NO GPS", menu_optics: "👁 OPTICS / AI", menu_radio: "💬 TEXT / QR RADIO", menu_alarm: "⏰ GEO-ALARM", menu_shield: "🛡 SHIELD", menu_manual: "📖 MANUAL", menu_power_off: "🛑 SHUTDOWN", menu_destroy: "💥 DESTROY DATA", menu_sos: "🆘 SOS / BEACON",
-        hud_gps_search: "GPS: SEARCHING...", hud_alt: "ALT: --- m", hud_level_analysis: "LEVEL: ANALYSIS", hud_speed: "SPD: 0.0 km/h", hud_target: "TGT: --- m", btn_map_manual: "📍 I AM HERE", btn_show_trace: "🔄 SHOW MY TRACE", btn_map_transport: "🚙 TRANSPORT", btn_map_share: "📤 SHARE QR", btn_map_del_last: "✖ DELETE LAST", btn_map_clear: "🗑 CLEAR ROUTE", btn_map_layer: "🗺 LAYER", btn_map_cache: "💾 CACHE",
+        btn_login: "LOGIN", err_access_denied: "❌ ACCESS DENIED", title_qr_scan: "OPTICAL DATA", btn_close: "CLOSE", menu_day_night: "☀️ DAY / 🔴 NIGHT", menu_map: "📍 ROUTE / MAP", menu_compass: "🧭 COMPASS / GUIDE", menu_city: "🏙️ CITY / GUIDE", menu_hud: "🚙 TRANSPORT (HUD)", menu_astro: "🌌 ASTRO / NO GPS", menu_optics: "👁 OPTICS / AI", menu_radio: "💬 TEXT / QR RADIO", menu_alarm: "⏰ GEO-ALARM", menu_shield: "🛡 SHIELD", menu_manual: "📖 MANUAL", menu_power_off: "🛑 SHUTDOWN", menu_destroy: "💥 DESTROY DATA", menu_sos: "🆘 SOS / BEACON",
+        hud_gps_search: "GPS: SEARCHING...", hud_alt: "ALT: --- m", hud_level_analysis: "LEVEL: ANALYSIS", hud_speed: "SPD: 0.0 km/h", hud_target: "TGT: --- m", btn_map_manual: "📍 I AM HERE", btn_show_trace: "🔄 SHOW MY TRACE", btn_map_share: "📤 SHARE QR", btn_map_del_last: "✖ DELETE LAST", btn_map_clear: "🗑 CLEAR ROUTE", btn_map_layer: "🗺 LAYER", btn_map_cache: "💾 CACHE",
         comp_acc: "ACC: --", comp_alt: "ALT: --- m", btn_pedo_off: "👣 PEDOMETER: OFF", btn_pedo_on: "👣 PEDOMETER: ON", btn_cal_walk: "CALIBRATE WALKING", comp_target_none: "TARGET: NONE", btn_voice_off: "VOICE: OFF", btn_voice_on: "VOICE: ON", btn_vibro_off: "GUIDE (VIBRO): OFF", btn_vibro_on: "GUIDE (VIBRO): ON", lbl_voice_int: "HINT INTERVAL:", lbl_sec: "sec", btn_eco: "🌑 ECO BLACKOUT", btn_orient_flat: "📱 ORIENT: FLAT", btn_orient_edge: "📱 ORIENT: EDGE",
-        city_title: "CITY GUIDE", city_waiting: "WAITING...", btn_city_online: "🌐 ROUTE: ONLINE", btn_city_offline: "🧭 ROUTE: OFFLINE", btn_back_to_map: "📍 BACK TO MAP", btn_hud_mirror: "MIRROR TO GLASS (HUD)", btn_start_ar: "OPEN CAMERA",
+        city_title: "CITY GUIDE", city_waiting: "WAITING...", btn_city_online: "🌐 ROUTE: ONLINE", btn_city_offline: "🧭 ROUTE: OFFLINE", btn_back_to_map: "📍 BACK TO MAP", btn_hud_mirror: "MIRROR TO GLASS (HUD)",
         astro_locked: "TARGET LOCKED", astro_polar: "POLARIS", astro_hint: "LOOK FOR NORTH", btn_astro_cal: "⚖ CALIBRATE HORIZON", btn_astro_sun: "☀ SUN (LOCK)", btn_astro_star: "⭐ STAR (LOCK)",
         ai_off: "AI INACTIVE", lbl_cam_zoom: "CAMERA ZOOM", lbl_ai_sens: "AI SENSITIVITY (%)", lbl_ai_focal: "AI RANGE", lbl_ir_sens: "IR SENSITIVITY", btn_scan_cam: "🔴 SCAN FROM CAM", btn_scan_photo: "🖼 READ PHOTO", btn_cam_off: "🔴 CAMERA", btn_ai_scan: "🤖 AI SCAN", btn_ir: "🔭 IR FILTER", btn_motion: "📉 MOTION",
         chat_title: "OFFLINE RADIO", chat_desc: "Enter text and generate QR.", btn_chat_cam: "📷 CAM TO READ", chat_left: "Remaining: 200", btn_chat_coords: "📍 INSERT MY COORDS", btn_chat_gen: "GENERATE ENCRYPTED QR", btn_chat_clear: "CLEAR TEXT",
@@ -129,7 +129,7 @@ let horizonBeta = 90;
 let currentSpeedKmh = 0, currentDistanceToTarget = null;
 let isScanning = false, isShielded = false, shieldSound = false, irMode = false;
 let aiModel = null, isAiLive = false, isScanningQR = false;
-let currentVideoTrack = null, currentAstroTrack = null;
+let currentVideoTrack = null;
 
 let map = null, userMarker = null;
 let routePoints = [], routeMarkers = [], routeLine = null;
@@ -150,14 +150,18 @@ let isManualPosMode = false;
 let wakeLock = null;
 let isTransportMode = false, lastGpsCoordsForTransport = null;
 
+// НОВІ ЗМІННІ (Сітка та Маршрут)
 let isCityOnline = true;
-let isARActive = false;
+let routeMode = 1; // 0: Авто, 1: Пішки, 2: Напростець
+let isGridActive = false;
+let gridLayer = null;
+
 let alarmActive = false, alarmTriggered = false, alarmRadiusKm = 10, alarmOsc = null;
 
 let isUserDraggingMap = false;
 let mapInteractionTimer = null;
 
-let hudState = 0; // 0: зелений, 1: жовтий, 2: червоний
+let hudState = 0; 
 let hudMsgTimer = null;
 
 const REAL_HEIGHTS = { 'person': 1.7, 'car': 1.5, 'truck': 3.0, 'bus': 3.0, 'motorcycle': 1.2 };
@@ -289,7 +293,7 @@ async function showModule(id) {
     
     if (id === 'mod-map' && map) setTimeout(() => { map.invalidateSize(); if (lastGoodGPS) map.panTo([lastGoodGPS.lat, lastGoodGPS.lon]); }, 200);
     
-    if (!['mod-eye', 'mod-chat', 'mod-astro', 'mod-ar'].includes(id)) turnOffCamera();
+    if (!['mod-eye', 'mod-chat', 'mod-astro'].includes(id)) turnOffCamera();
     
     let astroLine = document.getElementById('astro-horizon-line');
     if(astroLine) astroLine.style.display = (id === 'mod-astro') ? 'block' : 'none';
@@ -301,16 +305,13 @@ async function showModule(id) {
         const videoAstro = document.getElementById('v-astro-stream');
         if (videoAstro && videoAstro.srcObject) { videoAstro.srcObject.getTracks().forEach(t => t.stop()); videoAstro.srcObject = null; }
     }
-    
-    if (id !== 'mod-ar' && isARActive) startAR();
 }
 
 function turnOffCamera() {
     try {
-        const v = document.getElementById('v-stream'), vChat = document.getElementById('v-chat-stream'), vAR = document.getElementById('v-ar-stream');
+        const v = document.getElementById('v-stream'), vChat = document.getElementById('v-chat-stream');
         if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; }
         if (vChat && vChat.srcObject) { vChat.srcObject.getTracks().forEach(t => t.stop()); vChat.srcObject = null; vChat.style.display = 'none'; }
-        if (vAR && vAR.srcObject) { vAR.srcObject.getTracks().forEach(t => t.stop()); vAR.srcObject = null; isARActive = false; }
     } catch(e) {}
     isAiLive = false; isScanning = false; isScanningQR = false;
     let btnChatCam = document.getElementById('btn-chat-cam'); if(btnChatCam) btnChatCam.innerText = getT('btn_chat_cam');
@@ -348,6 +349,7 @@ function initMap() {
             'dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
         };
         
+        // В РЕЖИМІ ЛАЙТ - ТІЛЬКИ ОСМ І ТЕМНА МАПА
         currentLayerKeys = isLiteMode ? ['osm', 'dark'] : ['osm', 'tourist', 'topo', 'sat', 'dark'];
         currentLayerIdx = 0;
 
@@ -356,6 +358,9 @@ function initMap() {
 
         map.on('dragstart', handleMapInteraction);
         map.on('zoomstart', handleMapInteraction);
+        
+        map.on('moveend', drawGrid);
+        map.on('zoomend', drawGrid);
 
         let pressTimer;
         map.on('mousedown contextmenu touchstart', (e) => {
@@ -395,6 +400,95 @@ function initMap() {
 }
 
 document.getElementById('btn-manual-pos').onclick = () => { isManualPosMode = true; alert(getT('alert_man_pos')); toggleMapMenu(); };
+
+// =====================================
+// ЛОГІКА СІТКИ (100М / 1КМ)
+// =====================================
+document.getElementById('btn-grid-toggle').onclick = () => {
+    isGridActive = !isGridActive;
+    let btn = document.getElementById('btn-grid-toggle');
+    btn.style.color = isGridActive ? "#4ade80" : "#fff";
+    drawGrid();
+    toggleMapMenu();
+};
+
+function drawGrid() {
+    if (!map) return;
+    if (gridLayer) { map.removeLayer(gridLayer); gridLayer = null; }
+    if (!isGridActive) return;
+
+    let zoom = map.getZoom();
+    if (zoom < 5) return; // Не малювати сітку, якщо масштаб занадто віддалений
+    
+    let step = zoom >= 14 ? 100 : 1000; // 100 метрів або 1 км
+    let bounds = map.getBounds();
+    let n = bounds.getNorth(), s = bounds.getSouth(), e = bounds.getEast(), w = bounds.getWest();
+
+    let lines = [];
+    let latStep = step / 111320; 
+    let startLat = Math.floor(s / latStep) * latStep;
+    for (let lat = startLat; lat <= n; lat += latStep) { lines.push([[lat, w], [lat, e]]); }
+
+    let midLat = (n + s) / 2;
+    let lonStep = step / (111320 * Math.cos(midLat * Math.PI / 180));
+    let startLon = Math.floor(w / lonStep) * lonStep;
+    for (let lon = startLon; lon <= e; lon += lonStep) { lines.push([[s, lon], [n, lon]]); }
+
+    let color = zoom >= 14 ? 'rgba(74, 222, 128, 0.4)' : 'rgba(0, 204, 255, 0.4)';
+    let weight = zoom >= 14 ? 1 : 2;
+
+    gridLayer = L.polyline(lines, {color: color, weight: weight, interactive: false, dashArray: '5,5'}).addTo(map);
+}
+
+// =====================================
+// РОЗУМНА МАРШРУТИЗАЦІЯ
+// =====================================
+let btnRouteType = document.getElementById('btn-route-type');
+if (btnRouteType) {
+    btnRouteType.onclick = () => {
+        routeMode = (routeMode + 1) % 3;
+        if (routeMode === 0) btnRouteType.innerHTML = "🚗 АВТО";
+        else if (routeMode === 1) btnRouteType.innerHTML = "🚶 ПІШКИ";
+        else btnRouteType.innerHTML = "🧭 НАПРОСТЕЦЬ";
+        
+        buildCityRoute(); // Перебудувати маршрут під новий режим
+        toggleMapMenu();
+    };
+}
+
+document.getElementById('btn-city-route-mode').onclick = (e) => {
+    isCityOnline = !isCityOnline; let btn = e.target;
+    if(isCityOnline) { btn.innerText = getT('btn_city_online'); btn.style.color = "#4ade80"; btn.style.borderColor = "#4ade80"; buildCityRoute(); } 
+    else { btn.innerText = getT('btn_city_offline'); btn.style.color = "#f1c40f"; btn.style.borderColor = "#f1c40f"; document.getElementById('city-eta-text').innerText = "-- хв"; }
+};
+
+async function buildCityRoute() {
+    if(!isCityOnline || !navigator.onLine || routePoints.length === 0 || !lastGoodGPS) return;
+    
+    // Якщо режим "Напростець" (Direct) - відключаємо OSRM
+    if (routeMode === 2) {
+        document.getElementById('city-turn-text').innerText = "НАПРОСТЕЦЬ (БЕЗ ДОРІГ)";
+        document.getElementById('city-eta-text').innerText = "-- хв";
+        updateRoute();
+        return;
+    }
+
+    try {
+        document.getElementById('city-turn-text').innerText = "МАРШРУТИЗАЦІЯ...";
+        let endP = routePoints[routePoints.length - 1];
+        let osrmProfile = routeMode === 0 ? 'driving' : 'foot';
+        
+        let res = await fetch(`https://router.project-osrm.org/route/v1/${osrmProfile}/${lastGoodGPS.lon},${lastGoodGPS.lat};${endP.lng},${endP.lat}?geometries=geojson`);
+        let data = await res.json();
+        if(data.routes && data.routes.length > 0) {
+            let route = data.routes[0];
+            routePoints = route.geometry.coordinates.map(c => L.latLng(c[1], c[0]));
+            updateRoute();
+            document.getElementById('city-eta-text').innerText = `⏱ ${Math.round(route.duration / 60)} хв`;
+            document.getElementById('city-turn-text').innerText = "МАРШРУТ ПОБУДОВАНО";
+        }
+    } catch(e) { document.getElementById('city-turn-text').innerText = "ПОМИЛКА OSRM"; }
+}
 
 function updateRoute() {
     if(!map) return;
@@ -439,29 +533,6 @@ function traceVanishing() {
             if(tracePoints.length > 0) traceLineLayer = L.polyline(tracePoints, { color: '#0cf', weight: 4, className: 'map-trace' }).addTo(map);
         }
     }
-}
-
-document.getElementById('btn-city-route-mode').onclick = (e) => {
-    isCityOnline = !isCityOnline; let btn = e.target;
-    if(isCityOnline) { btn.innerText = getT('btn_city_online'); btn.style.color = "#4ade80"; btn.style.borderColor = "#4ade80"; buildCityRoute(); } 
-    else { btn.innerText = getT('btn_city_offline'); btn.style.color = "#f1c40f"; btn.style.borderColor = "#f1c40f"; document.getElementById('city-eta-text').innerText = "-- хв"; }
-};
-
-async function buildCityRoute() {
-    if(!isCityOnline || !navigator.onLine || routePoints.length === 0 || !lastGoodGPS) return;
-    try {
-        document.getElementById('city-turn-text').innerText = "МАРШРУТИЗАЦІЯ...";
-        let endP = routePoints[routePoints.length - 1];
-        let res = await fetch(`https://router.project-osrm.org/route/v1/foot/${lastGoodGPS.lon},${lastGoodGPS.lat};${endP.lng},${endP.lat}?geometries=geojson`);
-        let data = await res.json();
-        if(data.routes && data.routes.length > 0) {
-            let route = data.routes[0];
-            routePoints = route.geometry.coordinates.map(c => L.latLng(c[1], c[0]));
-            updateRoute();
-            document.getElementById('city-eta-text').innerText = `⏱ ${Math.round(route.duration / 60)} хв`;
-            document.getElementById('city-turn-text').innerText = "МАРШРУТ ПОБУДОВАНО";
-        }
-    } catch(e) { document.getElementById('city-turn-text').innerText = "ПОМИЛКА OSRM"; }
 }
 
 document.getElementById('btn-share-qr').onclick = () => {
@@ -711,6 +782,10 @@ function initGPS() {
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
+            
+            // РЕЖИМ ЛАЙТ: Зниження частоти оновлення до ~1 Гц
+            if (isLiteMode && (now - lastGpsProcessTime < 1000)) return;
+
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
             currentSpeedKmh = spd ? (spd * 3.6) : 0;
             if (firstFix && acc > 50) return; 
@@ -762,7 +837,6 @@ function initGPS() {
             let prefixSpd = currentLang === 'uk' ? 'ШВИД:' : 'SPD:';
             let speedEl = document.getElementById('speed-val'); if(speedEl) speedEl.innerText = `${prefixSpd} ${currentSpeedKmh.toFixed(1)} km/h`;
             
-            // ПАСХАЛКИ ТА ВЕЛИКІ ЦИФРИ (HUD)
             let spdRound = Math.round(currentSpeedKmh);
             let hudBigSpeed = document.getElementById('hud-big-speed'); 
             if(hudBigSpeed) {
@@ -791,7 +865,6 @@ function initGPS() {
 
             if (firstFix && map) { map.setView([lat, lon], 18); firstFix = false; }
             
-            // АВТО-ЦЕНТРУВАННЯ МАПИ (з перевіркою таймера)
             if (!firstFix && map && !isManualPosMode && !isUserDraggingMap) map.panTo([lat, lon]);
 
             if(!userMarker && map && typeof L !== 'undefined') {
@@ -852,15 +925,13 @@ function handleOrientation(e) {
 function animateCompass() {
     let target = targetDisplayAngle;
     
-    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" (Якщо кут > 45 град, зчитуємо гіроскоп)
-    if (Math.abs(currentPitch) > 45) {
-        target = currentRoll + compassOffset; 
-    }
+    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" 
+    if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
 
     let delta = target - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
     
-    // РЕЖИМ ЛАЙТ: Жорстка фільтрація "смикань" компаса (ігноруємо шум менше 2 градусів)
+    // РЕЖИМ ЛАЙТ: Жорсткий фільтр компаса
     if (isLiteMode && Math.abs(delta) < 2.0 && currentSpeedKmh < 1.0) delta = 0;
     let smoothing = isLiteMode ? 0.05 : (isTransportMode ? 0.02 : 0.15);
     
@@ -1069,85 +1140,11 @@ document.getElementById('btn-astro-star').onclick = () => {
     alert(getT('astro_star_fix')); OfflineWizard.finish();
 };
 
-// 📹 AR ВІЗІЯ (ПРАВИЛЬНА 3D ПЕРСПЕКТИВА І ВЕРТИКАЛЬНА РОБОТА)
-async function startAR() {
-    if (isLiteMode) { alert(currentLang === 'uk' ? "AR вимкнено у ЛАЙТ режимі." : "AR disabled in LITE mode."); return; }
-    
-    const video = document.getElementById('v-ar-stream'); let btn = document.getElementById('btn-start-ar');
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null;
-        isARActive = false; btn.innerText = getT('btn_start_ar');
-        document.getElementById('ar-canvas').getContext('2d').clearRect(0,0, window.innerWidth, window.innerHeight);
-    } else {
-        btn.innerText = "ЗАПУСК...";
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}});
-            video.srcObject = stream; isARActive = true; btn.innerText = "🛑 ЗАКРИТИ КАМЕРУ";
-            let canvas = document.getElementById('ar-canvas'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            drawAR();
-        } catch(e) { btn.innerText = "❌ ПОМИЛКА КАМЕРИ"; }
-    }
-}
-
-function drawAR() {
-    if (!isARActive) return;
-    const canvas = document.getElementById('ar-canvas'); const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (routePoints.length > 0 && lastGoodGPS) {
-        let fov = 60; 
-        // Вираховуємо "горизонт" на екрані (залежить від нахилу телефону)
-        let horizonY = canvas.height / 2 + (displayPitch - 90) * (canvas.height / 90);
-
-        routePoints.forEach((pt, index) => {
-            let bearing = calcBearing(lastGoodGPS.lat, lastGoodGPS.lon, pt.lat, pt.lng);
-            let d = index === 0 ? currentDistanceToTarget : map.distance([lastGoodGPS.lat, lastGoodGPS.lon], pt);
-            
-            // Якщо телефон вертикально, беремо Roll (поворот) замість компаса
-            let viewAngle = currentDisplayAngle;
-            if (Math.abs(currentPitch) > 50) { viewAngle = currentRoll + compassOffset; }
-            
-            let relAngle = (((bearing - viewAngle) % 360) + 540) % 360 - 180;
-            
-            if (Math.abs(relAngle) < fov / 2) {
-                let x = canvas.width / 2 + (relAngle / (fov / 2)) * (canvas.width / 2);
-                let factor = Math.max(0.1, 1 - (d / 5000)); // Масштабування від 0 до 5 км
-                
-                let startY = horizonY; // Промінь починається з горизонту (за будинками)
-                if (d < 50) startY = canvas.height; // Якщо ціль ближче 50м, малюємо з-під ніг
-                
-                // ТРАПЕЦІЯ (3D Стовп світла в небо)
-                ctx.fillStyle = `rgba(74, 222, 128, ${0.4 * factor})`;
-                ctx.beginPath();
-                ctx.moveTo(x - 60*factor, startY); // Низ ліво (на горизонті)
-                ctx.lineTo(x + 60*factor, startY); // Низ право
-                ctx.lineTo(x + 5*factor, 0); // Верх право (у небо)
-                ctx.lineTo(x - 5*factor, 0); // Верх ліво
-                ctx.fill();
-
-                // Яскраве ядро стовпа
-                ctx.fillStyle = `rgba(74, 222, 128, ${0.8 * factor})`;
-                ctx.beginPath();
-                ctx.moveTo(x - 15*factor, startY);
-                ctx.lineTo(x + 15*factor, startY);
-                ctx.lineTo(x + 2*factor, 0);
-                ctx.lineTo(x - 2*factor, 0);
-                ctx.fill();
-                
-                // Текст дистанції (Метри або Кілометри)
-                let distText = d >= 1000 ? (d/1000).toFixed(1) + " км" : Math.round(d) + " м";
-                
-                ctx.fillStyle = "#fff"; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
-                ctx.fillText(distText, x, startY - 20); // Текст над базою лазера
-                ctx.fillText(`ЦІЛЬ ${index+1}`, x, startY + 5);
-            }
-        });
-    }
-    requestAnimationFrame(drawAR);
-}
-
 let prevFrame = null;
 function processCamera() {
+    // РЕЖИМ ЛАЙТ: Відключення ШІ та детекції руху
+    if (isLiteMode && !isScanningQR && !irMode) return;
+
     const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
     if(!video || !uiCanvas) return; const uiCtx = uiCanvas.getContext('2d');
     if (video.srcObject && !isScanningQR) {
