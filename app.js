@@ -948,6 +948,8 @@ function initGPS() {
     }
 }
 
+let lastLiteCompassUpdate = 0; // Таймер для Лайт-режиму
+
 function handleOrientation(e) {
     if (currentSpeedKmh > 15 && !e.isGpsSimulated) return; // ІГНОР МАГНІТУ НА ШВИДКОСТІ
 
@@ -964,32 +966,52 @@ function handleOrientation(e) {
     hardwareHeading = hw;
     let trueH = (hardwareHeading + compassOffset) % 360; if (trueH < 0) trueH += 360;
     
+    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" 
+    let target = trueH;
+    if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
+    target = (target + 360) % 360;
+
+    // === РЕЖИМ ЛАЙТ: Прямий розрахунок без важкої анімації ===
+    if (isLiteMode) {
+        let now = Date.now();
+        // Оновлюємо стрілку лише 6-7 разів на секунду (економія батареї)
+        if (now - lastLiteCompassUpdate > 150) { 
+            if (isFirstCompassUpdate) {
+                currentDisplayAngle = target; displayPitch = currentPitch; displayRoll = currentRoll;
+                isFirstCompassUpdate = false;
+            } else {
+                let delta = target - currentDisplayAngle;
+                delta = ((delta % 360) + 540) % 360 - 180;
+                
+                if (Math.abs(delta) > 1.5) { // Відсікаємо мікро-тремтіння
+                    currentDisplayAngle = (currentDisplayAngle + delta * 0.6 + 360) % 360;
+                }
+                displayPitch = currentPitch; displayRoll = currentRoll;
+            }
+            updateCompassUI();
+            lastLiteCompassUpdate = now;
+        }
+        return; // Виходимо, щоб не вантажити процесор анімацією
+    }
+
+    // === ЗВИЧАЙНИЙ РЕЖИМ: Плавна 60FPS анімація ===
     if (isFirstCompassUpdate) {
-        currentDisplayAngle = trueH; targetDisplayAngle = trueH;
+        currentDisplayAngle = target; targetDisplayAngle = target;
         displayPitch = currentPitch; displayRoll = currentRoll;
         isFirstCompassUpdate = false; updateCompassUI(); 
     } else {
-        targetDisplayAngle = trueH;
+        targetDisplayAngle = target;
         if (!isCompassAnimating) { isCompassAnimating = true; requestAnimationFrame(animateCompass); }
     }
 }
 
 function animateCompass() {
-    let target = targetDisplayAngle;
-    
-    // АВТО-ВИЗНАЧЕННЯ: "ПЛОСКО / РЕБРОМ" 
-    if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
-
     // ЛОГІКА НАЙКОРОТШОГО ШЛЯХУ (ПРОТИ СТРИБКІВ ЧЕРЕЗ 0/360)
-    let delta = target - currentDisplayAngle;
+    let delta = targetDisplayAngle - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
     
-    // РЕЖИМ ЛАЙТ: Жорсткий фільтр компаса
-    if (isLiteMode && Math.abs(delta) < 2.0 && currentSpeedKmh < 1.0) delta = 0;
-    let smoothing = isLiteMode ? 0.05 : 0.15;
-    
-    currentDisplayAngle += delta * smoothing; 
-    currentDisplayAngle = (currentDisplayAngle + 360) % 360;
+    let smoothing = 0.15;
+    currentDisplayAngle = (currentDisplayAngle + delta * smoothing + 360) % 360; 
     
     displayPitch += (currentPitch - displayPitch) * smoothing;
     displayRoll += (currentRoll - displayRoll) * smoothing;
@@ -997,7 +1019,7 @@ function animateCompass() {
     updateCompassUI();
 
     if (Math.abs(delta) < 0.5 && Math.abs(currentPitch - displayPitch) < 0.5 && Math.abs(currentRoll - displayRoll) < 0.5) {
-        currentDisplayAngle = target; displayPitch = currentPitch; displayRoll = currentRoll;
+        currentDisplayAngle = targetDisplayAngle; displayPitch = currentPitch; displayRoll = currentRoll;
         updateCompassUI(); isCompassAnimating = false; return;
     }
     if (isCompassAnimating) requestAnimationFrame(animateCompass);
