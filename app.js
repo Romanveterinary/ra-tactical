@@ -792,9 +792,14 @@ document.getElementById('btn-compass-stop-alarm').onclick = () => {
     stopAlarm();
 };
 
+let alarmVibroInterval = null; // Змінна для збереження циклу вібрації
+
 function triggerAlarmWakeup() {
-    document.getElementById('btn-compass-stop-alarm').style.display = 'block'; // Показуємо кнопку вимкнення на компасі
-    if(navigator.vibrate) setInterval(() => navigator.vibrate([1000, 500, 1000]), 2000); 
+    document.getElementById('btn-compass-stop-alarm').style.display = 'block'; 
+    if(navigator.vibrate) {
+        // Запускаємо вібрацію і запам'ятовуємо цей процес
+        alarmVibroInterval = setInterval(() => navigator.vibrate([1000, 500, 1000]), 2000); 
+    }
     if(audioCtx) {
         alarmOsc = audioCtx.createOscillator(); let alarmGain = audioCtx.createGain();
         alarmOsc.connect(alarmGain); alarmGain.connect(audioCtx.destination);
@@ -806,8 +811,16 @@ function triggerAlarmWakeup() {
 }
 
 function stopAlarm() {
-    document.getElementById('btn-compass-stop-alarm').style.display = 'none'; // Ховаємо кнопку
+    document.getElementById('btn-compass-stop-alarm').style.display = 'none'; 
     if (alarmOsc) { alarmOsc.stop(); alarmOsc = null; }
+    
+    // Зупиняємо збережений цикл вібрації
+    if (alarmVibroInterval) {
+        clearInterval(alarmVibroInterval); 
+        alarmVibroInterval = null;
+    }
+    // Даємо моторчику жорстку команду зупинитися
+    if(navigator.vibrate) navigator.vibrate(0); 
 }
 
 function showHudMsg(text, color) {
