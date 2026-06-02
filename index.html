@@ -76,16 +76,20 @@
     </style>
 </head>
 <body>
-    <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div id="pin-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 20px;">
         <h2 style="color:#333; margin-bottom: 20px;">SYSTEM LOCKED</h2>
         <input type="password" id="pin-input" inputmode="numeric" placeholder="****" style="background:#111; color:#0cf; border:1px solid #333; padding:15px; font-size:2rem; text-align:center; width:200px; letter-spacing: 10px; border-radius: 8px;">
         
-        <label class="lite-mode-container">
+        <label class="lite-mode-container" style="margin-top: 15px;">
             <input type="checkbox" id="lite-mode-toggle">
             <span>РЕЖИМ "ЛАЙТ" (Слабкий телефон)</span>
         </label>
 
-        <button onclick="checkPin()" class="tactical-btn" style="width:200px; margin-top:25px;" data-i18n="btn_login">ВХІД</button>
+        <div style="display:flex; gap:15px; margin-top:30px; width:100%; max-width: 350px;">
+            <button onclick="checkPin('military')" class="tactical-btn" style="flex:1; background:#200; color:#f33; border-color:#500; font-size: 1rem; margin-top:0;">ВІЙСЬКОВИЙ</button>
+            <button onclick="checkPin('civilian')" class="tactical-btn" style="flex:1; background:#020; color:#4ade80; border-color:#050; font-size: 1rem; margin-top:0;">ЦИВІЛЬНИЙ</button>
+        </div>
+
         <div id="pin-error" style="color:#f33; margin-top:20px; font-weight:bold; display:none;" data-i18n="err_access_denied">❌ ДОСТУП ЗАБОРОНЕНО</div>
     </div>
 
@@ -111,7 +115,7 @@
 
         <a href="#" onclick="showModule('mod-map'); closeNav()" data-i18n="menu_map">📍 МАРШРУТ / МАПА</a>
         <a href="#" onclick="showModule('mod-compass'); closeNav()" data-i18n="menu_compass">🧭 КОМПАС / ПОВОДИР</a>
-        <a href="#" onclick="showModule('mod-city'); closeNav()" style="color: #0cf;" data-i18n="menu_city">🏙️ МІСТО / ГІД</a>
+        <a href="#" id="menu-item-city" onclick="showModule('mod-city'); closeNav()" style="color: #0cf;" data-i18n="menu_city">🏙️ МІСТО / ГІД</a>
         <a href="#" onclick="showModule('mod-hud'); closeNav()" style="color: #4ade80;" data-i18n="menu_hud">🚙 ТРАНСПОРТ (HUD)</a>
         <a href="#" onclick="showModule('mod-astro'); closeNav()" style="color: #f1c40f;" data-i18n="menu_astro">🌌 АСТРО / БЕЗ GPS</a>
         <a href="#" onclick="showModule('mod-eye'); closeNav()" data-i18n="menu_optics" class="heavy-module">👁 ОПТИКА / ШІ</a>
@@ -180,10 +184,10 @@
                 </div>
             </div>
             
+            <button id="btn-compass-stop-alarm" class="tactical-btn" style="display:none; background:#f00; color:#fff; border-color:#fff; margin-bottom:15px; font-size:1.2rem; box-shadow:0 0 15px #f00;">🛑 ВИМКНУТИ БУДИЛЬНИК</button>
+
             <button id="btn-pedometer" class="tactical-btn" style="margin-bottom: 10px; color:#f1c40f; border-color:#f1c40f; transition: opacity 0.3s;" data-i18n="btn_pedo_off">👣 РЕЖИМ КРОКОМІРА: ВИМК</button>
             <button id="btn-cal-walk" class="tactical-btn" style="margin-bottom: 20px;" data-i18n="btn_cal_walk" onclick="startWalkCalibration()">КАЛІБРУВАТИ ПРОХОДОМ (15м)</button>
-
-            <div id="route-info" style="text-align:center; color:#666; margin-bottom: 15px; font-weight: bold;" data-i18n="comp_target_none">ЦІЛЬ: НЕМАЄ</div>
             
             <div class="guide-panel">
                 <div class="flex-row">
@@ -397,6 +401,8 @@
             <button id="wizard-btn-next" onclick="OfflineWizard.next()" class="tactical-btn" style="flex:1; display:none; margin:0;" data-i18n="btn_wiz_next">ДАЛІ ➡</button>
         </div>
     </div>
+    
+    <video id="nosleep-video" muted loop playsinline style="display:none;"></video>
     
     <script src="app.js?v=10.40"></script>
 </body>
