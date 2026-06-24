@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ra-tactical-v10.40';
+const CACHE_NAME = 'ra-tactical-v10.41';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -8,14 +8,15 @@ const ASSETS_TO_CACHE = [
     './leaflet.js',
     './leaflet.css',
     './tf.min.js',
-    './coco-ssd.min.js'
+    './coco-ssd.min.js',
+    './silence.mp3'
 ];
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[SW] Збереження тактичного пакету v10.40');
+            console.log('[SW] Збереження тактичного пакету v10.41');
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
@@ -39,7 +40,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
 
-    // Кешування зовнішніх карт (OSM, Topo, Sat, Dark) та ШІ на льоту
     if (req.url.includes('tile.openstreetmap.org') || 
         req.url.includes('opentopomap.org') || 
         req.url.includes('cartocdn.com') || 
