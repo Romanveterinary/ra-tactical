@@ -77,7 +77,7 @@ function toggleNightMode() {
 const SECRET_PIN = "4567"; 
 let pinAttempts = 0;
 let isLiteMode = false;
-let userProfile = 'civilian'; // 'civilian' або 'military'
+let userProfile = 'civilian'; 
 
 async function checkPin(profile) {
     let input = document.getElementById('pin-input').value;
@@ -88,18 +88,21 @@ async function checkPin(profile) {
         userProfile = profile;
         document.getElementById('pin-screen').style.display = 'none';
         
-        // ЛОГІКА ПРОФІЛІВ
         if (userProfile === 'military') {
-            document.getElementById('menu-item-city').style.display = 'none'; // Ховаємо місто
+            document.getElementById('menu-item-city').style.display = 'none'; 
             routeMode = 2; // Примусово "Напростець"
             let routeBtn = document.getElementById('btn-route-type');
-            if(routeBtn) { routeBtn.innerHTML = "🧭 НАПРОСТЕЦЬ"; routeBtn.style.pointerEvents = 'none'; routeBtn.style.opacity = '0.5'; } // Блокуємо зміну
+            if(routeBtn) { routeBtn.innerHTML = "🧭 НАПРОСТЕЦЬ"; routeBtn.style.pointerEvents = 'none'; routeBtn.style.opacity = '0.5'; } 
             isCityOnline = false;
         }
 
         await initSensors();
-        startAntiSleepAudio(); 
-        startAntiSleepVideo(); // НОВИЙ ХАК ДЛЯ ЕКРАНА
+        
+        // НОВИЙ АУДІО-ХАК ДЛЯ УТРИМАННЯ ЕКРАНА УВІМКНЕНИМ
+        let silentAudio = document.getElementById('nosleep-audio');
+        if(silentAudio) {
+            silentAudio.play().catch(e => console.log("Audio play error:", e));
+        }
         
         if(navigator.vibrate) navigator.vibrate(50); 
         playNavTone(1000, 100);
@@ -128,7 +131,6 @@ if ('serviceWorker' in navigator) {
 
 const CRYPTO_KEY = "RA_STORM_2026"; 
 let audioCtx = null, osc = null, gain = null;
-let keepAwakeOsc = null; 
 let lastGoodGPS = null, watchId = null;
 
 let hardwareHeading = 0, compassOffset = 7, currentBearing = null; 
@@ -164,7 +166,7 @@ let isTransportMode = false, lastGpsCoordsForTransport = null;
 
 // НОВІ ЗМІННІ (Сітка та Маршрут)
 let isCityOnline = true;
-let routeMode = 1; // 0: Авто, 1: Пішки, 2: Напростець
+let routeMode = 2; // ЗМІНЕНО: 2 = "Напростець" за умовчанням
 let isGridActive = false;
 let gridLayer = null;
 
@@ -197,15 +199,6 @@ function initSystem() {
             if (stat && stat.innerText === getT('gps_ok')) { stat.innerText = getT('gps_delay'); stat.style.color = "#f1c40f"; }
         }
     }, 1000);
-}
-
-// НОВИЙ ВІДЕО ХАК ДЛЯ УТРИМАННЯ ЕКРАНА
-function startAntiSleepVideo() {
-    const video = document.getElementById('nosleep-video');
-    if(video) {
-        video.src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMQAAAAhmcmVlAAAAG21kYXQAAAHkQAAABgBAAAABAAAABgBAAAABAAABpG1vb3YAAABsbXZoZAAAAADahVMAANqFUwAAA+gAAD6AAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAlZXh0cwAAAB1leHRzAEQASQBDACAAVgBpAGQAZQBvAAAAE21kcmEAAABBbWRyYQAAADltaGN2AAAAFXV1aWQoIilP2iK6RUKz0oN2i8P1eAAAABh1dWlk1oZ8Tf0N1ku4mP9/uI2kegAAAAh1ZHRhAAAAHG1ldGEAAAAAAAAAAGhkbHIAAAAAAAAAAAAAAAAhbWRpcmFwcGwAAAAAAAAAAAAAAAAAAAAAAHlpbHN0AAAAOaWdnZwAAABRkYXRhAAAAAQAAAAAAH0AHAAMADwAhAAAAHwAcAAwAPACEAAAAHwAcAAwAPACEAAAAEHRvb2wAAAAAZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAC10cmFrAAAAXHRraGQAAAAD2oVTAADahVMAAAAAAQAAAAAAAAPoAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAEAAAABAAAAAABibWRpYQAAACBtZGhkAAAAANqFUwAA2oVTAAADYAAANwAAAAAAABVoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAK21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAALZzdGJsAAAAMHN0c2QAAAAAAAAAAQAAACBhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAABpG1vb3YAAABsbXZoZAAAAADahVMAANqFUwAAA+gAAD6AAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAlZXh0cwAAAB1leHRzAEQASQBDACAAVgBpAGQAZQBvAAAAE21kcmEAAABBbWRyYQAAADltaGN2AAAAFXV1aWQoIilP2iK6RUKz0oN2i8P1eAAAABh1dWlk1oZ8Tf0N1ku4mP9/uI2kegAAAAh1ZHRhAAAAHG1ldGEAAAAAAAAAAGhkbHIAAAAAAAAAAAAAAAAhbWRpcmFwcGwAAAAAAAAAAAAAAAAAAAAAAHlpbHN0AAAAOaWdnZwAAABRkYXRhAAAAAQAAAAAAH0AHAAMADwAhAAAAHwAcAAwAPACEAAAAHwAcAAwAPACEAAAAEHRvb2wAAAAAZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAC10cmFrAAAAXHRraGQAAAAD2oVTAADahVMAAAAAAQAAAAAAAAPoAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAEAAAABAAAAAABibWRpYQAAACBtZGhkAAAAANqFUwAA2oVTAAADYAAANwAAAAAAABVoZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAK21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAALZzdGJsAAAAMHN0c2QAAAAAAAAAAQAAACBhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAABpG1vb3Y=";
-        video.play().catch(e => console.log(e));
-    }
 }
 
 async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} } }
@@ -246,17 +239,6 @@ async function initSensors() {
             osc.connect(gain); gain.connect(audioCtx.destination); gain.gain.value = 0; osc.start();
         } else if (audioCtx.state === 'suspended') { await audioCtx.resume(); }
     } catch (e) {}
-}
-
-function startAntiSleepAudio() {
-    if (!audioCtx) return;
-    keepAwakeOsc = audioCtx.createOscillator();
-    let silentGain = audioCtx.createGain();
-    silentGain.gain.value = 0; 
-    keepAwakeOsc.frequency.value = 0;
-    keepAwakeOsc.connect(silentGain);
-    silentGain.connect(audioCtx.destination);
-    keepAwakeOsc.start();
 }
 
 function playNavTone(freq, duration) {
@@ -370,7 +352,6 @@ function initMap() {
             'dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
         };
         
-        // В РЕЖИМІ ЛАЙТ - ТІЛЬКИ ОСМ І ТЕМНА МАПА
         currentLayerKeys = isLiteMode ? ['osm', 'dark'] : ['osm', 'tourist', 'topo', 'sat', 'dark'];
         currentLayerIdx = 0;
 
@@ -439,9 +420,9 @@ function drawGrid() {
     if (!isGridActive) return;
 
     let zoom = map.getZoom();
-    if (zoom < 5) return; // Не малювати сітку, якщо масштаб занадто віддалений
+    if (zoom < 5) return; 
     
-    let step = zoom >= 14 ? 100 : 1000; // 100 метрів або 1 км
+    let step = zoom >= 14 ? 100 : 1000; 
     let bounds = map.getBounds();
     let n = bounds.getNorth(), s = bounds.getSouth(), e = bounds.getEast(), w = bounds.getWest();
 
@@ -466,13 +447,14 @@ function drawGrid() {
 // =====================================
 let btnRouteType = document.getElementById('btn-route-type');
 if (btnRouteType) {
+    btnRouteType.innerHTML = "🧭 НАПРОСТЕЦЬ"; // Встановлюємо правильний текст на старті
     btnRouteType.onclick = () => {
         routeMode = (routeMode + 1) % 3;
         if (routeMode === 0) btnRouteType.innerHTML = "🚗 АВТО";
         else if (routeMode === 1) btnRouteType.innerHTML = "🚶 ПІШКИ";
         else btnRouteType.innerHTML = "🧭 НАПРОСТЕЦЬ";
         
-        buildCityRoute(); // Перебудувати маршрут під новий режим
+        buildCityRoute(); 
         toggleMapMenu();
     };
 }
@@ -486,7 +468,6 @@ document.getElementById('btn-city-route-mode').onclick = (e) => {
 async function buildCityRoute() {
     if(!isCityOnline || !navigator.onLine || routePoints.length === 0 || !lastGoodGPS) return;
     
-    // Якщо режим "Напростець" (Direct) - відключаємо OSRM
     if (routeMode === 2) {
         document.getElementById('city-turn-text').innerText = "НАПРОСТЕЦЬ (БЕЗ ДОРІГ)";
         document.getElementById('city-eta-text').innerText = "-- хв";
@@ -691,7 +672,6 @@ function processDecodedQR(data) {
 document.getElementById('btn-layer-toggle').onclick = () => {
     if(!map || currentLayerKeys.length === 0) return;
     
-    // ВІЙСЬКОВИЙ ПРОФІЛЬ: Перевірка безпеки перед завантаженням супутника
     if(userProfile === 'military' && currentLayerKeys[currentLayerIdx] === 'osm') {
         if(!confirm("⚠️ УВАГА! Використання шару мапи може споживати інтернет. Продовжити?")) return;
     }
@@ -780,7 +760,7 @@ document.getElementById('btn-alarm-toggle').onclick = () => {
         alert(currentLang === 'uk' ? "Будильник активовано. Екран можна вимкнути." : "Alarm active.");
     } else {
         btn.innerText = getT('btn_alarm_start'); btn.style.background = "#111"; btn.style.color = "#f97316";
-        stopAlarm(); // Зупиняємо сирену, якщо була
+        stopAlarm();
     }
 };
 
@@ -792,12 +772,11 @@ document.getElementById('btn-compass-stop-alarm').onclick = () => {
     stopAlarm();
 };
 
-let alarmVibroInterval = null; // Змінна для збереження циклу вібрації
+let alarmVibroInterval = null; 
 
 function triggerAlarmWakeup() {
     document.getElementById('btn-compass-stop-alarm').style.display = 'block'; 
     if(navigator.vibrate) {
-        // Запускаємо вібрацію і запам'ятовуємо цей процес
         alarmVibroInterval = setInterval(() => navigator.vibrate([1000, 500, 1000]), 2000); 
     }
     if(audioCtx) {
@@ -813,13 +792,7 @@ function triggerAlarmWakeup() {
 function stopAlarm() {
     document.getElementById('btn-compass-stop-alarm').style.display = 'none'; 
     if (alarmOsc) { alarmOsc.stop(); alarmOsc = null; }
-    
-    // Зупиняємо збережений цикл вібрації
-    if (alarmVibroInterval) {
-        clearInterval(alarmVibroInterval); 
-        alarmVibroInterval = null;
-    }
-    // Даємо моторчику жорстку команду зупинитися
+    if (alarmVibroInterval) { clearInterval(alarmVibroInterval); alarmVibroInterval = null; }
     if(navigator.vibrate) navigator.vibrate(0); 
 }
 
@@ -835,7 +808,6 @@ function initGPS() {
         watchId = navigator.geolocation.watchPosition(pos => {
             const now = Date.now();
             
-            // РЕЖИМ ЛАЙТ: Зниження частоти оновлення до ~1 Гц
             if (isLiteMode && (now - lastGpsProcessTime < 1000)) return;
 
             const { latitude: lat, longitude: lon, speed: spd, accuracy: acc, altitude: alt } = pos.coords;
@@ -878,7 +850,6 @@ function initGPS() {
 
             if (isEcoMode && (now - lastGpsProcessTime < 3000)) return; 
 
-            // ВІДВЯЗКА ВІД МАГНІТА НА ШВИДКОСТІ > 15 км/год
             if (currentSpeedKmh > 15) { 
                 let gpsH = pos.coords.heading; if (gpsH === null || isNaN(gpsH)) { gpsH = calcBearing(lastGoodGPS ? lastGoodGPS.lat : lat, lastGoodGPS ? lastGoodGPS.lon : lon, lat, lon); }
                 let fakeAlpha = (360 - gpsH) % 360; handleOrientation({ alpha: fakeAlpha, beta: 0, isGpsSimulated: true });
@@ -948,10 +919,10 @@ function initGPS() {
     }
 }
 
-let lastLiteCompassUpdate = 0; // Таймер для Лайт-режиму
+let lastLiteCompassUpdate = 0;
 
 function handleOrientation(e) {
-    if (currentSpeedKmh > 15 && !e.isGpsSimulated) return; // ІГНОР МАГНІТУ НА ШВИДКОСТІ
+    if (currentSpeedKmh > 15 && !e.isGpsSimulated) return;
 
     let hw = null;
     currentPitch = e.beta || 0;
@@ -972,10 +943,8 @@ function handleOrientation(e) {
     if (Math.abs(currentPitch) > 45) { target = currentRoll + compassOffset; }
     target = (target + 360) % 360;
 
-    // === СУПЕР-ЛАЙТ: Відеокарта (GPU) + Нескінченний кут ===
     if (isLiteMode) {
         let now = Date.now();
-        // Оновлюємо лише 3 рази на секунду! (Економія процесора 95%)
         if (now - lastLiteCompassUpdate > 333) { 
             if (isFirstCompassUpdate) {
                 currentDisplayAngle = target; 
@@ -983,18 +952,15 @@ function handleOrientation(e) {
                 displayRoll = currentRoll;
                 isFirstCompassUpdate = false;
                 
-                // Вмикаємо плавний CSS перехід (апаратне прискорення GPU)
                 let ring = document.getElementById('tc-ring');
                 if(ring) ring.style.transition = "transform 0.3s ease-out";
                 let tri = document.getElementById('user-tri');
                 if(tri) tri.style.transition = "transform 0.3s ease-out";
             } else {
-                // Знаходимо найкоротший шлях і додаємо до "нескінченного кута" (напр. 350 -> 370)
                 let currentMod = ((currentDisplayAngle % 360) + 360) % 360;
                 let delta = target - currentMod;
                 delta = ((delta + 540) % 360) - 180;
                 
-                // Відсікаємо мікро-шум датчика (< 2 градусів)
                 if (Math.abs(delta) > 2) {
                     currentDisplayAngle += delta; 
                 }
@@ -1007,10 +973,9 @@ function handleOrientation(e) {
         return; 
     }
 
-    // === ЗВИЧАЙНИЙ РЕЖИМ: JS Анімація ===
     if (isFirstCompassUpdate) {
         let ring = document.getElementById('tc-ring');
-        if(ring) ring.style.transition = "none"; // Вимикаємо CSS, бо JS малює кадри
+        if(ring) ring.style.transition = "none";
         
         currentDisplayAngle = target; targetDisplayAngle = target;
         displayPitch = currentPitch; displayRoll = currentRoll;
@@ -1022,26 +987,6 @@ function handleOrientation(e) {
 }
 
 function animateCompass() {
-    let delta = targetDisplayAngle - currentDisplayAngle;
-    delta = ((delta % 360) + 540) % 360 - 180; 
-    
-    let smoothing = 0.15;
-    currentDisplayAngle = (currentDisplayAngle + delta * smoothing + 360) % 360; 
-    
-    displayPitch += (currentPitch - displayPitch) * smoothing;
-    displayRoll += (currentRoll - displayRoll) * smoothing;
-    
-    updateCompassUI();
-
-    if (Math.abs(delta) < 0.5 && Math.abs(currentPitch - displayPitch) < 0.5 && Math.abs(currentRoll - displayRoll) < 0.5) {
-        currentDisplayAngle = targetDisplayAngle; displayPitch = currentPitch; displayRoll = currentRoll;
-        updateCompassUI(); isCompassAnimating = false; return;
-    }
-    if (isCompassAnimating) requestAnimationFrame(animateCompass);
-}
-
-function animateCompass() {
-    // ЛОГІКА НАЙКОРОТШОГО ШЛЯХУ (ПРОТИ СТРИБКІВ ЧЕРЕЗ 0/360)
     let delta = targetDisplayAngle - currentDisplayAngle;
     delta = ((delta % 360) + 540) % 360 - 180; 
     
@@ -1252,7 +1197,6 @@ document.getElementById('btn-astro-star').onclick = () => {
 
 let prevFrame = null;
 function processCamera() {
-    // РЕЖИМ ЛАЙТ: Відключення ШІ та детекції руху
     if (isLiteMode && !isScanningQR && !irMode) return;
 
     const video = document.getElementById('v-stream'); const uiCanvas = document.getElementById('ui-canvas');
